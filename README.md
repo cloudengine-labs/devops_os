@@ -89,7 +89,7 @@ To quickly generate both GitHub Actions and Jenkins pipelines:
 .devcontainer/generate-cicd.py --name "My Project" --languages python,javascript --kubernetes
 ```
 
-For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](DEVOPS-OS-QUICKSTART.md).
+For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](.devcontainer/DEVOPS-OS-QUICKSTART.md).
 
 ## What's Included
 
@@ -120,15 +120,15 @@ For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](DEVO
 
 | Guide | Description |
 |-------|-------------|
-| [Creating DevOps-OS Using Dev Container](DEVOPS-OS-README.md) | How to set up and customize the DevOps-OS development container |
-| [DevOps-OS Quick Start Guide](DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality in the project |
-| [Creating Customized GitHub Actions Templates](GITHUB-ACTIONS-README.md) | How to generate and customize GitHub Actions workflows |
-| [Creating Customized Jenkins Templates](JENKINS-PIPELINE-README.md) | How to generate and customize Jenkins pipelines |
-| [Creating Kubernetes Deployments](KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
-| [Implementing CI/CD for Technology Stacks](CICD-TECH-STACK-README.md) | How to implement CI/CD pipelines for specific technology stacks |
-| [CI/CD Generators Usage Guide](CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |
+| [Creating DevOps-OS Using Dev Container](.devcontainer/DEVOPS-OS-README.md) | How to set up and customize the DevOps-OS development container |
+| [DevOps-OS Quick Start Guide](.devcontainer/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality in the project |
+| [Creating Customized GitHub Actions Templates](.devcontainer/GITHUB-ACTIONS-README.md) | How to generate and customize GitHub Actions workflows |
+| [Creating Customized Jenkins Templates](.devcontainer/JENKINS-PIPELINE-README.md) | How to generate and customize Jenkins pipelines |
+| [Creating Kubernetes Deployments](.devcontainer/KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
+| [Implementing CI/CD for Technology Stacks](.devcontainer/CICD-TECH-STACK-README.md) | How to implement CI/CD pipelines for specific technology stacks |
+| [CI/CD Generators Usage Guide](.devcontainer/CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |
 
-For detailed information on using the Kubernetes capabilities, see [kubernetes-capabilities.md](kubernetes-capabilities.md).
+For detailed information on using the Kubernetes capabilities, see [kubernetes-capabilities.md](.devcontainer/kubernetes-capabilities.md).
 
 ## Customization
 
