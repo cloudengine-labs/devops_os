@@ -1,0 +1,161 @@
+name: Example CI CI/CD
+'on':
+  push:
+    branches: &id001
+    - main
+  pull_request:
+    branches: *id001
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        required: true
+        default: dev
+        type: choice
+        options:
+        - dev
+        - test
+        - staging
+        - prod
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up build environment
+      run: echo 'Setting up build environment for DevOps-OS'
+    - name: Install Python dependencies
+      run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build Python package
+      run: if [ -f setup.py ]; then pip install -e .; elif [ -f pyproject.toml ];
+        then pip install -e .; fi
+    - name: Set up Java environment
+      run: echo 'Setting up Java environment'
+    - name: Build with Maven
+      run: if [ -f pom.xml ]; then mvn -B package --file pom.xml; fi
+    - name: Build with Gradle
+      run: if [ -f build.gradle ]; then ./gradlew build; fi
+    - name: Install Node.js dependencies
+      run: if [ -f package.json ]; then npm ci; fi
+    - name: Build JavaScript/TypeScript
+      run: if [ -f package.json ]; then npm run build --if-present; fi
+    - name: Build Go application
+      run: if [ -f go.mod ]; then go build -v ./...; fi
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts-${{ matrix.os }}-${{ matrix.arch }}
+        path: dist/
+        retention-days: 1
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        arch:
+        - amd64
+        - arm64
+      fail-fast: false
+  test:
+    needs:
+    - build
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up test environment
+      run: echo 'Setting up test environment for DevOps-OS'
+    - name: Install Python dependencies
+      run: if [ -f requirements.txt ]; then pip install -r requirements.txt pytest
+        pytest-cov; fi
+    - name: Run Python tests
+      run: if [ -d tests ]; then python -m pytest --cov=./ --cov-report=xml; fi
+    - name: Run Pylint
+      run: if command -v pylint &> /dev/null; then pylint --disable=C0111 **/*.py;
+        fi
+    - name: Set up Java environment
+      run: echo 'Setting up Java environment'
+    - name: Run Java tests with Maven
+      run: if [ -f pom.xml ]; then mvn -B test --file pom.xml; fi
+    - name: Run Java tests with Gradle
+      run: if [ -f build.gradle ]; then ./gradlew test; fi
+    - name: Run Checkstyle
+      run: if [ -f pom.xml ]; then mvn checkstyle:checkstyle; fi
+    - name: Install Node.js dependencies
+      run: if [ -f package.json ]; then npm ci; fi
+    - name: Run JavaScript tests
+      run: if [ -f package.json ]; then npm test; fi
+    - name: Run ESLint
+      run: if [ -f package.json ] && grep -q eslint package.json; then npm run lint;
+        fi
+    - name: Run Go tests
+      run: if [ -f go.mod ]; then go test -v ./...; fi
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.arch }}
+        path: test-reports/
+        retention-days: 1
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml,./coverage/lcov.info
+        fail_ci_if_error: false
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        arch:
+        - amd64
+        - arm64
+      fail-fast: false
+  deploy:
+    needs:
+    - test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ${{ matrix.os }}
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up deployment environment
+      run: echo 'Setting up deployment environment for DevOps-OS'
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      run: 'echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor
+        }} --password-stdin
+
+        docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name
+        }}:latest .
+
+        docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name
+        }}:latest'
+    - name: Deploy to Kubernetes with Kustomize
+      if: github.ref == 'refs/heads/main'
+      run: 'mkdir -p $HOME/.kube
+
+        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+
+        chmod 600 $HOME/.kube/config
+
+        kubectl apply -k ./k8s/overlays/${ENVIRONMENT}
+
+        kubectl rollout status deployment/my-app'
+      env:
+        ENVIRONMENT: ${{ github.event.inputs.environment || 'dev' }}
+    strategy:
+      matrix:
+        os:
+        - ubuntu-latest
+        arch:
+        - amd64
+        - arm64
+      fail-fast: false

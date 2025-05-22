@@ -1,0 +1,27 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: sample-app
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/your-org/your-repo
+  ref:
+    branch: main
+  secretRef:
+    name: flux-system
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: sample-app
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: "./kubernetes/overlays/${ENVIRONMENT}"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: sample-app
+  targetNamespace: sample-app-${ENVIRONMENT}
+  timeout: 2m

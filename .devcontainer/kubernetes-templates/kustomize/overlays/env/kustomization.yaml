@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: sample-app-overlay
+
+# Base configuration
+resources:
+- ../base
+
+# Common labels
+commonLabels:
+  app.kubernetes.io/managed-by: kustomize
+
+# Namespace to deploy to
+namespace: sample-app-${ENVIRONMENT}
+
+# ConfigMap generator for environment-specific configs
+configMapGenerator:
+- name: app-config
+  literals:
+  - APP_ENV=${ENVIRONMENT}
+  - FEATURE_FLAGS=${FEATURE_FLAGS}
+  - LOG_LEVEL=info
+
+# Secret generator for sensitive data
+secretGenerator:
+- name: app-secrets
+  type: Opaque
+  literals:
+  - db-connection-string=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/${DB_NAME}
+  - api-key=${API_KEY}
+
+# Image customization
+images:
+- name: ${CONTAINER_REGISTRY}/sample-app
+  newName: ${CONTAINER_REGISTRY}/sample-app
+  newTag: ${IMAGE_TAG}
+
+# Patch the deployment to add environment-specific settings
+patches:
+- patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: ${REPLICAS}
+  target:
+    kind: Deployment
+    name: sample-app

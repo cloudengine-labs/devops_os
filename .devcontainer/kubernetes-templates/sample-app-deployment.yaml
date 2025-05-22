@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  labels:
+    app: sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-app
+  template:
+    metadata:
+      labels:
+        app: sample-app
+    spec:
+      containers:
+      - name: sample-app
+        image: ${CONTAINER_REGISTRY}/sample-app:${IMAGE_TAG}
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        env:
+        - name: APP_ENV
+          value: "${ENVIRONMENT}"
+        - name: DB_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: db-connection-string
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+spec:
+  selector:
+    app: sample-app
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-app-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - app.example.com
+    secretName: sample-app-tls
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-app
+            port:
+              number: 80

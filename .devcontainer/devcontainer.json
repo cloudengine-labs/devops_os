@@ -1,0 +1,50 @@
+{
+  "name": "Multi-Language Development Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "PYTHON_VERSION": "3.11",
+      "JAVA_VERSION": "17",
+      "NODE_VERSION": "20",
+      "GO_VERSION": "1.21",
+      "INSTALL_PYTHON": "true",
+      "INSTALL_JAVA": "true",
+      "INSTALL_JS": "true",
+      "INSTALL_GO": "true",
+      "INSTALL_DOCKER": "true",
+      "INSTALL_TERRAFORM": "true",
+      "INSTALL_KUBECTL": "true",
+      "INSTALL_HELM": "true",
+      "INSTALL_GITHUB_ACTIONS": "true"
+    }
+  },
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "vscjava.vscode-java-pack",
+        "redhat.java",
+        "vscjava.vscode-maven",
+        "vscjava.vscode-gradle",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "golang.go",
+        "ms-azuretools.vscode-docker",
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "github.vscode-github-actions",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-vsliveshare.vsliveshare",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens"
+      ]
+    }
+  }
+}
