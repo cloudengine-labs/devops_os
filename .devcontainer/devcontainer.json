@@ -1,5 +1,5 @@
 {
-  "name": "Multi-Language Development Environment",
+  "name": "DevOps OS - Multi-Language Development Environment",
   "build": {
     "dockerfile": "Dockerfile",
     "args": {
@@ -15,7 +15,38 @@
       "INSTALL_TERRAFORM": "true",
       "INSTALL_KUBECTL": "true",
       "INSTALL_HELM": "true",
-      "INSTALL_GITHUB_ACTIONS": "true"
+      "INSTALL_GITHUB_ACTIONS": "true",
+      "INSTALL_K9S": "true",
+      "K9S_VERSION": "0.29.1",
+      "INSTALL_KUSTOMIZE": "true",
+      "KUSTOMIZE_VERSION": "5.2.1",
+      "INSTALL_ARGOCD_CLI": "true",
+      "ARGOCD_VERSION": "2.8.4",
+      "INSTALL_LENS": "false",
+      "INSTALL_KUBESEAL": "true",
+      "INSTALL_FLUX": "true",
+      "FLUX_VERSION": "2.1.2",
+      "INSTALL_KIND": "true",
+      "INSTALL_MINIKUBE": "true",
+      "INSTALL_OPENSHIFT_CLI": "false",
+      "INSTALL_GRADLE": "true",
+      "INSTALL_MAVEN": "true",
+      "INSTALL_ANT": "true",
+      "INSTALL_MAKE": "true",
+      "INSTALL_CMAKE": "true",
+      "INSTALL_SONARQUBE": "true",
+      "INSTALL_CHECKSTYLE": "true",
+      "INSTALL_PMD": "true",
+      "INSTALL_ESLINT": "true",
+      "INSTALL_PYLINT": "true",
+      "INSTALL_NEXUS": "true",
+      "NEXUS_VERSION": "3.50.0",
+      "INSTALL_PROMETHEUS": "true",
+      "PROMETHEUS_VERSION": "2.45.0",
+      "INSTALL_GRAFANA": "true",
+      "GRAFANA_VERSION": "10.0.0",
+      "INSTALL_ELK": "true",
+      "INSTALL_JENKINS": "false"
     }
   },
   "mounts": [
@@ -38,7 +69,16 @@
         "ms-azuretools.vscode-docker",
         "hashicorp.terraform",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "mindaro.mindaro",
+        "argoproj.argocd-vscode-extension",
+        "weaveworks.vscode-gitops-tools",
         "github.vscode-github-actions",
+        "SonarSource.sonarlint-vscode",
+        "shengchen.vscode-checkstyle",
+        "vscjava.vscode-java-dependency",
+        "dbaeumer.vscode-eslint",
+        "ms-python.pylint",
         "github.copilot",
         "github.copilot-chat",
         "ms-vsliveshare.vsliveshare",
@@ -46,5 +86,14 @@
         "eamodio.gitlens"
       ]
     }
-  }
+  },
+  "forwardPorts": [
+    8081,
+    9090,
+    3000,
+    9200,
+    9300,
+    5601
+  ],
+  "postCreateCommand": "chmod +x /workspaces/.devcontainer/k8s-config-generator.py && ln -sf /workspaces/.devcontainer/k8s-config-generator.py /usr/local/bin/k8s-config-generator"
 }
