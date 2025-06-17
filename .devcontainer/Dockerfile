@@ -77,7 +77,7 @@ RUN if [ "$INSTALL_PYTHON" = "true" ]; then \
     && apt-get install -y python${PYTHON_VERSION} python${PYTHON_VERSION}-dev python${PYTHON_VERSION}-venv python3-pip \
     && ln -sf /usr/bin/python${PYTHON_VERSION} /usr/bin/python3 \
     && ln -sf /usr/bin/python3 /usr/bin/python \
-    && python -m pip install --upgrade pip \
+#    && python -m pip install --upgrade pip \
     && pip install pytest black flake8 mypy pipenv tox coverage pytest-cov; \
     fi
 

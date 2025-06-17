@@ -45,25 +45,25 @@ terraform --version
 ### Unified CI/CD Generator (Simplest Option)
 ```bash
 # Generate both GitHub Actions and Jenkins pipelines with defaults
-.devcontainer/generate-cicd.py
+cicd/generate-cicd.py
 
 # Generate build-only configurations for specific languages
-.devcontainer/generate-cicd.py --type build --languages python,javascript
+cicd/generate-cicd.py --type build --languages python,javascript
 
 # Generate with Kubernetes deployment
-.devcontainer/generate-cicd.py --kubernetes --k8s-method kustomize
+cicd/generate-cicd.py --kubernetes --k8s-method kustomize
 
 # Generate with matrix builds for GitHub Actions
-.devcontainer/generate-cicd.py --github --matrix
+cicd/generate-cicd.py --github --matrix
 
 # Generate with parameters for Jenkins
-.devcontainer/generate-cicd.py --jenkins --parameters
+cicd/generate-cicd.py --jenkins --parameters
 
 # Generate with custom values file
-.devcontainer/generate-cicd.py --custom-values my-config.json
+cicd/generate-cicd.py --custom-values my-config.json
 
 # Generate for specific output location
-.devcontainer/generate-cicd.py --output-dir /path/to/my/project
+cicd/generate-cicd.py --output-dir /path/to/my/project
 ```
 
 ## GitHub Actions Workflows
@@ -71,31 +71,31 @@ terraform --version
 ### Generate GitHub Actions Workflows
 ```bash
 # Basic GitHub Actions workflow
-python3 .devcontainer/github-actions-generator-improved.py
+python3 cicd/github-actions-generator-improved.py
 
 # Build-only workflow
-python3 .devcontainer/github-actions-generator-improved.py --type build
+python3 cicd/github-actions-generator-improved.py --type build
 
 # Complete CI/CD workflow
-python3 .devcontainer/github-actions-generator-improved.py --type complete
+python3 cicd/github-actions-generator-improved.py --type complete
 
 # Workflow with Kubernetes deployment
-python3 .devcontainer/github-actions-generator-improved.py --kubernetes --k8s-method kubectl
+python3 cicd/github-actions-generator-improved.py --kubernetes --k8s-method kubectl
 
 # Matrix build across multiple platforms
-python3 .devcontainer/github-actions-generator-improved.py --matrix
+python3 cicd/github-actions-generator-improved.py --matrix
 
 # Reusable workflow
-python3 .devcontainer/github-actions-generator-improved.py --type reusable
+python3 cicd/github-actions-generator-improved.py --type reusable
 
 # Specify languages to enable
-python3 .devcontainer/github-actions-generator-improved.py --languages python,java,go
+python3 cicd/github-actions-generator-improved.py --languages python,java,go
 
 # Custom container image
-python3 .devcontainer/github-actions-generator-improved.py --image ghcr.io/myorg/devops-os:latest
+python3 cicd/github-actions-generator-improved.py --image ghcr.io/myorg/devops-os:latest
 
 # Custom output location
-python3 .devcontainer/github-actions-generator-improved.py --output ./my-workflows
+python3 cicd/github-actions-generator-improved.py --output ./my-workflows
 ```
 
 ### Use Environment Variables Instead
@@ -107,7 +107,7 @@ export DEVOPS_OS_GHA_KUBERNETES=true
 export DEVOPS_OS_GHA_K8S_METHOD=kustomize
 
 # Run generator (will use environment variables)
-python3 .devcontainer/github-actions-generator-improved.py
+python3 cicd/github-actions-generator-improved.py
 ```
 
 ## Jenkins Pipelines
@@ -115,31 +115,31 @@ python3 .devcontainer/github-actions-generator-improved.py
 ### Generate Jenkins Pipelines
 ```bash
 # Basic Jenkins pipeline
-python3 .devcontainer/jenkins-pipeline-generator-improved.py
+python3 cicd/jenkins-pipeline-generator-improved.py
 
 # Build-only pipeline
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --type build
+python3 cicd/jenkins-pipeline-generator-improved.py --type build
 
 # Complete CI/CD pipeline
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --type complete
+python3 cicd/jenkins-pipeline-generator-improved.py --type complete
 
 # Pipeline with Kubernetes deployment
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --kubernetes --k8s-method kubectl
+python3 cicd/jenkins-pipeline-generator-improved.py --kubernetes --k8s-method kubectl
 
 # Parameterized pipeline
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --parameters
+python3 cicd/jenkins-pipeline-generator-improved.py --parameters
 
 # Specify languages to enable
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --languages java,go
+python3 cicd/jenkins-pipeline-generator-improved.py --languages java,go
 
 # Specify SCM type
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --scm git
+python3 cicd/jenkins-pipeline-generator-improved.py --scm git
 
 # Custom container image
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --image docker.io/myorg/devops-os:latest
+python3 cicd/jenkins-pipeline-generator-improved.py --image docker.io/myorg/devops-os:latest
 
 # Custom output location
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --output ./Jenkinsfile
+python3 cicd/jenkins-pipeline-generator-improved.py --output ./Jenkinsfile
 ```
 
 ### Use Environment Variables Instead
@@ -152,7 +152,7 @@ export DEVOPS_OS_JENKINS_K8S_METHOD=kustomize
 export DEVOPS_OS_JENKINS_PARAMETERS=true
 
 # Run generator (will use environment variables)
-python3 .devcontainer/jenkins-pipeline-generator-improved.py
+python3 cicd/jenkins-pipeline-generator-improved.py
 ```
 
 ## Kubernetes Deployments
@@ -160,34 +160,34 @@ python3 .devcontainer/jenkins-pipeline-generator-improved.py
 ### Generate Kubernetes Configurations
 ```bash
 # Generate basic Kubernetes configuration
-python3 .devcontainer/k8s-config-generator.py
+python3 kubernetes/k8s-config-generator.py
 
 # Specify application name
-python3 .devcontainer/k8s-config-generator.py --name my-app
+python3 kubernetes/k8s-config-generator.py --name my-app
 
 # Multi-container application
-python3 .devcontainer/k8s-config-generator.py --containers app,db,cache
+python3 kubernetes/k8s-config-generator.py --containers app,db,cache
 
 # Generate with specific namespace
-python3 .devcontainer/k8s-config-generator.py --namespace my-namespace
+python3 kubernetes/k8s-config-generator.py --namespace my-namespace
 
 # Generate with Ingress
-python3 .devcontainer/k8s-config-generator.py --ingress
+python3 kubernetes/k8s-config-generator.py --ingress
 
 # Generate with specific resource limits
-python3 .devcontainer/k8s-config-generator.py --cpu 500m --memory 512Mi
+python3 kubernetes/k8s-config-generator.py --cpu 500m --memory 512Mi
 
 # Generate with persistent storage
-python3 .devcontainer/k8s-config-generator.py --storage
+python3 kubernetes/k8s-config-generator.py --storage
 
 # Generate with Kustomize support
-python3 .devcontainer/k8s-config-generator.py --kustomize
+python3 kubernetes/k8s-config-generator.py --kustomize
 
 # Generate configurations for multiple environments
-python3 .devcontainer/k8s-config-generator.py --environments dev,test,prod
+python3 kubernetes/k8s-config-generator.py --environments dev,test,prod
 
 # Custom output directory
-python3 .devcontainer/k8s-config-generator.py --output ./k8s-configs
+python3 kubernetes/k8s-config-generator.py --output ./k8s-configs
 ```
 
 ### Deploy Kubernetes Resources
@@ -262,34 +262,34 @@ python3 .devcontainer/jenkins-pipeline-generator-improved.py --image myorg/devop
 ### Python Web Application (FastAPI)
 ```bash
 # Generate Python-focused CI/CD
-.devcontainer/generate-cicd.py --languages python --name "FastAPI CI/CD"
+cicd/generate-cicd.py --languages python --name "FastAPI CI/CD"
 
 # Add Python test stage with coverage
-python3 .devcontainer/github-actions-generator-improved.py --type test --languages python
+python3 cicd/github-actions-generator-improved.py --type test --languages python
 ```
 
 ### Java Spring Boot Application
 ```bash
 # Generate Java-focused CI/CD
-.devcontainer/generate-cicd.py --languages java --name "Spring Boot CI/CD"
+cicd/generate-cicd.py --languages java --name "Spring Boot CI/CD"
 
 # Generate Kubernetes deployment for Spring Boot
-python3 .devcontainer/k8s-config-generator.py --name spring-app --port 8080
+python3 cicd/k8s-config-generator.py --name spring-app --port 8080
 ```
 
 ### JavaScript/Node.js Application
 ```bash
 # Generate JavaScript-focused CI/CD
-.devcontainer/generate-cicd.py --languages javascript --name "Node.js CI/CD"
+cicd/generate-cicd.py --languages javascript --name "Node.js CI/CD"
 
 # Generate with npm caching
-python3 .devcontainer/github-actions-generator-improved.py --languages javascript --custom-values node-config.json
+python3 cicd/github-actions-generator-improved.py --languages javascript --custom-values node-config.json
 ```
 
 ### Microservices Project
 ```bash
 # Generate complete CI/CD for multiple services
-.devcontainer/generate-cicd.py --kubernetes --k8s-method kustomize --custom-values microservices.json
+cicd/generate-cicd.py --kubernetes --k8s-method kustomize --custom-values microservices.json
 ```
 
 ## Common Options for All Generators
@@ -309,10 +309,10 @@ python3 .devcontainer/github-actions-generator-improved.py --languages javascrip
 
 ```bash
 # Show help for each generator
-python3 .devcontainer/github-actions-generator-improved.py --help
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --help
-python3 .devcontainer/k8s-config-generator.py --help
-python3 .devcontainer/generate-cicd.py --help
+python3 cicd/github-actions-generator-improved.py --help
+python3 cicd/jenkins-pipeline-generator-improved.py --help
+python3 kubernetes/k8s-config-generator.py --help
+python3 cicd/generate-cicd.py --help
 
 # Verify container configuration
 cat .devcontainer/devcontainer.env.json
