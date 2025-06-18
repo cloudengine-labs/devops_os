@@ -54,13 +54,25 @@ Here’s an updated migration plan reflecting your new, **prioritized implementa
 
 #### **Steps:**
 1. **Onboarding Wizard**
-   - Implement `devopsos init` for guided project setup.
+   - Implement `devopsos init` for guided project setup (uses InquirerPy for interactive prompts).
+   - Add options in the wizard to scaffold a VS Code Dev Container (e.g., generate `.devcontainer/devcontainer.json` and `Dockerfile` if needed).
+   - Example (in `devopsos.py`):
+     ```python
+     devcontainer = inquirer.confirm(message="Add VS Code Dev Container support?", default=True).execute()
+     if devcontainer:
+         # Generate devcontainer.json and Dockerfile
+         ...
+     ```
 
 2. **Demo App**
    - Add `/demo/` with a full sample app, pipeline, and K8s deployment.
 
 3. **Dev Container**
-   - Add VS Code Dev Container configuration.
+   - Add `.devcontainer/` directory at the project root.
+   - Create `devcontainer.json` with workspace settings, extensions, and postCreate scripts.
+   - Add a `Dockerfile` (if custom environment is needed) with all required tools (Python, Typer, InquirerPy, etc.).
+   - Document Dev Container usage in `/docs/quickstart.md` and reference it in the root `README.md`.
+   - Test onboarding: Ensure a new developer can clone the repo, open in VS Code, and have a ready-to-use environment.
 
 4. **Improve CLI UX**
    - Enhance error messages and usage prompts.
