@@ -1,0 +1,178 @@
+[
+  {
+    "name": "generate_github_actions_workflow",
+    "description": "Generate a GitHub Actions CI/CD workflow YAML file for the specified application. Supports build, test, deploy, and complete pipelines with optional Kubernetes deployment stages and matrix builds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Workflow and application name (e.g. 'my-api').",
+          "default": "my-app"
+        },
+        "workflow_type": {
+          "type": "string",
+          "enum": ["build", "test", "deploy", "complete", "reusable"],
+          "description": "Type of workflow to generate.",
+          "default": "complete"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of programming languages (e.g. 'python,javascript,go,java').",
+          "default": "python"
+        },
+        "kubernetes": {
+          "type": "boolean",
+          "description": "Include a Kubernetes deployment stage in the workflow.",
+          "default": false
+        },
+        "k8s_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Kubernetes deployment method.",
+          "default": "kubectl"
+        },
+        "branches": {
+          "type": "string",
+          "description": "Comma-separated list of branches that trigger the workflow.",
+          "default": "main"
+        },
+        "matrix": {
+          "type": "boolean",
+          "description": "Enable matrix builds across multiple platforms/OS.",
+          "default": false
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_jenkins_pipeline",
+    "description": "Generate a Jenkins Declarative Pipeline (Jenkinsfile) for the specified application. Supports build, test, deploy, complete, and parameterized pipeline types.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Pipeline and application name.",
+          "default": "my-app"
+        },
+        "pipeline_type": {
+          "type": "string",
+          "enum": ["build", "test", "deploy", "complete", "parameterized"],
+          "description": "Type of Jenkins pipeline to generate.",
+          "default": "complete"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of programming languages (e.g. 'python,java').",
+          "default": "python"
+        },
+        "kubernetes": {
+          "type": "boolean",
+          "description": "Include a Kubernetes deployment stage.",
+          "default": false
+        },
+        "k8s_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Kubernetes deployment method.",
+          "default": "kubectl"
+        },
+        "parameters": {
+          "type": "boolean",
+          "description": "Add runtime build parameters to the pipeline.",
+          "default": false
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_k8s_config",
+    "description": "Generate Kubernetes Deployment and Service manifests for an application. Optionally generates method-specific resources (e.g. a Kustomization for kustomize-based deployments).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "app_name": {
+          "type": "string",
+          "description": "Name of the Kubernetes application (used as resource name and label).",
+          "default": "my-app"
+        },
+        "image": {
+          "type": "string",
+          "description": "Container image reference (e.g. 'ghcr.io/myorg/my-app:v1.0.0').",
+          "default": "myregistry/my-app:latest"
+        },
+        "replicas": {
+          "type": "integer",
+          "description": "Number of pod replicas.",
+          "default": 2
+        },
+        "port": {
+          "type": "integer",
+          "description": "Container port to expose.",
+          "default": 8080
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Kubernetes namespace.",
+          "default": "default"
+        },
+        "deployment_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Deployment tooling (adds method-specific manifests; kustomize adds a Kustomization resource).",
+          "default": "kubectl"
+        },
+        "expose_service": {
+          "type": "boolean",
+          "description": "Create a ClusterIP Service alongside the Deployment.",
+          "default": true
+        }
+      }
+    }
+  },
+  {
+    "name": "scaffold_devcontainer",
+    "description": "Generate a devcontainer.json and devcontainer.env.json configuration for the DevOps-OS development container based on selected languages and tools.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of languages to install (python, java, javascript, go, rust, csharp, php).",
+          "default": "python"
+        },
+        "cicd_tools": {
+          "type": "string",
+          "description": "Comma-separated list of CI/CD tools (docker, terraform, kubectl, helm, github_actions, jenkins).",
+          "default": "docker,github_actions"
+        },
+        "kubernetes_tools": {
+          "type": "string",
+          "description": "Comma-separated list of Kubernetes tools (k9s, kustomize, argocd_cli, kubeseal, flux, kind, minikube).",
+          "default": "kubectl,helm"
+        },
+        "python_version": {
+          "type": "string",
+          "description": "Python version to install.",
+          "default": "3.11"
+        },
+        "node_version": {
+          "type": "string",
+          "description": "Node.js version to install.",
+          "default": "20"
+        },
+        "java_version": {
+          "type": "string",
+          "description": "Java JDK version to install.",
+          "default": "17"
+        },
+        "go_version": {
+          "type": "string",
+          "description": "Go version to install.",
+          "default": "1.21"
+        }
+      }
+    }
+  }
+]
