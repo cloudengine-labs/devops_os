@@ -4,8 +4,9 @@
 
 DevOps-OS is an open-source DevOps automation platform that provides:
 
-- 🚀 **CI/CD Generators** — one-command GitHub Actions & Jenkins pipeline scaffolding
-- ☸️ **Kubernetes Config Generator** — Deployment, Service, Kustomize, ArgoCD & Flux manifests
+- 🚀 **CI/CD Generators** — one-command GitHub Actions, **GitLab CI**, & Jenkins pipeline scaffolding
+- ☸️ **GitOps Config Generator** — Kubernetes manifests, **ArgoCD** Applications, Flux CD Kustomizations
+- 📊 **SRE Config Generator** — Prometheus alert rules, Grafana dashboards, SLO manifests
 - 🤖 **MCP Server** — plug DevOps-OS tools into Claude or ChatGPT as native AI skills
 - 🛠️ **Dev Container** — pre-configured multi-language environment (Python, Java, Go, JS, ...)
 
@@ -43,6 +44,25 @@ python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-m
 python -m cli.scaffold_jenkins --name my-app --languages java --type complete
 ```
 
+### 3b — Generate a GitLab CI pipeline
+
+```bash
+python -m cli.scaffold_gitlab --name my-app --languages python,go --type complete
+```
+
+### 3c — Generate ArgoCD / Flux GitOps configs
+
+```bash
+python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git
+python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
+```
+
+### 3d — Generate SRE configs (Prometheus, Grafana, SLO)
+
+```bash
+python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
+```
+
 ### 4 — Generate Kubernetes manifests
 
 ```bash
@@ -53,8 +73,11 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 ```bash
 python -m cli.devopsos init        # interactive project configurator
-python -m cli.devopsos scaffold gha   # scaffold a GitHub Actions workflow
-python -m cli.devopsos scaffold jenkins
+python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
+python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
+python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
+python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
+python -m cli.devopsos scaffold sre      # scaffold SRE configs
 ```
 
 ### 6 — Use with AI (MCP Server)
@@ -160,9 +183,12 @@ python3 configure.py
 DevOps-OS includes powerful generators for creating CI/CD configurations:
 
 1. **GitHub Actions Generator**: `cli/scaffold_gha.py`
-2. **Jenkins Pipeline Generator**: `cli/scaffold_jenkins.py`
-3. **Kubernetes Config Generator**: `kubernetes/k8s-config-generator.py`
-4. **Unified CLI**: `cli/devopsos.py`
+2. **GitLab CI Generator**: `cli/scaffold_gitlab.py`
+3. **Jenkins Pipeline Generator**: `cli/scaffold_jenkins.py`
+4. **ArgoCD / Flux GitOps Generator**: `cli/scaffold_argocd.py`
+5. **SRE Config Generator**: `cli/scaffold_sre.py`
+6. **Kubernetes Config Generator**: `kubernetes/k8s-config-generator.py`
+7. **Unified CLI**: `cli/devopsos.py`
 
 ### Quick Start
 
@@ -204,10 +230,14 @@ For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](docs
 
 | Guide | Description |
 |-------|-------------|
+| [**Getting Started**](docs/GETTING-STARTED.md) | Easy step-by-step guide — start here! |
 | [Dev Container Setup](docs/DEVOPS-OS-README.md) | How to set up and customize the DevOps-OS development container |
-| [Quick Start Guide](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality in the project |
+| [Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
 | [GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | How to generate and customize GitHub Actions workflows |
+| [GitLab CI Generator](docs/GITLAB-CI-README.md) | How to generate and customize GitLab CI pipelines |
 | [Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | How to generate and customize Jenkins pipelines |
+| [ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
+| [SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
 | [Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
 | [CI/CD Tech Stack Guide](docs/CICD-TECH-STACK-README.md) | Implementing CI/CD pipelines for specific technology stacks |
 | [CI/CD Generators Usage](docs/CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |

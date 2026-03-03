@@ -186,5 +186,160 @@
         }
       }
     }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "generate_gitlab_ci_pipeline",
+      "description": "Generate a GitLab CI pipeline (.gitlab-ci.yml) for the specified application. Supports build, test, deploy, and complete pipeline types with optional Kubernetes deployment stages.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Application name (used in APP_NAME variable and image tags).",
+            "default": "my-app"
+          },
+          "pipeline_type": {
+            "type": "string",
+            "enum": ["build", "test", "deploy", "complete"],
+            "description": "Type of GitLab CI pipeline to generate.",
+            "default": "complete"
+          },
+          "languages": {
+            "type": "string",
+            "description": "Comma-separated list of programming languages (e.g. 'python,javascript,go,java').",
+            "default": "python"
+          },
+          "kubernetes": {
+            "type": "boolean",
+            "description": "Include a Kubernetes deployment stage.",
+            "default": false
+          },
+          "k8s_method": {
+            "type": "string",
+            "enum": ["kubectl", "kustomize", "argocd", "flux"],
+            "description": "Kubernetes deployment method.",
+            "default": "kubectl"
+          },
+          "branches": {
+            "type": "string",
+            "description": "Comma-separated list of branches that trigger deploy jobs.",
+            "default": "main"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "generate_argocd_config",
+      "description": "Generate ArgoCD Application and AppProject Custom Resources for GitOps-based continuous delivery, or Flux CD Kustomization resources. Optionally adds an Argo Rollouts canary strategy.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Application name.",
+            "default": "my-app"
+          },
+          "method": {
+            "type": "string",
+            "enum": ["argocd", "flux"],
+            "description": "GitOps tool to use.",
+            "default": "argocd"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Git repository URL containing the Kubernetes manifests.",
+            "default": "https://github.com/myorg/my-app.git"
+          },
+          "revision": {
+            "type": "string",
+            "description": "Git revision, branch, or tag to sync.",
+            "default": "HEAD"
+          },
+          "path": {
+            "type": "string",
+            "description": "Path inside the repo to the manifests directory.",
+            "default": "k8s"
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Kubernetes namespace to deploy into.",
+            "default": "default"
+          },
+          "project": {
+            "type": "string",
+            "description": "ArgoCD project name.",
+            "default": "default"
+          },
+          "auto_sync": {
+            "type": "boolean",
+            "description": "Enable ArgoCD automated sync (prune + self-heal).",
+            "default": false
+          },
+          "rollouts": {
+            "type": "boolean",
+            "description": "Add an Argo Rollouts canary Rollout resource.",
+            "default": false
+          },
+          "image": {
+            "type": "string",
+            "description": "Container image for Flux image automation.",
+            "default": "ghcr.io/myorg/my-app"
+          }
+        }
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "generate_sre_configs",
+      "description": "Generate SRE configuration files including Prometheus alerting rules, a Grafana dashboard, an OpenSLO/Sloth SLO manifest, and an Alertmanager routing config stub.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Application / service name.",
+            "default": "my-app"
+          },
+          "team": {
+            "type": "string",
+            "description": "Owning team (used in alert labels and routing).",
+            "default": "platform"
+          },
+          "namespace": {
+            "type": "string",
+            "description": "Kubernetes namespace where the app runs.",
+            "default": "default"
+          },
+          "slo_type": {
+            "type": "string",
+            "enum": ["availability", "latency", "error_rate", "all"],
+            "description": "Which SLOs to generate.",
+            "default": "all"
+          },
+          "slo_target": {
+            "type": "number",
+            "description": "SLO target percentage (e.g. 99.9).",
+            "default": 99.9
+          },
+          "latency_threshold": {
+            "type": "number",
+            "description": "Latency SLI threshold in seconds (default 0.5).",
+            "default": 0.5
+          },
+          "slack_channel": {
+            "type": "string",
+            "description": "Slack channel for alert routing.",
+            "default": "#alerts"
+          }
+        }
+      }
+    }
   }
 ]

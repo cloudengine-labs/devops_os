@@ -8,8 +8,11 @@ creation from CI/CD to SRE dashboards through conversational AI.
 
 Tools exposed:
   - generate_github_actions_workflow  : Create GitHub Actions workflow YAML
+  - generate_gitlab_ci_pipeline       : Create a GitLab CI .gitlab-ci.yml
   - generate_jenkins_pipeline         : Create a Jenkins Declarative Pipeline
   - generate_k8s_config               : Create Kubernetes manifests
+  - generate_argocd_config            : Create ArgoCD Application / AppProject CRs
+  - generate_sre_configs              : Create Prometheus rules, Grafana dashboard, SLO manifest
   - scaffold_devcontainer             : Create a dev-container configuration
 """
 
@@ -396,6 +399,172 @@ def scaffold_devcontainer(
         {
             "devcontainer_json": json.dumps(devcontainer_json, indent=2),
             "devcontainer_env_json": json.dumps(env_json, indent=2),
+        },
+        indent=2,
+    )
+
+
+
+# ---------------------------------------------------------------------------
+# Tool: generate_gitlab_ci_pipeline
+# ---------------------------------------------------------------------------
+
+@mcp.tool()
+def generate_gitlab_ci_pipeline(
+    name: str = "my-app",
+    pipeline_type: str = "complete",
+    languages: str = "python",
+    kubernetes: bool = False,
+    k8s_method: str = "kubectl",
+    branches: str = "main",
+) -> str:
+    """
+    Generate a GitLab CI pipeline (.gitlab-ci.yml) as a YAML string.
+
+    Args:
+        name: Application name (used in variable APP_NAME and image tags).
+        pipeline_type: One of 'build', 'test', 'deploy', 'complete'.
+        languages: Comma-separated list of languages, e.g. 'python,javascript,go,java'.
+        kubernetes: Include a Kubernetes deployment stage.
+        k8s_method: Kubernetes deployment method — 'kubectl', 'kustomize', 'argocd', or 'flux'.
+        branches: Comma-separated list of branches that trigger deploy jobs.
+
+    Returns:
+        Generated .gitlab-ci.yml content as a YAML string.
+    """
+    from cli import scaffold_gitlab
+    import yaml
+
+    args = argparse.Namespace(
+        name=name,
+        type=pipeline_type,
+        languages=languages,
+        kubernetes=kubernetes,
+        k8s_method=k8s_method,
+        branches=branches,
+        image="docker:24",
+        custom_values=None,
+    )
+
+    pipeline = scaffold_gitlab.generate_pipeline(args, {})
+    return yaml.dump(pipeline, sort_keys=False, default_flow_style=False)
+
+
+# ---------------------------------------------------------------------------
+# Tool: generate_argocd_config
+# ---------------------------------------------------------------------------
+
+@mcp.tool()
+def generate_argocd_config(
+    name: str = "my-app",
+    method: str = "argocd",
+    repo: str = "https://github.com/myorg/my-app.git",
+    revision: str = "HEAD",
+    path: str = "k8s",
+    namespace: str = "default",
+    project: str = "default",
+    auto_sync: bool = False,
+    rollouts: bool = False,
+    image: str = "ghcr.io/myorg/my-app",
+) -> str:
+    """
+    Generate ArgoCD Application + AppProject CRs, or Flux Kustomization resources.
+
+    Args:
+        name: Application name.
+        method: GitOps tool — 'argocd' or 'flux'.
+        repo: Git repository URL containing the Kubernetes manifests.
+        revision: Git revision / branch / tag to sync (default 'HEAD').
+        path: Path inside the repo to the manifests directory.
+        namespace: Kubernetes namespace to deploy into.
+        project: ArgoCD project name.
+        auto_sync: Enable ArgoCD automated sync (prune + self-heal).
+        rollouts: Add an Argo Rollouts canary Rollout resource.
+        image: Container image for Flux image automation.
+
+    Returns:
+        JSON string with generated YAML documents keyed by filename.
+    """
+    from cli import scaffold_argocd
+    import yaml as _yaml
+
+    args = argparse.Namespace(
+        name=name, method=method, repo=repo, revision=revision, path=path,
+        namespace=namespace, project=project, auto_sync=auto_sync,
+        rollouts=rollouts, image=image, output_dir=".", custom_values=None,
+        server="https://kubernetes.default.svc",
+    )
+
+    docs = {}
+    if method == "argocd":
+        docs["argocd/application.yaml"] = _yaml.dump(
+            scaffold_argocd.generate_argocd_application(args), sort_keys=False)
+        docs["argocd/appproject.yaml"] = _yaml.dump(
+            scaffold_argocd.generate_argocd_appproject(args), sort_keys=False)
+        if rollouts:
+            docs["argocd/rollout.yaml"] = _yaml.dump(
+                scaffold_argocd.generate_argo_rollout(args), sort_keys=False)
+    else:
+        docs["flux/git-repository.yaml"] = _yaml.dump(
+            scaffold_argocd.generate_flux_git_repository(args), sort_keys=False)
+        docs["flux/kustomization.yaml"] = _yaml.dump(
+            scaffold_argocd.generate_flux_kustomization(args), sort_keys=False)
+
+    return json.dumps(docs, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# Tool: generate_sre_configs
+# ---------------------------------------------------------------------------
+
+@mcp.tool()
+def generate_sre_configs(
+    name: str = "my-app",
+    team: str = "platform",
+    namespace: str = "default",
+    slo_type: str = "all",
+    slo_target: float = 99.9,
+    latency_threshold: float = 0.5,
+    slack_channel: str = "#alerts",
+) -> str:
+    """
+    Generate SRE configuration files: Prometheus alert rules, Grafana dashboard,
+    SLO manifest, and Alertmanager routing config.
+
+    Args:
+        name: Application / service name.
+        team: Owning team (used in alert labels and routing).
+        namespace: Kubernetes namespace where the app runs.
+        slo_type: Which SLOs to generate — 'availability', 'latency', 'error_rate', or 'all'.
+        slo_target: SLO target percentage, e.g. 99.9.
+        latency_threshold: Latency SLI threshold in seconds (default 0.5).
+        slack_channel: Slack channel for alert routing.
+
+    Returns:
+        JSON string with keys 'alert_rules_yaml', 'grafana_dashboard_json',
+        'slo_yaml', 'alertmanager_config_yaml'.
+    """
+    from cli import scaffold_sre
+    import yaml as _yaml
+
+    args = argparse.Namespace(
+        name=name, team=team, namespace=namespace,
+        slo_type=slo_type, slo_target=slo_target,
+        latency_threshold=latency_threshold,
+        slack_channel=slack_channel, pagerduty_key="",
+        output_dir=".",
+    )
+
+    return json.dumps(
+        {
+            "alert_rules_yaml": _yaml.dump(
+                scaffold_sre.generate_alert_rules(args), sort_keys=False),
+            "grafana_dashboard_json": json.dumps(
+                scaffold_sre.generate_grafana_dashboard(args), indent=2),
+            "slo_yaml": _yaml.dump(
+                scaffold_sre.generate_slo_manifest(args), sort_keys=False),
+            "alertmanager_config_yaml": _yaml.dump(
+                scaffold_sre.generate_alertmanager_config(args), sort_keys=False),
         },
         indent=2,
     )

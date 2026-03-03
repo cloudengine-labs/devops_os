@@ -8,8 +8,11 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from mcp_server.server import (
     generate_github_actions_workflow,
+    generate_gitlab_ci_pipeline,
     generate_jenkins_pipeline,
     generate_k8s_config,
+    generate_argocd_config,
+    generate_sre_configs,
     scaffold_devcontainer,
 )
 
@@ -98,3 +101,93 @@ def test_scaffold_devcontainer_language_flags():
     assert env["languages"]["python"] is True
     assert env["languages"]["go"] is True
     assert env["languages"]["java"] is False
+
+
+# ---------------------------------------------------------------------------
+# GitLab CI
+# ---------------------------------------------------------------------------
+
+def test_generate_gitlab_ci_default():
+    result = generate_gitlab_ci_pipeline()
+    assert isinstance(result, str)
+    assert len(result) > 0
+
+
+def test_generate_gitlab_ci_with_k8s():
+    result = generate_gitlab_ci_pipeline(
+        name="api", pipeline_type="complete",
+        languages="python,go", kubernetes=True, k8s_method="argocd"
+    )
+    assert "deploy" in result.lower()
+
+
+def test_generate_gitlab_ci_test_java():
+    result = generate_gitlab_ci_pipeline(
+        name="java-app", pipeline_type="test", languages="java"
+    )
+    assert "java" in result.lower()
+
+
+# ---------------------------------------------------------------------------
+# ArgoCD
+# ---------------------------------------------------------------------------
+
+def test_generate_argocd_config_default():
+    result = generate_argocd_config()
+    data = json.loads(result)
+    assert "argocd/application.yaml" in data
+    assert "argocd/appproject.yaml" in data
+
+
+def test_generate_argocd_config_auto_sync():
+    result = generate_argocd_config(auto_sync=True)
+    data = json.loads(result)
+    assert "automated" in data["argocd/application.yaml"]
+
+
+def test_generate_argocd_config_rollouts():
+    result = generate_argocd_config(rollouts=True)
+    data = json.loads(result)
+    assert "argocd/rollout.yaml" in data
+    assert "Rollout" in data["argocd/rollout.yaml"]
+
+
+def test_generate_argocd_config_flux():
+    result = generate_argocd_config(method="flux")
+    data = json.loads(result)
+    assert "flux/kustomization.yaml" in data
+    assert "Kustomization" in data["flux/kustomization.yaml"]
+
+
+# ---------------------------------------------------------------------------
+# SRE configs
+# ---------------------------------------------------------------------------
+
+def test_generate_sre_configs_default():
+    result = generate_sre_configs()
+    data = json.loads(result)
+    assert "alert_rules_yaml" in data
+    assert "grafana_dashboard_json" in data
+    assert "slo_yaml" in data
+    assert "alertmanager_config_yaml" in data
+
+
+def test_generate_sre_configs_alert_rules_kind():
+    result = generate_sre_configs(name="web-api", slo_type="availability")
+    data = json.loads(result)
+    assert "PrometheusRule" in data["alert_rules_yaml"]
+
+
+def test_generate_sre_configs_grafana_panels():
+    result = generate_sre_configs(name="web-api")
+    data = json.loads(result)
+    dash = json.loads(data["grafana_dashboard_json"])
+    assert len(dash.get("panels", [])) > 0
+
+
+def test_generate_sre_configs_slo_service():
+    result = generate_sre_configs(name="my-svc", slo_type="latency", slo_target=99.5)
+    data = json.loads(result)
+    import yaml
+    slo = yaml.safe_load(data["slo_yaml"])
+    assert slo["service"] == "my-svc"
