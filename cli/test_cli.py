@@ -101,6 +101,25 @@ def test_scaffold_argocd_appproject():
             doc = yaml.safe_load(fh)
         assert doc["kind"] == "AppProject"
         assert doc["metadata"]["name"] == "team-a"
+        # wildcard must NOT be present by default (least-privilege)
+        assert "*" not in doc["spec"]["sourceRepos"]
+        assert "https://github.com/myorg/my-app.git" in doc["spec"]["sourceRepos"]
+
+
+def test_scaffold_argocd_appproject_allow_any_source_repo():
+    """--allow-any-source-repo adds '*' as an explicit opt-in."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_argocd",
+                             ["--name", "my-app",
+                              "--repo", "https://github.com/myorg/my-app.git",
+                              "--project", "team-a",
+                              "--allow-any-source-repo",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        proj_path = Path(tmp) / "argocd" / "appproject.yaml"
+        with open(proj_path) as fh:
+            doc = yaml.safe_load(fh)
+        assert "*" in doc["spec"]["sourceRepos"]
 
 def test_scaffold_argocd_with_rollouts():
     with tempfile.TemporaryDirectory() as tmp:

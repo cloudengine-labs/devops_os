@@ -61,6 +61,9 @@ def parse_arguments():
                         help="Root output directory")
     parser.add_argument("--custom-values", default=None,
                         help="Path to custom values JSON file")
+    parser.add_argument("--allow-any-source-repo", action="store_true",
+                        default=os.environ.get(f"{ENV_PREFIX}ALLOW_ANY_SOURCE_REPO", "false").lower() in ("true", "1", "yes"),
+                        help="Add '*' to AppProject sourceRepos (opt-in; grants access to any repo)")
     return parser.parse_args()
 
 
@@ -133,7 +136,7 @@ def generate_argocd_appproject(args):
         },
         "spec": {
             "description": f"Project for {args.name} deployments",
-            "sourceRepos": [args.repo, "*"],
+            "sourceRepos": [args.repo, "*"] if getattr(args, "allow_any_source_repo", False) else [args.repo],
             "destinations": [
                 {"namespace": args.namespace, "server": args.server},
                 {"namespace": "argocd", "server": args.server},
