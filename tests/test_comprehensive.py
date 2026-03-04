@@ -325,6 +325,49 @@ class TestScaffoldGHA:
         assert cfg["kustomize"] is False
         assert cfg["flux"] is False
 
+    def test_yaml_output_has_no_anchors_or_aliases(self):
+        """Verify that the serialised YAML does not contain anchor/alias syntax.
+
+        When the same ``branches`` list is shared between the ``push`` and
+        ``pull_request`` trigger blocks PyYAML would normally emit YAML anchors
+        (``&id001``) and aliases (``*id001``).  GitHub Actions does not support
+        this syntax and it is confusing to users, so the generator must
+        suppress it.
+        """
+        args = _gha_args(type="build", branches="main")
+        configs = {
+            "languages": scaffold_gha.generate_language_config("python", {}),
+            "kubernetes": scaffold_gha.generate_kubernetes_config(False, "kubectl", {}),
+            "cicd": scaffold_gha.generate_cicd_config({}),
+            "build_tools": scaffold_gha.generate_build_tools_config({}),
+            "code_analysis": scaffold_gha.generate_code_analysis_config({}),
+            "devops_tools": scaffold_gha.generate_devops_tools_config({}),
+        }
+        wf = scaffold_gha.generate_workflow(args, {}, configs)
+        yaml_str = yaml.dump(wf, sort_keys=False, Dumper=scaffold_gha._NoAliasDumper)
+        assert "&id" not in yaml_str, "YAML output must not contain anchors (&id...)"
+        assert "*id" not in yaml_str, "YAML output must not contain aliases (*id...)"
+        # Also verify both push and pull_request branches are present
+        parsed = yaml.safe_load(yaml_str)
+        assert parsed["on"]["push"]["branches"] == ["main"]
+        assert parsed["on"]["pull_request"]["branches"] == ["main"]
+
+    def test_yaml_output_no_anchors_multiple_branches(self):
+        """Same anchor/alias check with multiple branches."""
+        args = _gha_args(type="complete", branches="main,develop,release")
+        configs = {
+            "languages": scaffold_gha.generate_language_config("python", {}),
+            "kubernetes": scaffold_gha.generate_kubernetes_config(False, "kubectl", {}),
+            "cicd": scaffold_gha.generate_cicd_config({}),
+            "build_tools": scaffold_gha.generate_build_tools_config({}),
+            "code_analysis": scaffold_gha.generate_code_analysis_config({}),
+            "devops_tools": scaffold_gha.generate_devops_tools_config({}),
+        }
+        wf = scaffold_gha.generate_workflow(args, {}, configs)
+        yaml_str = yaml.dump(wf, sort_keys=False, Dumper=scaffold_gha._NoAliasDumper)
+        assert "&id" not in yaml_str, "YAML output must not contain anchors (&id...)"
+        assert "*id" not in yaml_str, "YAML output must not contain aliases (*id...)"
+
 
 # ===========================================================================
 # CLI: scaffold_jenkins
@@ -977,6 +1020,18 @@ class TestMCPServerGHA:
         )
         assert isinstance(result, str)
         assert len(result) > 0
+
+    def test_mcp_yaml_output_has_no_anchors_or_aliases(self):
+        """MCP server must not emit YAML anchors/aliases in GHA workflow output."""
+        result = generate_github_actions_workflow(
+            name="no-alias-app", workflow_type="build", branches="main"
+        )
+        assert "&id" not in result, "MCP GHA output must not contain YAML anchors (&id...)"
+        assert "*id" not in result, "MCP GHA output must not contain YAML aliases (*id...)"
+        # Both triggers must carry explicit branch lists
+        parsed = yaml.safe_load(result)
+        assert parsed["on"]["push"]["branches"] == ["main"]
+        assert parsed["on"]["pull_request"]["branches"] == ["main"]
 
 
 class TestMCPServerJenkins:

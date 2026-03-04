@@ -23,6 +23,28 @@ import yaml
 from string import Template
 from pathlib import Path
 
+
+class _NoAliasDumper(yaml.Dumper):
+    """Custom YAML Dumper that never emits anchors or aliases.
+
+    When the same Python object (e.g. a ``branches`` list) is referenced in
+    multiple places inside the workflow dict, the default PyYAML serialiser
+    collapses those references into an anchor/alias pair such as::
+
+        branches: &id001
+        - main
+        pull_request:
+          branches: *id001
+
+    GitHub Actions does not support YAML aliases, and the output is
+    confusing to users.  This dumper overrides ``ignore_aliases`` so that
+    every occurrence is written out in full.
+    """
+
+    def ignore_aliases(self, data):  # noqa: ARG002
+        return True
+
+
 # Default paths
 TEMPLATE_DIR = os.path.dirname(os.path.abspath(__file__))
 OUTPUT_DIR = os.getcwd()
@@ -1050,8 +1072,8 @@ def main():
     # Generate workflow content
     workflow_content = generate_workflow(args, custom_values, configs)
     
-    # Convert workflow to YAML
-    yaml_content = yaml.dump(workflow_content, sort_keys=False)
+    # Convert workflow to YAML (use _NoAliasDumper to avoid anchor/alias output)
+    yaml_content = yaml.dump(workflow_content, sort_keys=False, Dumper=_NoAliasDumper)
     
     # Write to file
     with open(filepath, 'w') as f:

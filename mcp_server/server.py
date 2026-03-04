@@ -28,6 +28,20 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from mcp.server.fastmcp import FastMCP
+import yaml
+
+
+class _NoAliasDumper(yaml.Dumper):
+    """Custom YAML Dumper that never emits anchors or aliases.
+
+    Prevents PyYAML from collapsing shared object references (e.g. the same
+    ``branches`` list used in both ``push`` and ``pull_request`` triggers) into
+    anchor/alias pairs like ``&id001`` / ``*id001`` that are not supported by
+    GitHub Actions and confuse users.
+    """
+
+    def ignore_aliases(self, data):  # noqa: ARG002
+        return True
 
 # ---------------------------------------------------------------------------
 # Shared helpers
@@ -156,7 +170,7 @@ def generate_github_actions_workflow(
 
         import yaml
         workflow_content = scaffold_gha.generate_workflow(args, {}, configs)
-        return yaml.dump(workflow_content, sort_keys=False)
+        return yaml.dump(workflow_content, sort_keys=False, Dumper=_NoAliasDumper)
 
 
 # ---------------------------------------------------------------------------
