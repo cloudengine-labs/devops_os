@@ -157,7 +157,8 @@ def _test_job(lang_config):
             "stage": "test",
             "image": "python:3.11-slim",
             "script": [
-                "pip install -r requirements.txt pytest pytest-cov || true",
+                "if [ -f requirements.txt ]; then pip install -r requirements.txt; fi",
+                "pip install pytest pytest-cov",
                 "if [ -d tests ] || [ -d test ]; then python -m pytest --cov=./ --cov-report=xml -v; fi",
             ],
             "coverage": r"'/TOTAL.*\s+(\d+%)$/'",
