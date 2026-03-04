@@ -86,6 +86,8 @@ def generate_alert_rules(args):
     namespace = args.namespace
     team = args.team
     slo = args.slo_target
+    if not (0 < slo < 100):
+        raise ValueError(f"slo_target must be between 0 and 100 (exclusive); got {slo!r}")
     error_budget_burn_rate_high = round(14.4 / (1 - slo / 100), 1)
     latency_ms = int(args.latency_threshold * 1000)
 
