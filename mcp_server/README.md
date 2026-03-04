@@ -12,6 +12,9 @@ Claude Desktop / Claude API) and **ChatGPT** (via custom GPT Actions).
 | `generate_jenkins_pipeline` | Generate a Jenkins Declarative Pipeline (Jenkinsfile) |
 | `generate_k8s_config` | Generate Kubernetes Deployment + Service manifests |
 | `scaffold_devcontainer` | Generate `devcontainer.json` and `devcontainer.env.json` |
+| `generate_gitlab_ci_pipeline` | Generate a GitLab CI/CD pipeline configuration (`.gitlab-ci.yml`) |
+| `generate_argocd_config` | Generate Argo CD Application and related Kubernetes manifests |
+| `generate_sre_configs` | Generate SRE-related configuration (e.g., monitoring and alerting setup) |
 
 ## Installation
 
