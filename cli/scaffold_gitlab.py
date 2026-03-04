@@ -110,7 +110,7 @@ def _global_section(args):
 def _build_job(args, lang_config):
     """Docker build + push job."""
     script = [
-        "docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY",
+        'echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"',
         "docker build -t $REGISTRY_IMAGE:$IMAGE_TAG .",
         "docker push $REGISTRY_IMAGE:$IMAGE_TAG",
         "docker tag $REGISTRY_IMAGE:$IMAGE_TAG $REGISTRY_IMAGE:latest",
