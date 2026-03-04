@@ -87,7 +87,9 @@ python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-m
 python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
-Output: `.github/workflows/my-app-complete.yml`
+**Output:** `.github/workflows/my-app-complete.yml`  
+The filename is built as `<name-hyphenated>-<type>.yml` inside the output directory (default: `.github/workflows/`).  
+Override the directory with `--output <dir>`.
 
 ---
 
@@ -101,7 +103,8 @@ python -m cli.scaffold_gitlab --name my-app --languages python --type complete
 python -m cli.scaffold_gitlab --name my-app --languages python,go --kubernetes --k8s-method argocd
 ```
 
-Output: `.gitlab-ci.yml`
+**Output:** `.gitlab-ci.yml` (default)  
+Override the file path with `--output <path>` (e.g. `--output ci/my-pipeline.yml`).
 
 ---
 
@@ -115,7 +118,8 @@ python -m cli.scaffold_jenkins --name my-app --languages java --type complete
 python -m cli.scaffold_jenkins --name my-app --languages python --type parameterized
 ```
 
-Output: `Jenkinsfile`
+**Output:** `Jenkinsfile` (default)  
+Override the file path with `--output <path>` (e.g. `--output pipelines/Jenkinsfile`).
 
 ---
 
@@ -125,27 +129,37 @@ Output: `Jenkinsfile`
 # Plain kubectl Deployment + Service
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 
-# ArgoCD Application CR
+# ArgoCD Application CR + AppProject
 python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git \
        --namespace production
 
-# Flux Kustomization
+# Flux Kustomization + GitRepository + Image Automation
 python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
 ```
+
+**Output — ArgoCD:** `argocd/application.yaml` and `argocd/appproject.yaml` (in current directory)  
+**Output — Flux:** `flux/git-repository.yaml`, `flux/kustomization.yaml`, `flux/image-update-automation.yaml`  
+Override the root directory with `--output-dir <dir>`.
 
 ---
 
 ## 4 — Generate SRE configs
 
 ```bash
-# Prometheus alert rules + Grafana dashboard + SLO manifest
+# Prometheus alert rules + Grafana dashboard + SLO manifest + Alertmanager config
 python -m cli.scaffold_sre --name my-app --team platform
 
 # Latency SLO only
 python -m cli.scaffold_sre --name my-app --slo-type latency --slo-target 99.5
 ```
 
-Output: `sre/` directory with `alert-rules.yaml`, `grafana-dashboard.json`, `slo.yaml`
+**Output:** `sre/` directory containing:
+- `sre/alert-rules.yaml` — Prometheus PrometheusRule CR
+- `sre/grafana-dashboard.json` — Grafana importable dashboard
+- `sre/slo.yaml` — Sloth-compatible SLO manifest
+- `sre/alertmanager-config.yaml` — Alertmanager routing stub
+
+Override the directory with `--output-dir <dir>`.
 
 ---
 
@@ -217,7 +231,16 @@ devops_os/
 A: No. Docker is only needed if you want to run the dev container. The generators are plain Python scripts.
 
 **Q: Where do the generated files go?**  
-A: By default they are written into your current working directory. Use `--output` / `--output-dir` to change the location.
+A: Each generator has its own default output location:
+- `scaffold_gha` → `.github/workflows/<name>-<type>.yml`
+- `scaffold_gitlab` → `.gitlab-ci.yml`
+- `scaffold_jenkins` → `Jenkinsfile`
+- `scaffold_argocd` → `argocd/` (ArgoCD) or `flux/` (Flux CD) directory in the current directory
+- `scaffold_sre` → `sre/` directory
+- `scaffold_devcontainer` → `.devcontainer/` directory
+
+Use `--output` / `--output-dir` to change the location.
+See [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md) for the full details.
 
 **Q: Can I customise the generated output?**  
 A: Yes — use `--custom-values path/to/values.json` to override any default value.
@@ -231,6 +254,7 @@ A: Copy the generated file(s) to your project repository, commit, and push. No f
 
 | I want to… | Read |
 |-----------|------|
+| See every option and output path | [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md) |
 | Deep-dive GitHub Actions options | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
 | Deep-dive GitLab CI options | [GITLAB-CI-README.md](GITLAB-CI-README.md) |
 | Deep-dive Jenkins options | [JENKINS-PIPELINE-README.md](JENKINS-PIPELINE-README.md) |

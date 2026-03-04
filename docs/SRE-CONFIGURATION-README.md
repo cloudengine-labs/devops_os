@@ -32,7 +32,10 @@ python -m cli.scaffold_sre --name my-app --pagerduty-key YOUR_PD_KEY \
 | `--latency-threshold` | `0.5` | Latency SLI threshold in seconds |
 | `--pagerduty-key` | _(empty)_ | PagerDuty integration key |
 | `--slack-channel` | `#alerts` | Slack channel for alert routing |
-| `--output-dir` | `sre` | Output directory |
+| `--output-dir` | `sre` | Directory where all output files are written |
+
+All options can also be set via environment variables prefixed with `DEVOPS_OS_SRE_`
+(e.g. `DEVOPS_OS_SRE_SLO_TARGET=99.5`).
 
 ## Generated Files
 

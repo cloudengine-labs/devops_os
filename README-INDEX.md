@@ -6,40 +6,63 @@ Welcome to the DevOps-OS documentation! This set of guides will help you use and
 
 | Guide | Description |
 |-------|-------------|
-| [Creating DevOps-OS Using Dev Container](.devcontainer/DEVOPS-OS-README.md) | How to set up and customize the DevOps-OS development container |
-| [DevOps-OS Quick Start Guide](.devcontainer/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality in the project |
-| [Creating Customized GitHub Actions Templates](.devcontainer/GITHUB-ACTIONS-README.md) | How to generate and customize GitHub Actions workflows |
-| [Creating Customized Jenkins Templates](.devcontainer/JENKINS-PIPELINE-README.md) | How to generate and customize Jenkins pipelines |
-| [Creating Kubernetes Deployments](.devcontainer/KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
-| [Implementing CI/CD for Technology Stacks](.devcontainer/CICD-TECH-STACK-README.md) | How to implement CI/CD pipelines for specific technology stacks |
-| [CI/CD Generators Usage Guide](.devcontainer/CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |
+| [**CLI Commands Reference**](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location for all CLI commands |
+| [Getting Started](docs/GETTING-STARTED.md) | First pipeline in 5 minutes |
+| [Quick Start Guide](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
+| [GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
+| [GitLab CI Generator](docs/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
+| [Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
+| [ArgoCD / Flux CD Generator](docs/ARGOCD-README.md) | Generate ArgoCD and Flux CD GitOps configs |
+| [SRE Configuration Generator](docs/SRE-CONFIGURATION-README.md) | Generate Prometheus, Grafana, SLO, and Alertmanager configs |
+| [Kubernetes Deployment](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configurations |
+| [CI/CD for Technology Stacks](docs/CICD-TECH-STACK-README.md) | Implement CI/CD for specific technology stacks |
+| [DevOps-OS Dev Container](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 
-## CI/CD Generator Tools
+## CLI Generator Quick Reference
 
-DevOps-OS includes powerful generators for creating CI/CD configurations:
+| Command | Default output |
+|---------|---------------|
+| `python -m cli.scaffold_gha` | `.github/workflows/<name>-<type>.yml` |
+| `python -m cli.scaffold_gitlab` | `.gitlab-ci.yml` |
+| `python -m cli.scaffold_jenkins` | `Jenkinsfile` |
+| `python -m cli.scaffold_argocd` | `argocd/` directory |
+| `python -m cli.scaffold_argocd --method flux` | `flux/` directory |
+| `python -m cli.scaffold_sre` | `sre/` directory |
+| `python -m cli.scaffold_devcontainer` | `.devcontainer/` directory |
 
-1. **GitHub Actions Generator**: `github-actions-generator-improved.py`
-2. **Jenkins Pipeline Generator**: `jenkins-pipeline-generator-improved.py`
-3. **Kubernetes Config Generator**: `k8s-config-generator.py`
-4. **Unified CI/CD Generator**: `generate-cicd.py`
+See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables, input files, and output path details.
 
 ## Quick Start
 
-To quickly generate both GitHub Actions and Jenkins pipelines:
-
 ```bash
-.devcontainer/generate-cicd.py --name "My Project" --languages python,javascript --kubernetes
+git clone https://github.com/cloudengine-labs/devops_os.git
+cd devops_os
+pip install -r cli/requirements.txt
+
+# GitHub Actions complete pipeline
+python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+# Output: .github/workflows/my-app-complete.yml
+
+# GitLab CI pipeline
+python -m cli.scaffold_gitlab --name my-app --languages python
+# Output: .gitlab-ci.yml
+
+# SRE monitoring stack
+python -m cli.scaffold_sre --name my-app --team platform
+# Output: sre/ directory
 ```
 
-For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](DEVOPS-OS-QUICKSTART.md).
+For more examples and detailed usage, see the [Getting Started guide](docs/GETTING-STARTED.md).
 
 ## Features
 
 - **Multi-language Support**: Python, Java, JavaScript/TypeScript, Go
-- **CI/CD Configuration**: GitHub Actions, Jenkins
+- **CI/CD Configuration**: GitHub Actions, GitLab CI, Jenkins
+- **GitOps**: ArgoCD, Flux CD
+- **SRE Observability**: Prometheus alert rules, Grafana dashboards, SLO manifests, Alertmanager configs
 - **Kubernetes Deployment**: kubectl, kustomize, ArgoCD, Flux
 - **Customization**: Environment variables, command-line options, custom JSON configurations
-- **Integration**: Container registries, credentials management, external services
+- **AI Integration**: Claude MCP server, OpenAI function calling
 
 ## Getting Help
 

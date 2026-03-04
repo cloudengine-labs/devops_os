@@ -103,25 +103,29 @@ python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-m
 ### 3 — Generate other pipelines & configs
 
 ```bash
-# Jenkins pipeline
+# Jenkins pipeline → Jenkinsfile
 python -m cli.scaffold_jenkins --name my-app --languages java --type complete
 
-# GitLab CI pipeline
+# GitLab CI pipeline → .gitlab-ci.yml
 python -m cli.scaffold_gitlab --name my-app --languages python,go --type complete
 
-# ArgoCD / Flux GitOps configs
+# ArgoCD GitOps configs → argocd/application.yaml + argocd/appproject.yaml
 python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git
+
+# Flux GitOps configs → flux/git-repository.yaml + flux/kustomization.yaml + flux/image-update-automation.yaml
 python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
 
-# SRE configs (Prometheus, Grafana, SLO)
+# SRE configs (Prometheus, Grafana, SLO) → sre/ directory
 python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
 
-# Dev container configuration
+# Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
 python -m cli.scaffold_devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
 
 # Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
+
+> See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
 ### 4 — Interactive wizard (all-in-one)
 
@@ -234,6 +238,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 | Guide | Description |
 |-------|-------------|
 | [🚀 Getting Started](docs/GETTING-STARTED.md) | Easy step-by-step guide — **start here** |
+| [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
 | [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
 | [⚙️ GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
