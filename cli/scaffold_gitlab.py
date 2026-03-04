@@ -54,6 +54,8 @@ def parse_arguments():
                         help="Default Docker image for pipeline jobs")
     parser.add_argument("--branches", default=os.environ.get(f"{ENV_PREFIX}BRANCHES", "main"),
                         help="Comma-separated protected branches (used for deploy rules)")
+    parser.add_argument("--kube-namespace", default=os.environ.get(f"{ENV_PREFIX}KUBE_NAMESPACE", ""),
+                        help="Kubernetes namespace to deploy to (omit to let GitLab CI/CD variable take effect)")
     parser.add_argument("--custom-values", default=None,
                         help="Path to custom values JSON file")
     return parser.parse_args()
@@ -267,18 +269,19 @@ def _deploy_job(args):
         "flux":       "fluxcd/flux-cli:v2.3.0",
     }.get(args.k8s_method, "bitnami/kubectl:1.29")
 
-    return {
-        "deploy:kubernetes": {
-            "stage": "deploy",
-            "image": deploy_image,
-            "environment": {"name": "$CI_COMMIT_BRANCH", "url": "https://$APP_NAME.$KUBE_NAMESPACE.example.com"},
-            "variables": {
-                "KUBE_NAMESPACE": "default",
-            },
-            "script": script,
-            "rules": rules,
-        }
+    job: dict = {
+        "stage": "deploy",
+        "image": deploy_image,
+        "environment": {"name": "$CI_COMMIT_BRANCH", "url": "https://$APP_NAME.$KUBE_NAMESPACE.example.com"},
+        "script": script,
+        "rules": rules,
     }
+    # Only pin KUBE_NAMESPACE in the job when the user provided one at generation time.
+    # If omitted, the value set in GitLab CI/CD Variables takes effect.
+    kube_namespace = getattr(args, "kube_namespace", "")
+    if kube_namespace:
+        job["variables"] = {"KUBE_NAMESPACE": kube_namespace}
+    return {"deploy:kubernetes": job}
 
 
 # ---------------------------------------------------------------------------
