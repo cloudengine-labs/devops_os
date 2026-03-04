@@ -239,8 +239,8 @@ def _deploy_job(args):
         ]
     elif args.k8s_method == "kustomize":
         script = [
-            "kustomize edit set image $REGISTRY_IMAGE=$REGISTRY_IMAGE:$IMAGE_TAG",
-            "kustomize build . | kubectl apply -f - --namespace=$KUBE_NAMESPACE",
+            "kubectl config use-context $KUBE_CONTEXT",
+            "kubectl apply -k . --namespace=$KUBE_NAMESPACE",
             "kubectl rollout status deployment/$APP_NAME --namespace=$KUBE_NAMESPACE",
         ]
     elif args.k8s_method == "argocd":
