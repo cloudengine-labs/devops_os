@@ -312,7 +312,7 @@ def generate_k8s_config(
 def scaffold_devcontainer(
     languages: str = "python",
     cicd_tools: str = "docker,github_actions",
-    kubernetes_tools: str = "kubectl,helm",
+    kubernetes_tools: str = "k9s,kustomize",
     python_version: str = "3.11",
     node_version: str = "20",
     java_version: str = "17",

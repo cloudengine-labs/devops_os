@@ -150,7 +150,7 @@
         "kubernetes_tools": {
           "type": "string",
           "description": "Comma-separated list of Kubernetes tools (k9s, kustomize, argocd_cli, kubeseal, flux, kind, minikube).",
-          "default": "kubectl,helm"
+          "default": "k9s,kustomize"
         },
         "python_version": {
           "type": "string",
