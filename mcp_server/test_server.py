@@ -87,7 +87,7 @@ def test_scaffold_devcontainer_returns_valid_json():
     result = scaffold_devcontainer(
         languages="python,go",
         cicd_tools="docker,github_actions",
-        kubernetes_tools="kubectl,helm",
+        kubernetes_tools="k9s,kustomize",
     )
     data = json.loads(result)
     assert "devcontainer_json" in data
