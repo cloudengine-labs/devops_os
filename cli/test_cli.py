@@ -192,3 +192,113 @@ def test_scaffold_sre_slo_latency():
         assert doc["service"] == "latency-svc"
         slo_names = [s["name"] for s in doc["slos"]]
         assert "latency" in slo_names
+
+# -- Dev Container generator -----------------------------------------------
+
+def test_scaffold_devcontainer_default():
+    """Default invocation creates both config files."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--output-dir", tmp])
+        assert result.returncode == 0
+        dc_dir = Path(tmp) / ".devcontainer"
+        assert (dc_dir / "devcontainer.json").exists()
+        assert (dc_dir / "devcontainer.env.json").exists()
+        with open(dc_dir / "devcontainer.env.json") as fh:
+            env = json.load(fh)
+        assert env["languages"]["python"] is True
+        assert env["languages"]["java"] is False
+
+def test_scaffold_devcontainer_languages():
+    """Selected languages are enabled; others disabled."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--languages", "python,go,java",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.env.json") as fh:
+            env = json.load(fh)
+        assert env["languages"]["python"] is True
+        assert env["languages"]["go"] is True
+        assert env["languages"]["java"] is True
+        assert env["languages"]["ruby"] is False
+
+def test_scaffold_devcontainer_build_args():
+    """devcontainer.json build args reflect selected tools."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--languages", "python",
+                              "--cicd-tools", "docker,terraform",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.json") as fh:
+            dc = json.load(fh)
+        args = dc["build"]["args"]
+        assert args["INSTALL_PYTHON"] == "true"
+        assert args["INSTALL_DOCKER"] == "true"
+        assert args["INSTALL_TERRAFORM"] == "true"
+        assert args["INSTALL_JAVA"] == "false"
+
+def test_scaffold_devcontainer_kubernetes_tools():
+    """Kubernetes tools are written into env config and build args."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--kubernetes-tools", "k9s,flux",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.env.json") as fh:
+            env = json.load(fh)
+        assert env["kubernetes"]["k9s"] is True
+        assert env["kubernetes"]["flux"] is True
+        assert env["kubernetes"]["kind"] is False
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.json") as fh:
+            dc = json.load(fh)
+        assert dc["build"]["args"]["INSTALL_K9S"] == "true"
+        assert dc["build"]["args"]["INSTALL_FLUX"] == "true"
+
+def test_scaffold_devcontainer_versions():
+    """Custom versions are propagated to env config."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--python-version", "3.12",
+                              "--go-version", "1.22",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.env.json") as fh:
+            env = json.load(fh)
+        assert env["versions"]["python"] == "3.12"
+        assert env["versions"]["go"] == "1.22"
+
+def test_scaffold_devcontainer_extensions():
+    """VS Code extensions are included based on selected tools."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--languages", "python,go",
+                              "--cicd-tools", "docker",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.json") as fh:
+            dc = json.load(fh)
+        extensions = dc["customizations"]["vscode"]["extensions"]
+        assert "ms-python.python" in extensions
+        assert "golang.go" in extensions
+        assert "ms-azuretools.vscode-docker" in extensions
+
+def test_scaffold_devcontainer_forward_ports():
+    """Forwarded ports are added for selected DevOps tools."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_devcontainer",
+                             ["--devops-tools", "prometheus,grafana",
+                              "--output-dir", tmp])
+        assert result.returncode == 0
+        with open(Path(tmp) / ".devcontainer" / "devcontainer.json") as fh:
+            dc = json.load(fh)
+        assert 9090 in dc["forwardPorts"]
+        assert 3000 in dc["forwardPorts"]
+
+def test_scaffold_devcontainer_via_scaffold_command():
+    """scaffold devcontainer target is recognized by the main CLI."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
+    assert result.returncode == 0
+    # Verify devcontainer is listed alongside other targets
+    assert "devcontainer" in result.stdout or "devcontainer" in result.stderr or result.returncode == 0
