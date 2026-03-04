@@ -116,6 +116,9 @@ python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.
 # SRE configs (Prometheus, Grafana, SLO)
 python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
 
+# Dev container configuration
+python -m cli.scaffold_devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
+
 # Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
@@ -127,8 +130,9 @@ python -m cli.devopsos init              # interactive project configurator
 python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
 python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
 python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
-python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
-python -m cli.devopsos scaffold sre      # scaffold SRE configs
+python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
+python -m cli.devopsos scaffold sre          # scaffold SRE configs
+python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
 
 ### 5 — Use with AI (MCP Server)
@@ -207,7 +211,21 @@ The pre-configured dev container gives you a consistent multi-language environme
 </details>
 
 
-Customize `.devcontainer/devcontainer.env.json` to enable or disable any language or tool, then reopen in VS Code.
+Generate a dev container configuration from the CLI instead of editing JSON by hand:
+
+```bash
+# Generate devcontainer.json and devcontainer.env.json for a Python + Go project
+python -m cli.scaffold_devcontainer \
+  --languages python,go \
+  --cicd-tools docker,terraform,kubectl \
+  --kubernetes-tools k9s,flux \
+  --devops-tools prometheus,grafana
+
+# Or use the unified CLI
+python -m cli.devopsos scaffold devcontainer
+```
+
+You can also customize `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then reopen in VS Code.
 
 ---
 

@@ -130,7 +130,7 @@ def init():
 
 @app.command()
 def scaffold(
-    target: str = typer.Argument(..., help="What to scaffold: cicd | gha | gitlab | jenkins | argocd | sre"),
+    target: str = typer.Argument(..., help="What to scaffold: cicd | gha | gitlab | jenkins | argocd | sre | devcontainer"),
     tool: str = typer.Option(None, help="Tool type (e.g., github, jenkins, argo, flux)"),
 ):
     """Scaffold CI/CD or K8s resources."""

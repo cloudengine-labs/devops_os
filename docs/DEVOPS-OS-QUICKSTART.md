@@ -43,7 +43,13 @@ To deactivate it later, simply run `deactivate`.
 
 ### Configure Development Container
 ```bash
-# Edit configuration before building
+# Generate dev container config via CLI (recommended)
+python -m cli.scaffold_devcontainer \
+  --languages python,go \
+  --cicd-tools docker,terraform,kubectl,helm \
+  --kubernetes-tools k9s,flux
+
+# Or edit configuration manually before building
 vim .devcontainer/devcontainer.env.json
 
 # Open in VS Code and reopen in container
@@ -233,7 +239,24 @@ flux create kustomization my-app --source=my-app --path="./k8s" --prune=true --i
 
 ## Container Configuration
 
-### Configure Development Container
+### Generate Dev Container Config via CLI
+```bash
+# Generate devcontainer.json and devcontainer.env.json with selected tools
+python -m cli.scaffold_devcontainer \
+  --languages python,java,go \
+  --cicd-tools docker,terraform,kubectl,helm \
+  --kubernetes-tools k9s,kustomize,argocd_cli,flux \
+  --devops-tools prometheus,grafana \
+  --python-version 3.12
+
+# Or via the unified CLI
+python -m cli.devopsos scaffold devcontainer
+
+# See all available options
+python -m cli.scaffold_devcontainer --help
+```
+
+### Configure Development Container Manually
 ```bash
 # Edit the devcontainer.env.json file
 cat > .devcontainer/devcontainer.env.json << EOF

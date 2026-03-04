@@ -18,6 +18,26 @@ This development container provides a consistent environment for Java, JavaScrip
 
 ### Configuration
 
+#### Option A — Use the CLI (recommended)
+
+Generate `devcontainer.json` and `devcontainer.env.json` with a single command:
+
+```bash
+# From the repository root
+python -m cli.scaffold_devcontainer \
+  --languages python,java,go \
+  --cicd-tools docker,terraform,kubectl,helm \
+  --kubernetes-tools k9s,kustomize,argocd_cli,flux \
+  --devops-tools prometheus,grafana
+
+# Or via the unified CLI
+python -m cli.devopsos scaffold devcontainer
+```
+
+Run `python -m cli.scaffold_devcontainer --help` to see all available options including version overrides (`--python-version`, `--go-version`, etc.).
+
+#### Option B — Edit JSON manually
+
 1. Customize the environment by editing `.devcontainer/devcontainer.env.json`:
 
 ```json
@@ -66,7 +86,9 @@ cd .devcontainer
 python3 configure.py
 ```
 
-3. Open the project in VS Code and click "Reopen in Container" when prompted
+#### Open in VS Code
+
+After configuring (via either option), open the project in VS Code and click "Reopen in Container" when prompted.
 
 ## What's Included
 

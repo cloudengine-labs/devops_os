@@ -46,12 +46,24 @@ Before getting started, ensure you have the following installed:
    cd my-devops-project
    ```
 
-2. Create a `.devcontainer` directory:
+2. Generate the dev container configuration using the CLI:
    ```bash
-   mkdir -p .devcontainer
+   # Generate devcontainer.json and devcontainer.env.json
+   python -m cli.scaffold_devcontainer \
+     --languages python,java,go \
+     --cicd-tools docker,terraform,kubectl,helm \
+     --kubernetes-tools k9s,kustomize,argocd_cli,flux \
+     --output-dir .
    ```
 
-3. Create the following files in the `.devcontainer` directory:
+   This creates `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json` with the correct build args, VS Code extensions, and forwarded ports for your selected tools.
+
+   Run `python -m cli.scaffold_devcontainer --help` to see all options, including version overrides (e.g. `--python-version 3.12`).
+
+   <details>
+   <summary>Alternative: create the files manually</summary>
+
+   Create a `.devcontainer` directory and add the following files:
 
    **devcontainer.json**:
    ```json
@@ -125,13 +137,27 @@ Before getting started, ensure you have the following installed:
    }
    ```
 
-4. Copy the Dockerfile from this repository to your `.devcontainer` directory.
+   </details>
 
-5. Open the project in VS Code and click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command from the Command Palette.
+3. Copy the Dockerfile from this repository to your `.devcontainer` directory.
+
+4. Open the project in VS Code and click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command from the Command Palette.
 
 ## Customizing DevOps-OS
 
-The DevOps-OS container is highly customizable through the `devcontainer.env.json` file. This file lets you specify which languages, tools, and features to include in your environment.
+The easiest way to reconfigure the container is with the CLI:
+
+```bash
+python -m cli.scaffold_devcontainer \
+  --languages python,go \
+  --cicd-tools docker,terraform \
+  --kubernetes-tools k9s,flux \
+  --devops-tools prometheus,grafana
+```
+
+This regenerates both `devcontainer.json` and `devcontainer.env.json`.
+
+You can also edit `devcontainer.env.json` by hand. This file lets you specify which languages, tools, and features to include in your environment.
 
 ### Language Configuration
 
