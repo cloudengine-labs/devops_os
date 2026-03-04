@@ -12,6 +12,9 @@ that can be loaded into Claude (via the Anthropic API) or ChatGPT / Custom GPTs
 | `generate_jenkins_pipeline` | Jenkins Declarative Pipeline (Jenkinsfile) |
 | `generate_k8s_config` | Kubernetes Deployment + Service manifests |
 | `scaffold_devcontainer` | `devcontainer.json` + `devcontainer.env.json` |
+| `generate_gitlab_ci_pipeline` | GitLab CI/CD pipeline configuration (`.gitlab-ci.yml`) |
+| `generate_argocd_config` | Argo CD application/project configuration manifests |
+| `generate_sre_configs` | SRE / observability configs (e.g., alerting/monitoring rules) |
 
 ---
 
