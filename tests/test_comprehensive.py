@@ -572,6 +572,16 @@ class TestScaffoldGitlabExtended:
             assert "services" in data["build"]
 
     # BUG-1: deploy pipeline with no kubernetes produces empty stages list
+    @pytest.mark.xfail(
+        strict=True,
+        reason=(
+            "BUG-1: When type='deploy' and kubernetes=False, _global_section() "
+            "produces an empty stages list because the 'deploy' stage is only "
+            "appended when args.kubernetes is True. A deploy-only pipeline "
+            "without Kubernetes has no valid stages, making it an invalid "
+            "GitLab CI pipeline."
+        ),
+    )
     def test_deploy_pipeline_no_kubernetes_empty_stages(self):
         """
         BUG-1: When type='deploy' and kubernetes=False, the generated
@@ -589,11 +599,9 @@ class TestScaffoldGitlabExtended:
             with open(out) as fh:
                 data = yaml.safe_load(fh)
             stages = data.get("stages") or []
-            # BUG: stages is empty when type=deploy and kubernetes=False
-            # This assertion documents the bug (it currently produces [])
-            assert stages == [], (
-                "BUG-1: stages should not be empty for a deploy pipeline, "
-                "but currently is: {!r}".format(stages)
+            # Correct expected behavior: there should be at least one stage
+            assert len(stages) > 0, (
+                "Expected at least one stage in a deploy pipeline, got: {!r}".format(stages)
             )
 
 
@@ -807,19 +815,27 @@ class TestScaffoldSREExtended:
         assert "latency" in slo_names
 
     # BUG-2: error_rate SLO type produces empty slos list in manifest
+    @pytest.mark.xfail(
+        strict=True,
+        reason=(
+            "BUG-2: generate_slo_manifest() only checks for 'availability' and "
+            "'latency' slo_type values. When slo_type='error_rate', neither "
+            "condition matches so the slos list is empty. An error_rate SLO "
+            "entry should be generated for slo_type='error_rate'."
+        ),
+    )
     def test_slo_manifest_error_rate_bug(self):
         """
-        BUG-2: When slo_type='error_rate', generate_slo_manifest() returns
-        an empty slos list because neither 'availability' nor 'latency'
-        conditions match 'error_rate'. This means no SLO objectives are
-        captured in the manifest.
+        BUG-2: When slo_type='error_rate', generate_slo_manifest() should
+        return at least one SLO entry capturing the error rate objective,
+        but currently returns an empty slos list.
         """
         args = _sre_args(slo_type="error_rate")
         manifest = scaffold_sre.generate_slo_manifest(args)
-        # BUG: slos is empty for error_rate - document current (broken) behavior
-        assert manifest["slos"] == [], (
-            "BUG-2: error_rate slo_type should generate an error_rate SLO entry, "
-            "but currently produces an empty list."
+        # Correct expected behavior: error_rate should produce at least one SLO
+        assert len(manifest["slos"]) > 0, (
+            "Expected at least one SLO entry for error_rate type, "
+            "got empty list."
         )
 
     def test_slo_manifest_all_type_has_both_slos(self):
@@ -1246,18 +1262,26 @@ class TestMCPServerArgoCD:
         assert "- '*'" not in proj_yaml
 
     # BUG-3: allow_any_source_repo is not exposed in MCP server generate_argocd_config
+    @pytest.mark.xfail(
+        strict=True,
+        reason=(
+            "BUG-3: generate_argocd_config() in the MCP server does not expose "
+            "the allow_any_source_repo parameter. Users cannot opt-in to wildcard "
+            "source repos via the MCP interface. The parameter exists in "
+            "scaffold_argocd but is not wired through the MCP tool."
+        ),
+    )
     def test_allow_any_source_repo_not_available_in_mcp(self):
         """
-        BUG-3: The MCP server's generate_argocd_config does not expose
-        allow_any_source_repo parameter, making it impossible to opt-in
-        to wildcard source repos through the MCP interface.
+        BUG-3: generate_argocd_config should expose allow_any_source_repo
+        so users can opt-in to wildcard source repos via the MCP interface.
         """
         import inspect
         sig = inspect.signature(generate_argocd_config)
-        # Verify the parameter is absent (documenting the bug)
-        assert "allow_any_source_repo" not in sig.parameters, (
-            "If this assertion fails, BUG-3 has been fixed: "
-            "allow_any_source_repo is now exposed in generate_argocd_config"
+        # Correct expected behavior: the parameter should be present
+        assert "allow_any_source_repo" in sig.parameters, (
+            "generate_argocd_config should expose allow_any_source_repo "
+            "so users can opt-in to wildcard source repos."
         )
 
     def test_flux_kustomization_present(self):
