@@ -1,14 +1,70 @@
-# DevOps-OS
+<div align="center">
 
-> **Automate your entire DevOps lifecycle** — from CI/CD pipelines to Kubernetes deployments and SRE dashboards — using a conversational AI assistant or a single CLI command.
+# 🚀 DevOps-OS
 
-DevOps-OS is an open-source DevOps automation platform that provides:
+**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments and SRE dashboards — using a conversational AI assistant or a single CLI command.**
 
-- 🚀 **CI/CD Generators** — one-command GitHub Actions, **GitLab CI**, & Jenkins pipeline scaffolding
-- ☸️ **GitOps Config Generator** — Kubernetes manifests, **ArgoCD** Applications, Flux CD Kustomizations
-- 📊 **SRE Config Generator** — Prometheus alert rules, Grafana dashboards, SLO manifests
-- 🤖 **MCP Server** — plug DevOps-OS tools into Claude or ChatGPT as native AI skills
-- 🛠️ **Dev Container** — pre-configured multi-language environment (Python, Java, Go, JS, ...)
+[![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
+[![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/cloudengine-labs/devops_os)
+
+<br/>
+
+> **Category:** DevOps Automation · AI-Assisted Infrastructure · GitOps · SRE Tooling
+
+</div>
+
+---
+
+## ✨ What is DevOps-OS?
+
+DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, from a single CLI command or an AI chat prompt.
+
+| Feature | Description |
+|---------|-------------|
+| 🚀 **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines |
+| ☸️ **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations |
+| 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
+| 🤖 **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills |
+| 🛠️ **Dev Container** | Pre-configured multi-language environment (Python · Java · Go · JavaScript) |
+
+---
+
+## 🏗️ Tech Stack
+
+<div align="center">
+
+### CI/CD & GitOps
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+![GitLab CI](https://img.shields.io/badge/GitLab%20CI-FC6D26?style=for-the-badge&logo=gitlab&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=for-the-badge&logo=argo&logoColor=white)
+![Flux CD](https://img.shields.io/badge/Flux%20CD-5468FF?style=for-the-badge&logo=flux&logoColor=white)
+
+### Kubernetes & Infrastructure
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Helm](https://img.shields.io/badge/Helm-0F1689?style=for-the-badge&logo=helm&logoColor=white)
+![Kustomize](https://img.shields.io/badge/Kustomize-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Terraform](https://img.shields.io/badge/Terraform-7B42BC?style=for-the-badge&logo=terraform&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+
+### Observability
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=for-the-badge&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=for-the-badge&logo=grafana&logoColor=white)
+
+### Languages
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+
+### AI Integration
+![Claude](https://img.shields.io/badge/Claude%20MCP-7C3AED?style=for-the-badge&logo=anthropic&logoColor=white)
+![OpenAI](https://img.shields.io/badge/OpenAI%20Functions-412991?style=for-the-badge&logo=openai&logoColor=white)
+
+</div>
 
 ---
 
@@ -17,7 +73,7 @@ DevOps-OS is an open-source DevOps automation platform that provides:
 ### Prerequisites
 
 - Python 3.10+ and `pip`
-- Docker (for the dev container)
+- Docker *(for the dev container)*
 - VS Code + [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) *(optional)*
 
 ### 1 — Clone & install
@@ -34,10 +90,6 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r cli/requirements.txt
 ```
 
-> **Why a virtual environment?**  A venv keeps the DevOps-OS dependencies isolated from
-> your system Python, preventing version conflicts with other projects.  
-> Skip this step only if you are already inside a container or a CI environment.
-
 ### 2 — Generate a GitHub Actions workflow
 
 ```bash
@@ -48,41 +100,30 @@ python -m cli.scaffold_gha --name my-app --languages python,javascript --type co
 python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
-### 3 — Generate a Jenkins pipeline
+### 3 — Generate other pipelines & configs
 
 ```bash
+# Jenkins pipeline
 python -m cli.scaffold_jenkins --name my-app --languages java --type complete
-```
 
-### 3b — Generate a GitLab CI pipeline
-
-```bash
+# GitLab CI pipeline
 python -m cli.scaffold_gitlab --name my-app --languages python,go --type complete
-```
 
-### 3c — Generate ArgoCD / Flux GitOps configs
-
-```bash
+# ArgoCD / Flux GitOps configs
 python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git
 python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
-```
 
-### 3d — Generate SRE configs (Prometheus, Grafana, SLO)
-
-```bash
+# SRE configs (Prometheus, Grafana, SLO)
 python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
-```
 
-### 4 — Generate Kubernetes manifests
-
-```bash
+# Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
 
-### 5 — Interactive wizard (all-in-one)
+### 4 — Interactive wizard (all-in-one)
 
 ```bash
-python -m cli.devopsos init        # interactive project configurator
+python -m cli.devopsos init              # interactive project configurator
 python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
 python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
 python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
@@ -90,9 +131,7 @@ python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
 python -m cli.devopsos scaffold sre      # scaffold SRE configs
 ```
 
-### 6 — Use with AI (MCP Server)
-
-Make sure your virtual environment is active, then install the MCP dependencies and start the server:
+### 5 — Use with AI (MCP Server)
 
 ```bash
 pip install -r mcp_server/requirements.txt
@@ -100,204 +139,113 @@ python mcp_server/server.py
 ```
 
 Add to your `claude_desktop_config.json` and ask Claude:
-> *"Generate a complete CI/CD GitHub Actions workflow for my Python API with
->  Kubernetes deployment using ArgoCD."*
+> *"Generate a complete CI/CD GitHub Actions workflow for my Python API with Kubernetes deployment using ArgoCD."*
 
-See **[mcp_server/README.md](mcp_server/README.md)** for full setup instructions and
-**[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
+See **[mcp_server/README.md](mcp_server/README.md)** for full setup and **[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
 
 ---
 
 ## 📁 Repository Structure
 
-| Directory | Contents |
-|-----------|----------|
-| `.devcontainer/` | Dev container configuration (Dockerfile, devcontainer.json, environment setup scripts) |
-| `cli/` | CLI scaffold tools: `scaffold_gha.py`, `scaffold_gitlab.py`, `scaffold_jenkins.py`, `scaffold_argocd.py`, `scaffold_sre.py`, unified `devopsos.py` |
-| `kubernetes/` | Kubernetes manifest generator and documentation |
-| `mcp_server/` | MCP server exposing DevOps-OS tools to AI assistants (Claude, ChatGPT) |
-| `skills/` | Claude & OpenAI tool/function definitions (`claude_tools.json`, `openai_functions.json`) |
-| `docs/` | Detailed documentation, guides, and test reports |
-| `tests/` | Comprehensive test suite (`test_comprehensive.py`) |
-| `go-project/` | Example Go application |
-| `scripts/` | Helper scripts |
-
-## Multi-Language Development Container
-
-This development container provides a consistent environment for Java, JavaScript, Go, and Python development, along with CI/CD tools.
-
-### Features
-
-- **Multiple Languages**: Java, JavaScript/TypeScript, Go, and Python with all necessary build tools
-- **CI/CD Tools**: Docker, Terraform, Kubernetes (kubectl), Helm, GitHub Actions
-- **Customizable**: Configure which languages and tools to include
-
-### Getting Started
-
-#### Prerequisites
-
-- [Docker](https://www.docker.com/products/docker-desktop)
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-
-#### Configuration
-
-1. Customize the environment by editing `.devcontainer/devcontainer.env.json`:
-
-```json
-{
-  "languages": {
-    "python": true,
-    "java": true,
-    "javascript": true,
-    "go": true
-  },
-  "cicd": {
-    "docker": true,
-    "terraform": true,
-    "kubectl": true,
-    "helm": true,
-    "github_actions": true
-  },
-  "kubernetes": {
-    "k9s": true,
-    "kustomize": true,
-    "argocd_cli": true,
-    "lens": false,
-    "kubeseal": true,
-    "flux": true,
-    "kind": true,
-    "minikube": true,
-    "openshift_cli": false
-  },
-  "versions": {
-    "python": "3.11",
-    "java": "17",
-    "node": "20",
-    "go": "1.21",
-    "k9s": "0.29.1",
-    "argocd": "2.8.4", 
-    "flux": "2.1.2",
-    "kustomize": "5.2.1"
-  }
-}
+```text
+devops_os/
+├── .devcontainer/      # Dev container config (Dockerfile, devcontainer.json, setup scripts)
+├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
+├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, devopsos)
+├── kubernetes/         # Kubernetes manifest generator
+├── mcp_server/         # MCP server for AI assistant integration (Claude, ChatGPT)
+├── skills/             # Claude & OpenAI tool/function definitions
+├── docs/               # Detailed guides and test reports
+├── tests/              # Comprehensive test suite
+├── go-project/         # Example Go application
+└── scripts/            # Helper scripts
 ```
 
-2. Run the configuration script:
-
-```bash
-cd .devcontainer
-python3 configure.py
-```
-
-3. Open the project in VS Code and click "Reopen in Container" when prompted
-
-## CI/CD Generator Tools
-
-DevOps-OS includes powerful generators for creating CI/CD configurations:
-
-1. **GitHub Actions Generator**: `cli/scaffold_gha.py`
-2. **GitLab CI Generator**: `cli/scaffold_gitlab.py`
-3. **Jenkins Pipeline Generator**: `cli/scaffold_jenkins.py`
-4. **ArgoCD / Flux GitOps Generator**: `cli/scaffold_argocd.py`
-5. **SRE Config Generator**: `cli/scaffold_sre.py`
-6. **Kubernetes Config Generator**: `kubernetes/k8s-config-generator.py`
-7. **Unified CLI**: `cli/devopsos.py`
-
-### Quick Start
-
-To quickly generate both GitHub Actions and Jenkins pipelines:
-
-```bash
-python -m cli.scaffold_gha --name "My Project" --languages python,javascript --kubernetes
-python -m cli.scaffold_jenkins --name "My Project" --languages python,javascript
-```
-
-For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](docs/DEVOPS-OS-QUICKSTART.md).
-
-## What's Included
-
-### Languages and Tools
-
-- **Python**: Python interpreter, pip, pytest, black, flake8, mypy
-- **Java**: JDK, Maven, Gradle
-- **JavaScript/TypeScript**: Node.js, npm, yarn, TypeScript, Jest, ESLint, Prettier
-- **Go**: Go compiler, golangci-lint
-
-### CI/CD Tools
-
-- **Docker**: Docker CLI, Docker Compose
-- **Infrastructure as Code**: Terraform
-- **Kubernetes**: kubectl, Helm
-- **Workflows**: GitHub Actions runner
-
-### Kubernetes Tools
-
-- **Cluster Management**: K9s terminal UI, KinD, Minikube
-- **Application Deployment**: Kustomize, Helm
-- **GitOps**: ArgoCD CLI, Flux CD
-- **Secret Management**: Kubeseal for Sealed Secrets
-- **Observability**: Integrated with Prometheus and Grafana
-- **Configuration Generator**: Built-in tool to generate Kubernetes manifests for kubectl, Kustomize, ArgoCD, and Flux
+---
 
 ## 🧪 Testing
 
-The test suite covers all CLI scaffold commands, the MCP server, and AI skill definitions.
-A dedicated **Sanity Tests** GitHub Actions workflow (`.github/workflows/sanity.yml`) runs every scenario automatically on every push and pull request — no real infrastructure required; all tests use in-memory mock data.
+[![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
+
+All tests run without real infrastructure — everything uses in-memory mock data.
 
 ```bash
 pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
 python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py -v
 ```
 
-**Latest results:** 162 passed · 3 xfailed (known bugs tracked for future fixes) · 0 failed
+**Latest results:** ✅ 162 passed · ⚠️ 3 xfailed (known tracked bugs) · ❌ 0 failed
 
-| Test report | Description |
-|-------------|-------------|
-| [**Detailed Test Report**](docs/TEST_REPORT.md) | Full test results with CLI output samples for every scaffold command |
-| [**Interactive HTML Report**](docs/test-reports/test-report.html) | Self-contained pytest HTML report (download and open in browser) |
-| [**CLI Output Examples**](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
-| [**Sanity Workflow**](.github/workflows/sanity.yml) | GitHub Actions workflow that runs all scenario tests on every push |
+| Report | Description |
+|--------|-------------|
+| [📋 Detailed Test Report](docs/TEST_REPORT.md) | Full results with CLI output samples for every scaffold command |
+| [🌐 Interactive HTML Report](docs/test-reports/test-report.html) | Self-contained pytest HTML report |
+| [📄 CLI Output Examples](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
+| [⚙️ Sanity Workflow](.github/workflows/sanity.yml) | GitHub Actions workflow running all scenarios on every push |
 
 ---
 
-## 📚 Available Documentation
+## 🛠️ Dev Container
+
+The pre-configured dev container gives you a consistent multi-language environment with all CI/CD tools included.
+
+<details>
+<summary><strong>Supported languages & tools</strong></summary>
+
+| Category | Tools |
+|----------|-------|
+| **Languages** | Python 3.11 · Java 17 · Node.js 20 · Go 1.21 |
+| **Build tools** | pip · Maven · Gradle · npm · yarn |
+| **Linting/Testing** | pytest · black · flake8 · mypy · Jest · ESLint · golangci-lint |
+| **Containers** | Docker CLI · Docker Compose |
+| **IaC** | Terraform |
+| **Kubernetes** | kubectl · Helm · Kustomize · K9s · KinD · Minikube |
+| **GitOps** | ArgoCD CLI · Flux CD |
+| **Secrets** | Kubeseal (Sealed Secrets) |
+| **Observability** | Prometheus · Grafana |
+
+</details>
+
+
+Customize `.devcontainer/devcontainer.env.json` to enable or disable any language or tool, then reopen in VS Code.
+
+---
+
+## 📚 Documentation
 
 | Guide | Description |
 |-------|-------------|
-| [**Getting Started**](docs/GETTING-STARTED.md) | Easy step-by-step guide — start here! |
-| [Dev Container Setup](docs/DEVOPS-OS-README.md) | How to set up and customize the DevOps-OS development container |
-| [Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
-| [GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | How to generate and customize GitHub Actions workflows |
-| [GitLab CI Generator](docs/GITLAB-CI-README.md) | How to generate and customize GitLab CI pipelines |
-| [Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | How to generate and customize Jenkins pipelines |
-| [ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
-| [SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
-| [Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
-| [Kubernetes Capabilities](docs/kubernetes-capabilities.md) | Detailed guide for all Kubernetes tooling |
-| [CI/CD Tech Stack Guide](docs/CICD-TECH-STACK-README.md) | Implementing CI/CD pipelines for specific technology stacks |
-| [CI/CD Generators Usage](docs/CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |
-| [MCP Server](mcp_server/README.md) | Connect DevOps-OS tools to Claude or ChatGPT |
-| [AI Skills](skills/README.md) | Use DevOps-OS with the Anthropic API or OpenAI function calling |
+| [🚀 Getting Started](docs/GETTING-STARTED.md) | Easy step-by-step guide — **start here** |
+| [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
+| [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
+| [⚙️ GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
+| [🦊 GitLab CI Generator](docs/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
+| [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
+| [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
+| [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
+| [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
+| [🤖 MCP Server](mcp_server/README.md) | Connect DevOps-OS tools to Claude or ChatGPT |
+| [🧠 AI Skills](skills/README.md) | Use DevOps-OS with the Anthropic API or OpenAI function calling |
 
-## Customization
+---
 
-You can:
+## 🤝 Contributing
 
-1. Disable languages or tools you don't need
-2. Change versions of languages
-3. Add additional tools by editing the Dockerfile
+Contributions are welcome! Whether it's a bug fix, a new scaffold generator, or documentation improvement — feel free to open an issue or submit a pull request.
 
-## Troubleshooting
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Commit your changes: `git commit -m 'feat: add my feature'`
+4. Push and open a pull request
 
-- **Docker Access Issues**: Make sure the Docker socket is properly mounted
-- **Performance Issues**: Adjust Docker Desktop resource settings
-- **Missing Tools**: Check the logs during container build or modify the Dockerfile
+---
 
-## Getting Help
+## 📄 License
 
-If you need additional help or have questions about DevOps-OS, please refer to the specific guides or open an issue in the repository.
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
-## Contributing
+---
 
-Contributions to DevOps-OS are welcome! Please see the contributing guidelines in the repository for more information.
+<div align="center">
+Made with ❤️ by <a href="https://github.com/cloudengine-labs">CloudEngine Labs</a>
+</div>
