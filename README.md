@@ -110,13 +110,17 @@ See **[mcp_server/README.md](mcp_server/README.md)** for full setup instructions
 
 ## 📁 Repository Structure
 
-- `.devcontainer/` — Dev container configuration (Dockerfile, devcontainer.json, environment setup scripts)
-- `cli/` — CLI tools: GitHub Actions generator, Jenkins generator, unified scaffold
-- `kubernetes/` — Kubernetes deployment tools, manifests, and documentation
-- `mcp_server/` — MCP server exposing DevOps-OS tools to AI assistants
-- `skills/` — Claude & OpenAI tool/function definitions
-- `docs/` — Detailed documentation
-- `go-project/` — Example Go application
+| Directory | Contents |
+|-----------|----------|
+| `.devcontainer/` | Dev container configuration (Dockerfile, devcontainer.json, environment setup scripts) |
+| `cli/` | CLI scaffold tools: `scaffold_gha.py`, `scaffold_gitlab.py`, `scaffold_jenkins.py`, `scaffold_argocd.py`, `scaffold_sre.py`, unified `devopsos.py` |
+| `kubernetes/` | Kubernetes manifest generator and documentation |
+| `mcp_server/` | MCP server exposing DevOps-OS tools to AI assistants (Claude, ChatGPT) |
+| `skills/` | Claude & OpenAI tool/function definitions (`claude_tools.json`, `openai_functions.json`) |
+| `docs/` | Detailed documentation, guides, and test reports |
+| `tests/` | Comprehensive test suite (`test_comprehensive.py`) |
+| `go-project/` | Example Go application |
+| `scripts/` | Helper scripts |
 
 ## Multi-Language Development Container
 
@@ -236,7 +240,26 @@ For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](docs
 - **Observability**: Integrated with Prometheus and Grafana
 - **Configuration Generator**: Built-in tool to generate Kubernetes manifests for kubectl, Kustomize, ArgoCD, and Flux
 
-## Available Documentation
+## 🧪 Testing
+
+The test suite covers all CLI scaffold commands, the MCP server, and AI skill definitions.
+
+```bash
+pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
+python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py -v
+```
+
+**Latest results:** 162 passed · 3 xfailed (known bugs tracked for future fixes) · 0 failed
+
+| Test report | Description |
+|-------------|-------------|
+| [**Detailed Test Report**](docs/TEST_REPORT.md) | Full test results with CLI output samples for every scaffold command |
+| [**Interactive HTML Report**](docs/test-reports/test-report.html) | Self-contained pytest HTML report (download and open in browser) |
+| [**CLI Output Examples**](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
+
+---
+
+## 📚 Available Documentation
 
 | Guide | Description |
 |-------|-------------|
@@ -249,12 +272,11 @@ For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](docs
 | [ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
 | [SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
 | [Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | How to generate and manage Kubernetes deployment configurations |
+| [Kubernetes Capabilities](docs/kubernetes-capabilities.md) | Detailed guide for all Kubernetes tooling |
 | [CI/CD Tech Stack Guide](docs/CICD-TECH-STACK-README.md) | Implementing CI/CD pipelines for specific technology stacks |
 | [CI/CD Generators Usage](docs/CI-CD-GENERATORS-USAGE.md) | Detailed options and examples for the CI/CD generators |
 | [MCP Server](mcp_server/README.md) | Connect DevOps-OS tools to Claude or ChatGPT |
 | [AI Skills](skills/README.md) | Use DevOps-OS with the Anthropic API or OpenAI function calling |
-
-For detailed information on using the Kubernetes capabilities, see [kubernetes-capabilities.md](docs/kubernetes-capabilities.md).
 
 ## Customization
 
