@@ -209,7 +209,6 @@ def generate_jenkins_pipeline(
         }
 
         pipeline_content = scaffold_jenkins.generate_pipeline(args, configs)
-        # write & read back to normalise line endings
         with open(out_path, "w") as fh:
             fh.write(pipeline_content)
         return pipeline_content
