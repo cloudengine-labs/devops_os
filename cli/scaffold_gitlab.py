@@ -161,7 +161,7 @@ def _test_job(lang_config):
                 "pip install pytest pytest-cov",
                 "if [ -d tests ] || [ -d test ]; then python -m pytest --cov=./ --cov-report=xml -v; fi",
             ],
-            "coverage": r"'/TOTAL.*\s+(\d+%)$/'",
+            "coverage": r"/TOTAL.*\s+(\d+%)$/",
             "artifacts": {
                 "reports": {"coverage_report": {"coverage_format": "cobertura", "path": "coverage.xml"}},
                 "when": "always",
