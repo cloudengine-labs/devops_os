@@ -358,8 +358,12 @@ def generate_slo_manifest(args):
             "sli": {
                 "events": {
                     "error_query": (
+                        f"("
+                        f"rate(http_request_duration_seconds_count{{job=\"{name}\"}}[{{{{.window}}}}])"
+                        f" - "
                         f"rate(http_request_duration_seconds_bucket{{job=\"{name}\","
                         f"le=\"{args.latency_threshold}\"}}[{{{{.window}}}}])"
+                        f")"
                     ),
                     "total_query": f"rate(http_request_duration_seconds_count{{job=\"{name}\"}}[{{{{.window}}}}])",
                 }
