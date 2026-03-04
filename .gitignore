@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.env
+*.log
+_site/
+.jekyll-cache/
+.venv/
+venv/
+docs/test-report.html

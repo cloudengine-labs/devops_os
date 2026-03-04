@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "copilot/**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r cli/requirements.txt pytest
+          pip install -r mcp_server/requirements.txt
+
+      - name: Run CLI tests
+        run: pytest cli/test_cli.py -v
+
+      - name: Run MCP server tests
+        run: pytest mcp_server/test_server.py -v

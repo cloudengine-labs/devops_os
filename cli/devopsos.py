@@ -8,6 +8,9 @@ from pathlib import Path
 import cli.scaffold_cicd as scaffold_cicd
 import cli.scaffold_gha as scaffold_gha
 import cli.scaffold_jenkins as scaffold_jenkins
+import cli.scaffold_gitlab as scaffold_gitlab
+import cli.scaffold_argocd as scaffold_argocd
+import cli.scaffold_sre as scaffold_sre
 
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
 
@@ -126,7 +129,7 @@ def init():
 
 @app.command()
 def scaffold(
-    target: str = typer.Argument(..., help="What to scaffold: cicd | gha | jenkins | k8s"),
+    target: str = typer.Argument(..., help="What to scaffold: cicd | gha | gitlab | jenkins | argocd | sre"),
     tool: str = typer.Option(None, help="Tool type (e.g., github, jenkins, argo, flux)"),
 ):
     """Scaffold CI/CD or K8s resources."""
@@ -134,8 +137,14 @@ def scaffold(
         scaffold_cicd.main()
     elif target == "gha":
         scaffold_gha.main()
+    elif target == "gitlab":
+        scaffold_gitlab.main()
     elif target == "jenkins":
         scaffold_jenkins.main()
+    elif target == "argocd":
+        scaffold_argocd.main()
+    elif target == "sre":
+        scaffold_sre.main()
     else:
         typer.echo("Unknown scaffold target.")
 

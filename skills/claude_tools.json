@@ -1,0 +1,324 @@
+[
+  {
+    "name": "generate_github_actions_workflow",
+    "description": "Generate a GitHub Actions CI/CD workflow YAML file for the specified application. Supports build, test, deploy, and complete pipelines with optional Kubernetes deployment stages and matrix builds.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Workflow and application name (e.g. 'my-api').",
+          "default": "my-app"
+        },
+        "workflow_type": {
+          "type": "string",
+          "enum": ["build", "test", "deploy", "complete", "reusable"],
+          "description": "Type of workflow to generate.",
+          "default": "complete"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of programming languages (e.g. 'python,javascript,go,java').",
+          "default": "python"
+        },
+        "kubernetes": {
+          "type": "boolean",
+          "description": "Include a Kubernetes deployment stage in the workflow.",
+          "default": false
+        },
+        "k8s_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Kubernetes deployment method.",
+          "default": "kubectl"
+        },
+        "branches": {
+          "type": "string",
+          "description": "Comma-separated list of branches that trigger the workflow.",
+          "default": "main"
+        },
+        "matrix": {
+          "type": "boolean",
+          "description": "Enable matrix builds across multiple platforms/OS.",
+          "default": false
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_jenkins_pipeline",
+    "description": "Generate a Jenkins Declarative Pipeline (Jenkinsfile) for the specified application. Supports build, test, deploy, complete, and parameterized pipeline types.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Pipeline and application name.",
+          "default": "my-app"
+        },
+        "pipeline_type": {
+          "type": "string",
+          "enum": ["build", "test", "deploy", "complete", "parameterized"],
+          "description": "Type of Jenkins pipeline to generate.",
+          "default": "complete"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of programming languages (e.g. 'python,java').",
+          "default": "python"
+        },
+        "kubernetes": {
+          "type": "boolean",
+          "description": "Include a Kubernetes deployment stage.",
+          "default": false
+        },
+        "k8s_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Kubernetes deployment method.",
+          "default": "kubectl"
+        },
+        "parameters": {
+          "type": "boolean",
+          "description": "Add runtime build parameters to the pipeline.",
+          "default": false
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_k8s_config",
+    "description": "Generate Kubernetes Deployment and Service manifests for an application. Optionally generates method-specific resources (e.g. a Kustomization for kustomize-based deployments).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "app_name": {
+          "type": "string",
+          "description": "Name of the Kubernetes application (used as resource name and label).",
+          "default": "my-app"
+        },
+        "image": {
+          "type": "string",
+          "description": "Container image reference (e.g. 'ghcr.io/myorg/my-app:v1.0.0').",
+          "default": "myregistry/my-app:latest"
+        },
+        "replicas": {
+          "type": "integer",
+          "description": "Number of pod replicas.",
+          "default": 2
+        },
+        "port": {
+          "type": "integer",
+          "description": "Container port to expose.",
+          "default": 8080
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Kubernetes namespace.",
+          "default": "default"
+        },
+        "deployment_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Deployment tooling (adds method-specific manifests; kustomize adds a Kustomization resource).",
+          "default": "kubectl"
+        },
+        "expose_service": {
+          "type": "boolean",
+          "description": "Create a ClusterIP Service alongside the Deployment.",
+          "default": true
+        }
+      }
+    }
+  },
+  {
+    "name": "scaffold_devcontainer",
+    "description": "Generate a devcontainer.json and devcontainer.env.json configuration for the DevOps-OS development container based on selected languages and tools.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of languages to install (python, java, javascript, go, rust, csharp, php).",
+          "default": "python"
+        },
+        "cicd_tools": {
+          "type": "string",
+          "description": "Comma-separated list of CI/CD tools (docker, terraform, kubectl, helm, github_actions, jenkins).",
+          "default": "docker,github_actions"
+        },
+        "kubernetes_tools": {
+          "type": "string",
+          "description": "Comma-separated list of Kubernetes tools (k9s, kustomize, argocd_cli, kubeseal, flux, kind, minikube).",
+          "default": "k9s,kustomize"
+        },
+        "python_version": {
+          "type": "string",
+          "description": "Python version to install.",
+          "default": "3.11"
+        },
+        "node_version": {
+          "type": "string",
+          "description": "Node.js version to install.",
+          "default": "20"
+        },
+        "java_version": {
+          "type": "string",
+          "description": "Java JDK version to install.",
+          "default": "17"
+        },
+        "go_version": {
+          "type": "string",
+          "description": "Go version to install.",
+          "default": "1.21"
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_gitlab_ci_pipeline",
+    "description": "Generate a GitLab CI pipeline (.gitlab-ci.yml) for the specified application. Supports build, test, deploy, and complete pipeline types with optional Kubernetes deployment stages.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Application name (used in APP_NAME variable and image tags).",
+          "default": "my-app"
+        },
+        "pipeline_type": {
+          "type": "string",
+          "enum": ["build", "test", "deploy", "complete"],
+          "description": "Type of GitLab CI pipeline to generate.",
+          "default": "complete"
+        },
+        "languages": {
+          "type": "string",
+          "description": "Comma-separated list of programming languages (e.g. 'python,javascript,go,java').",
+          "default": "python"
+        },
+        "kubernetes": {
+          "type": "boolean",
+          "description": "Include a Kubernetes deployment stage.",
+          "default": false
+        },
+        "k8s_method": {
+          "type": "string",
+          "enum": ["kubectl", "kustomize", "argocd", "flux"],
+          "description": "Kubernetes deployment method.",
+          "default": "kubectl"
+        },
+        "branches": {
+          "type": "string",
+          "description": "Comma-separated list of branches that trigger deploy jobs.",
+          "default": "main"
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_argocd_config",
+    "description": "Generate ArgoCD Application and AppProject Custom Resources for GitOps-based continuous delivery, or Flux CD Kustomization resources. Optionally adds an Argo Rollouts canary strategy.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Application name.",
+          "default": "my-app"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["argocd", "flux"],
+          "description": "GitOps tool to use.",
+          "default": "argocd"
+        },
+        "repo": {
+          "type": "string",
+          "description": "Git repository URL containing the Kubernetes manifests.",
+          "default": "https://github.com/myorg/my-app.git"
+        },
+        "revision": {
+          "type": "string",
+          "description": "Git revision, branch, or tag to sync.",
+          "default": "HEAD"
+        },
+        "path": {
+          "type": "string",
+          "description": "Path inside the repo to the manifests directory.",
+          "default": "k8s"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Kubernetes namespace to deploy into.",
+          "default": "default"
+        },
+        "project": {
+          "type": "string",
+          "description": "ArgoCD project name.",
+          "default": "default"
+        },
+        "auto_sync": {
+          "type": "boolean",
+          "description": "Enable ArgoCD automated sync (prune + self-heal).",
+          "default": false
+        },
+        "rollouts": {
+          "type": "boolean",
+          "description": "Add an Argo Rollouts canary Rollout resource.",
+          "default": false
+        },
+        "image": {
+          "type": "string",
+          "description": "Container image for Flux image automation.",
+          "default": "ghcr.io/myorg/my-app"
+        }
+      }
+    }
+  },
+  {
+    "name": "generate_sre_configs",
+    "description": "Generate SRE configuration files including Prometheus alerting rules, a Grafana dashboard, an OpenSLO/Sloth SLO manifest, and an Alertmanager routing config stub.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Application / service name.",
+          "default": "my-app"
+        },
+        "team": {
+          "type": "string",
+          "description": "Owning team (used in alert labels and routing).",
+          "default": "platform"
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Kubernetes namespace where the app runs.",
+          "default": "default"
+        },
+        "slo_type": {
+          "type": "string",
+          "enum": ["availability", "latency", "error_rate", "all"],
+          "description": "Which SLOs to generate.",
+          "default": "all"
+        },
+        "slo_target": {
+          "type": "number",
+          "description": "SLO target percentage (e.g. 99.9).",
+          "default": 99.9
+        },
+        "latency_threshold": {
+          "type": "number",
+          "description": "Latency SLI threshold in seconds (default 0.5).",
+          "default": 0.5
+        },
+        "slack_channel": {
+          "type": "string",
+          "description": "Slack channel for alert routing.",
+          "default": "#alerts"
+        }
+      }
+    }
+  }
+]

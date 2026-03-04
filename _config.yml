@@ -1,0 +1,43 @@
+title: DevOps-OS
+description: >-
+  A comprehensive DevOps automation platform featuring a Multi-Language
+  Development Container, CI/CD generators, MCP server, and AI-powered
+  pipeline automation from CI/CD to SRE dashboards.
+baseurl: "/devops_os"
+url: "https://cloudengine-labs.github.io"
+
+# Author
+author:
+  name: CloudEngine Labs
+
+# Theme
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+
+# Markdown settings
+markdown: kramdown
+highlighter: rouge
+
+# Navigation
+header_pages:
+  - README.md
+  - docs/DEVOPS-OS-QUICKSTART.md
+  - docs/CICD-GENERATORS-README.md
+  - docs/GITHUB-ACTIONS-README.md
+  - docs/JENKINS-PIPELINE-README.md
+  - docs/KUBERNETES-DEPLOYMENT-README.md
+  - mcp_server/README.md
+  - skills/README.md
+
+# Exclude from build
+exclude:
+  - .devcontainer
+  - go-project
+  - scripts
+  - "*.pyc"
+  - __pycache__
+  - .git
+  - vendor
+  - node_modules

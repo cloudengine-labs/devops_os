@@ -1,0 +1,97 @@
+name: Sanity Tests — All Scenarios
+
+# Run on every push and on PRs targeting main so every branch gets feedback.
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sanity:
+    name: Sanity Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
+
+      # ── CLI scaffold scenarios ─────────────────────────────────────────────
+
+      - name: "Scenario: GitHub Actions scaffold"
+        run: pytest tests/test_comprehensive.py::TestScaffoldGHA -v
+
+      - name: "Scenario: Jenkins scaffold"
+        run: pytest tests/test_comprehensive.py::TestScaffoldJenkins -v
+
+      - name: "Scenario: GitLab CI scaffold"
+        run: pytest tests/test_comprehensive.py::TestScaffoldGitlabExtended -v
+
+      - name: "Scenario: ArgoCD / Flux GitOps scaffold"
+        run: pytest tests/test_comprehensive.py::TestScaffoldArgoCDExtended -v
+
+      - name: "Scenario: SRE config scaffold (Prometheus, Grafana, SLO)"
+        run: pytest tests/test_comprehensive.py::TestScaffoldSREExtended -v
+
+      # ── MCP server tool scenarios ──────────────────────────────────────────
+
+      - name: "Scenario: MCP server — GitHub Actions tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerGHA -v
+
+      - name: "Scenario: MCP server — Jenkins tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerJenkins -v
+
+      - name: "Scenario: MCP server — Kubernetes tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerK8s -v
+
+      - name: "Scenario: MCP server — GitLab CI tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerGitLab -v
+
+      - name: "Scenario: MCP server — ArgoCD / Flux tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerArgoCD -v
+
+      - name: "Scenario: MCP server — SRE tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerSRE -v
+
+      - name: "Scenario: MCP server — Dev container tool"
+        run: pytest tests/test_comprehensive.py::TestMCPServerDevcontainer -v
+
+      # ── AI skills definitions ──────────────────────────────────────────────
+
+      - name: "Scenario: AI skills definitions (OpenAI & Claude)"
+        run: pytest tests/test_comprehensive.py::TestSkillsDefinitions -v
+
+      # ── CLI and MCP server unit tests ─────────────────────────────────────
+
+      - name: "Scenario: CLI integration tests (devopsos unified CLI)"
+        run: pytest cli/test_cli.py -v
+
+      - name: "Scenario: MCP server unit tests"
+        run: pytest mcp_server/test_server.py -v
+
+      # ── Combined report artifact ───────────────────────────────────────────
+
+      - name: Generate combined HTML report
+        if: always()
+        run: |
+          pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py \
+            --html=sanity-report.html --self-contained-html -q
+
+      - name: Upload sanity test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sanity-test-report
+          path: sanity-report.html
+          retention-days: 30
