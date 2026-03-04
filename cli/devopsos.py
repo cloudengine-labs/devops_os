@@ -11,6 +11,7 @@ import cli.scaffold_jenkins as scaffold_jenkins
 import cli.scaffold_gitlab as scaffold_gitlab
 import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
+import cli.scaffold_devcontainer as scaffold_devcontainer
 
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
 
@@ -145,6 +146,8 @@ def scaffold(
         scaffold_argocd.main()
     elif target == "sre":
         scaffold_sre.main()
+    elif target == "devcontainer":
+        scaffold_devcontainer.main()
     else:
         typer.echo("Unknown scaffold target.")
 
