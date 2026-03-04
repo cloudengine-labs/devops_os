@@ -18,7 +18,6 @@ Outputs:
 
 import os
 import argparse
-import json
 import yaml
 from pathlib import Path
 
@@ -59,8 +58,6 @@ def parse_arguments():
                         help="Container image (used in Rollouts / Flux image automation)")
     parser.add_argument("--output-dir", default=os.environ.get(f"{ENV_PREFIX}OUTPUT_DIR", "."),
                         help="Root output directory")
-    parser.add_argument("--custom-values", default=None,
-                        help="Path to custom values JSON file")
     parser.add_argument("--allow-any-source-repo", action="store_true",
                         default=os.environ.get(f"{ENV_PREFIX}ALLOW_ANY_SOURCE_REPO", "false").lower() in ("true", "1", "yes"),
                         help="Add '*' to AppProject sourceRepos (opt-in; grants access to any repo)")
@@ -70,13 +67,6 @@ def parse_arguments():
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def load_custom_values(file_path):
-    if file_path and os.path.exists(file_path):
-        with open(file_path) as fh:
-            return json.load(fh)
-    return {}
-
 
 def _write_yaml(path, data):
     path = Path(path)
@@ -277,7 +267,6 @@ def generate_flux_image_automation(args):
 
 def main():
     args = parse_arguments()
-    custom_values = load_custom_values(args.custom_values)  # noqa: F841
     output_root = Path(args.output_dir)
     generated = []
 

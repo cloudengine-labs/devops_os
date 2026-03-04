@@ -105,8 +105,8 @@ for server setup instructions.
 
 ```python
 import json
+import importlib
 import anthropic
-import subprocess
 
 with open("skills/claude_tools.json") as fh:
     tools = json.load(fh)
@@ -129,14 +129,22 @@ response = client.messages.create(
     ],
 )
 
-# 2. Execute the tool call via the MCP server
+# 2. Execute the tool call via the MCP server using an explicit dispatch table
+_server = importlib.import_module("mcp_server.server")
+TOOL_DISPATCH = {
+    "generate_github_actions_workflow": _server.generate_github_actions_workflow,
+    "generate_jenkins_pipeline":        _server.generate_jenkins_pipeline,
+    "generate_k8s_config":              _server.generate_k8s_config,
+    "scaffold_devcontainer":            _server.scaffold_devcontainer,
+    "generate_gitlab_ci_pipeline":      _server.generate_gitlab_ci_pipeline,
+    "generate_argocd_config":           _server.generate_argocd_config,
+    "generate_sre_configs":             _server.generate_sre_configs,
+}
+
 for block in response.content:
     if block.type == "tool_use":
-        result = subprocess.run(
-            ["python", "-c",
-             f"from mcp_server.server import {block.name}; "
-             f"print({block.name}(**{block.input!r}))"],
-            capture_output=True, text=True, check=True
-        )
-        print(result.stdout)
+        fn = TOOL_DISPATCH.get(block.name)
+        if fn is None:
+            raise ValueError(f"Unknown tool: {block.name!r}")
+        print(fn(**block.input))
 ```
