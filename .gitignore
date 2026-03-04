@@ -9,3 +9,5 @@ build/
 *.log
 _site/
 .jekyll-cache/
+.venv/
+venv/

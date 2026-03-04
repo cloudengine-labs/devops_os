@@ -39,10 +39,34 @@ DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernet
 ```bash
 git clone https://github.com/cloudengine-labs/devops_os.git
 cd devops_os
+```
+
+**Set up a virtual environment** (strongly recommended — keeps DevOps-OS dependencies isolated from your system Python):
+
+```bash
+# Create the virtual environment
+python -m venv .venv
+
+# Activate it
+source .venv/bin/activate        # macOS / Linux
+# .venv\Scripts\activate         # Windows (cmd)
+# .venv\Scripts\Activate.ps1     # Windows (PowerShell)
+```
+
+You will see `(.venv)` at the start of your prompt once the venv is active.  
+Run the same `activate` command every time you open a new terminal window.
+
+**Install the CLI dependencies:**
+
+```bash
 pip install -r cli/requirements.txt
 ```
 
-That's all you need for the generators. Nothing else is installed globally.
+> **Do I always need to activate the venv?**  
+> Yes — run `source .venv/bin/activate` (or the Windows equivalent) in every new
+> terminal session before running `python -m cli.*` commands.  
+> You can skip the venv entirely if you are already inside a Docker container or a
+> CI/CD runner, where dependency isolation is handled by the environment.
 
 ---
 
@@ -142,7 +166,9 @@ python -m cli.devopsos scaffold sre
 
 ## 6 — Use with an AI assistant
 
-Install the MCP server and connect it to Claude Desktop or any OpenAI-compatible tool:
+Install the MCP server and connect it to Claude Desktop or any OpenAI-compatible tool.
+
+Make sure your virtual environment is active (`source .venv/bin/activate`), then:
 
 ```bash
 pip install -r mcp_server/requirements.txt

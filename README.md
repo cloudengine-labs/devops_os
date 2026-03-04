@@ -25,8 +25,18 @@ DevOps-OS is an open-source DevOps automation platform that provides:
 ```bash
 git clone https://github.com/cloudengine-labs/devops_os.git
 cd devops_os
+
+# Create and activate a virtual environment (recommended)
+python -m venv .venv
+source .venv/bin/activate        # macOS / Linux
+# .venv\Scripts\activate         # Windows (cmd / PowerShell)
+
 pip install -r cli/requirements.txt
 ```
+
+> **Why a virtual environment?**  A venv keeps the DevOps-OS dependencies isolated from
+> your system Python, preventing version conflicts with other projects.  
+> Skip this step only if you are already inside a container or a CI environment.
 
 ### 2 — Generate a GitHub Actions workflow
 
@@ -82,7 +92,7 @@ python -m cli.devopsos scaffold sre      # scaffold SRE configs
 
 ### 6 — Use with AI (MCP Server)
 
-Install the MCP dependencies and start the server:
+Make sure your virtual environment is active, then install the MCP dependencies and start the server:
 
 ```bash
 pip install -r mcp_server/requirements.txt

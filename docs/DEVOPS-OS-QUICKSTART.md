@@ -18,6 +18,29 @@ git clone https://github.com/yourusername/devops-os.git
 cd devops-os
 ```
 
+### Set Up a Python Virtual Environment (Recommended)
+
+A virtual environment isolates DevOps-OS dependencies from your system Python and avoids version conflicts with other projects.
+
+```bash
+# Create the virtual environment
+python -m venv .venv
+
+# Activate it — run this every time you open a new terminal
+source .venv/bin/activate        # macOS / Linux
+# .venv\Scripts\activate         # Windows (cmd)
+# .venv\Scripts\Activate.ps1     # Windows (PowerShell)
+
+# Install CLI dependencies
+pip install -r cli/requirements.txt
+```
+
+You will see `(.venv)` in your prompt when the environment is active.  
+To deactivate it later, simply run `deactivate`.
+
+> **Skip the venv** only when running inside a Docker container or CI/CD runner
+> where environment isolation is already provided.
+
 ### Configure Development Container
 ```bash
 # Edit configuration before building
