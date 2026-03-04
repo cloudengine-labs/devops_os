@@ -27,7 +27,10 @@ def test_scaffold_unknown():
 
 def test_scaffold_help_lists_new_targets():
     result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
-    assert "gitlab" in result.stdout or "argocd" in result.stdout or result.returncode == 0
+    assert result.returncode == 0
+    assert "gitlab" in result.stdout
+    assert "argocd" in result.stdout
+    assert "sre" in result.stdout
 
 # -- GitLab CI generator ---------------------------------------------------
 
