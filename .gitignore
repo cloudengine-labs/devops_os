@@ -12,3 +12,8 @@ _site/
 .venv/
 venv/
 docs/test-report.html
+
+# Hugo build artifacts
+hugo-docs/public/
+hugo-docs/resources/
+hugo-docs/.hugo_build.lock
