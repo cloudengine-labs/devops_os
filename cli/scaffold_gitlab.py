@@ -136,11 +136,17 @@ def _build_job(args, lang_config):
             "if [ -f go.mod ]; then go build -v ./...; fi",
         ]
 
+    image = getattr(args, "image", "docker:24")
+    if isinstance(image, str) and image.startswith("docker:"):
+        dind_service = f"{image}-dind"
+    else:
+        dind_service = "docker:24-dind"
+
     return {
         "build": {
             "stage": "build",
-            "image": "docker:24",
-            "services": ["docker:24-dind"],
+            "image": image,
+            "services": [dind_service],
             "variables": {"DOCKER_TLS_CERTDIR": "/certs"},
             "script": pre + script,
             "rules": [{"if": "$CI_COMMIT_BRANCH", "when": "always"}],
