@@ -253,10 +253,18 @@ def _deploy_job(args):
         for b in protected_branches
     ]
 
+    # Select a method-appropriate image so that the required CLI is present.
+    deploy_image = {
+        "kubectl":    "bitnami/kubectl:1.29",
+        "kustomize":  "bitnami/kubectl:1.29",   # kubectl 1.14+ ships kustomize built-in
+        "argocd":     "argoproj/argocd:v2.11.0",
+        "flux":       "fluxcd/flux-cli:v2.3.0",
+    }.get(args.k8s_method, "bitnami/kubectl:1.29")
+
     return {
         "deploy:kubernetes": {
             "stage": "deploy",
-            "image": "bitnami/kubectl:latest",
+            "image": deploy_image,
             "environment": {"name": "$CI_COMMIT_BRANCH", "url": "https://$APP_NAME.$KUBE_NAMESPACE.example.com"},
             "variables": {
                 "KUBE_NAMESPACE": "default",
