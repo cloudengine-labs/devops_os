@@ -24,10 +24,15 @@ The GitHub Actions generator (`github-actions-generator-improved.py`) creates YA
 To generate a basic GitHub Actions workflow:
 
 ```bash
-python github-actions-generator-improved.py --name "My Workflow" --type complete
+python -m cli.scaffold_gha --name "My Workflow" --type complete
 ```
 
 This generates a complete CI/CD workflow including build, test, and deploy stages.
+
+**Output:** `.github/workflows/my-workflow-complete.yml`
+
+The filename is built as `<name-lowercased-and-hyphenated>-<type>.yml` inside the output directory.  
+Change the output directory with `--output <dir>` (default: `.github/workflows/`).
 
 ## Workflow Types
 
@@ -50,16 +55,20 @@ The generator supports several types of workflows:
 ### Example with Basic Options
 
 ```bash
-python github-actions-generator-improved.py --name "Python API" --languages python --output ./.github/workflows
+python -m cli.scaffold_gha --name "Python API" --languages python --output ./.github/workflows
 ```
+
+**Output:** `.github/workflows/python-api-complete.yml`
 
 ## Matrix Builds
 
 Matrix builds allow you to run your workflows across multiple configurations, such as different operating systems or language versions:
 
 ```bash
-python github-actions-generator-improved.py --matrix
+python -m cli.scaffold_gha --matrix
 ```
+
+**Output:** `.github/workflows/devops-os-complete.yml`
 
 This creates a workflow with a matrix strategy that runs on multiple platforms.
 
@@ -83,7 +92,7 @@ For more advanced matrix configurations, you can provide a custom values file:
 ```
 
 ```bash
-python github-actions-generator-improved.py --custom-values matrix-config.json
+python -m cli.scaffold_gha --custom-values matrix-config.json
 ```
 
 ## Kubernetes Integration
@@ -91,7 +100,7 @@ python github-actions-generator-improved.py --custom-values matrix-config.json
 To include Kubernetes deployment steps in your workflow:
 
 ```bash
-python github-actions-generator-improved.py --kubernetes --k8s-method kubectl
+python -m cli.scaffold_gha --kubernetes --k8s-method kubectl
 ```
 
 ### Kubernetes Deployment Methods
@@ -108,8 +117,10 @@ Four Kubernetes deployment methods are supported:
 Reusable workflows can be called from other workflows, making them ideal for creating standardized CI/CD templates:
 
 ```bash
-python github-actions-generator-improved.py --type reusable
+python -m cli.scaffold_gha --type reusable
 ```
+
+**Output:** `.github/workflows/devops-os-reusable.yml`
 
 ### Using a Reusable Workflow
 
@@ -136,7 +147,8 @@ export DEVOPS_OS_GHA_KUBERNETES="true"
 export DEVOPS_OS_GHA_K8S_METHOD="kustomize"
 export DEVOPS_OS_GHA_MATRIX="true"
 
-python github-actions-generator-improved.py
+python -m cli.scaffold_gha
+# Output: .github/workflows/api-service-complete.yml
 ```
 
 ## Advanced Customization
@@ -178,7 +190,7 @@ For advanced customization, create a custom values JSON file:
 ```
 
 ```bash
-python github-actions-generator-improved.py --custom-values advanced-config.json
+python -m cli.scaffold_gha --custom-values advanced-config.json
 ```
 
 ### Integration with DevOps-OS Configuration
@@ -186,7 +198,7 @@ python github-actions-generator-improved.py --custom-values advanced-config.json
 The generator integrates with the DevOps-OS `devcontainer.env.json` file to ensure consistency between your development environment and CI/CD workflows:
 
 ```bash
-python github-actions-generator-improved.py --env-file ./devcontainer.env.json
+python -m cli.scaffold_gha --env-file ./devcontainer.env.json
 ```
 
 ## Examples
@@ -194,31 +206,36 @@ python github-actions-generator-improved.py --env-file ./devcontainer.env.json
 ### Basic Python Application Workflow
 
 ```bash
-python github-actions-generator-improved.py --name "Python App" --languages python --type complete
+python -m cli.scaffold_gha --name "Python App" --languages python --type complete
+# Output: .github/workflows/python-app-complete.yml
 ```
 
 ### Java Application with Maven
 
 ```bash
-python github-actions-generator-improved.py --name "Java Service" --languages java --custom-values maven-config.json
+python -m cli.scaffold_gha --name "Java Service" --languages java --custom-values maven-config.json
+# Output: .github/workflows/java-service-complete.yml
 ```
 
 ### Multi-language Microservices
 
 ```bash
-python github-actions-generator-improved.py --name "Microservices" --languages python,javascript,go --kubernetes --k8s-method kustomize
+python -m cli.scaffold_gha --name "Microservices" --languages python,javascript,go --kubernetes --k8s-method kustomize
+# Output: .github/workflows/microservices-complete.yml
 ```
 
 ### Cross-platform Node.js Application
 
 ```bash
-python github-actions-generator-improved.py --name "Node.js App" --languages javascript --matrix --custom-values node-matrix.json
+python -m cli.scaffold_gha --name "Node.js App" --languages javascript --matrix --custom-values node-matrix.json
+# Output: .github/workflows/node-js-app-complete.yml
 ```
 
 ### Complete Docker and Kubernetes Workflow
 
 ```bash
-python github-actions-generator-improved.py --name "Container Deploy" --languages go --kubernetes --k8s-method argocd --registry ghcr.io
+python -m cli.scaffold_gha --name "Container Deploy" --languages go --kubernetes --k8s-method argocd --registry ghcr.io
+# Output: .github/workflows/container-deploy-complete.yml
 ```
 
 ## Understanding the Generated Workflow

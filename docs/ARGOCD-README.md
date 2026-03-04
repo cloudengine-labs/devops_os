@@ -43,6 +43,10 @@ python -m cli.scaffold_argocd \
 | `--rollouts` | off | Add an Argo Rollouts canary resource |
 | `--image` | `ghcr.io/myorg/my-app` | Image for Flux image automation |
 | `--output-dir` | `.` | Root directory for output files |
+| `--allow-any-source-repo` | off | Add `*` to AppProject `sourceRepos` (grants access to any repo — use with caution) |
+
+All options can also be set via environment variables prefixed with `DEVOPS_OS_ARGOCD_`
+(e.g. `DEVOPS_OS_ARGOCD_AUTO_SYNC=true`).
 
 ## ArgoCD Output Files
 

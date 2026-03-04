@@ -2,20 +2,25 @@
 
 This guide provides the essential CLI commands for using all functionalities of the DevOps-OS development container project.
 
+> 📖 **Full reference:** For the complete list of every option, input file, and output location see [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md).
+
 ## Table of Contents
 - [Setting Up DevOps-OS](#setting-up-devops-os)
-- [Creating CI/CD Configurations](#creating-cicd-configurations)
 - [GitHub Actions Workflows](#github-actions-workflows)
+- [GitLab CI Pipelines](#gitlab-ci-pipelines)
 - [Jenkins Pipelines](#jenkins-pipelines)
-- [Kubernetes Deployments](#kubernetes-deployments)
+- [GitOps / ArgoCD & Flux CD](#gitops--argocd--flux-cd)
+- [SRE Configuration](#sre-configuration)
 - [Container Configuration](#container-configuration)
+- [Common Options for All Generators](#common-options-for-all-generators)
+- [Troubleshooting](#troubleshooting)
 
 ## Setting Up DevOps-OS
 
 ### Clone the DevOps-OS Repository
 ```bash
-git clone https://github.com/yourusername/devops-os.git
-cd devops-os
+git clone https://github.com/cloudengine-labs/devops_os.git
+cd devops_os
 ```
 
 ### Set Up a Python Virtual Environment (Recommended)
@@ -44,6 +49,8 @@ To deactivate it later, simply run `deactivate`.
 ### Configure Development Container
 ```bash
 # Generate dev container config via CLI (recommended)
+# Output: .devcontainer/devcontainer.json
+#         .devcontainer/devcontainer.env.json
 python -m cli.scaffold_devcontainer \
   --languages python,go \
   --cicd-tools docker,terraform,kubectl,helm \
@@ -57,197 +64,235 @@ code .
 # Then use Command Palette (Cmd+Shift+P): "Remote-Containers: Reopen in Container"
 ```
 
-### Manually Configure Container (After Building)
-```bash
-# Run configuration script manually
-python3 .devcontainer/configure.py
-
-# Check installed tools
-docker --version
-kubectl version --client
-helm version
-terraform --version
-```
-
-## Creating CI/CD Configurations
-
-### Unified CI/CD Generator (Simplest Option)
-```bash
-# Generate both GitHub Actions and Jenkins pipelines with defaults
-cicd/generate-cicd.py
-
-# Generate build-only configurations for specific languages
-cicd/generate-cicd.py --type build --languages python,javascript
-
-# Generate with Kubernetes deployment
-cicd/generate-cicd.py --kubernetes --k8s-method kustomize
-
-# Generate with matrix builds for GitHub Actions
-cicd/generate-cicd.py --github --matrix
-
-# Generate with parameters for Jenkins
-cicd/generate-cicd.py --jenkins --parameters
-
-# Generate with custom values file
-cicd/generate-cicd.py --custom-values my-config.json
-
-# Generate for specific output location
-cicd/generate-cicd.py --output-dir /path/to/my/project
-```
-
 ## GitHub Actions Workflows
 
 ### Generate GitHub Actions Workflows
 ```bash
-# Basic GitHub Actions workflow
-python3 cicd/github-actions-generator-improved.py
+# Basic complete CI/CD workflow
+# Output: .github/workflows/devops-os-complete.yml
+python -m cli.scaffold_gha
 
 # Build-only workflow
-python3 cicd/github-actions-generator-improved.py --type build
+# Output: .github/workflows/devops-os-build.yml
+python -m cli.scaffold_gha --type build
 
-# Complete CI/CD workflow
-python3 cicd/github-actions-generator-improved.py --type complete
+# Complete CI/CD workflow for a named application
+# Output: .github/workflows/my-app-complete.yml
+python -m cli.scaffold_gha --name my-app --type complete
 
 # Workflow with Kubernetes deployment
-python3 cicd/github-actions-generator-improved.py --kubernetes --k8s-method kubectl
+# Output: .github/workflows/my-app-complete.yml
+python -m cli.scaffold_gha --name my-app --kubernetes --k8s-method kubectl
 
 # Matrix build across multiple platforms
-python3 cicd/github-actions-generator-improved.py --matrix
+# Output: .github/workflows/devops-os-complete.yml
+python -m cli.scaffold_gha --matrix
 
 # Reusable workflow
-python3 cicd/github-actions-generator-improved.py --type reusable
+# Output: .github/workflows/devops-os-reusable.yml
+python -m cli.scaffold_gha --type reusable
 
 # Specify languages to enable
-python3 cicd/github-actions-generator-improved.py --languages python,java,go
+# Output: .github/workflows/devops-os-complete.yml
+python -m cli.scaffold_gha --languages python,java,go
 
 # Custom container image
-python3 cicd/github-actions-generator-improved.py --image ghcr.io/myorg/devops-os:latest
+python -m cli.scaffold_gha --image ghcr.io/myorg/devops-os:latest
 
 # Custom output location
-python3 cicd/github-actions-generator-improved.py --output ./my-workflows
+# Output: my-workflows/devops-os-complete.yml
+python -m cli.scaffold_gha --output my-workflows
 ```
 
 ### Use Environment Variables Instead
 ```bash
 # Set environment variables
+export DEVOPS_OS_GHA_NAME=my-app
 export DEVOPS_OS_GHA_TYPE=complete
 export DEVOPS_OS_GHA_LANGUAGES=python,javascript
 export DEVOPS_OS_GHA_KUBERNETES=true
 export DEVOPS_OS_GHA_K8S_METHOD=kustomize
 
 # Run generator (will use environment variables)
-python3 cicd/github-actions-generator-improved.py
+# Output: .github/workflows/my-app-complete.yml
+python -m cli.scaffold_gha
+```
+
+## GitLab CI Pipelines
+
+### Generate GitLab CI Pipelines
+```bash
+# Complete pipeline for a Python project
+# Output: .gitlab-ci.yml
+python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+
+# Build + test for Java
+# Output: .gitlab-ci.yml
+python -m cli.scaffold_gitlab --name java-api --languages java --type test
+
+# Pipeline with Kubernetes deploy via ArgoCD
+# Output: .gitlab-ci.yml
+python -m cli.scaffold_gitlab --name my-app --languages python,go \
+       --kubernetes --k8s-method argocd
+
+# Custom output path
+# Output: ci/my-pipeline.yml
+python -m cli.scaffold_gitlab --name my-app --output ci/my-pipeline.yml
+```
+
+### Use Environment Variables Instead
+```bash
+export DEVOPS_OS_GITLAB_NAME=my-app
+export DEVOPS_OS_GITLAB_TYPE=complete
+export DEVOPS_OS_GITLAB_LANGUAGES=python,javascript
+export DEVOPS_OS_GITLAB_KUBERNETES=true
+export DEVOPS_OS_GITLAB_K8S_METHOD=kustomize
+
+# Output: .gitlab-ci.yml
+python -m cli.scaffold_gitlab
 ```
 
 ## Jenkins Pipelines
 
 ### Generate Jenkins Pipelines
 ```bash
-# Basic Jenkins pipeline
-python3 cicd/jenkins-pipeline-generator-improved.py
+# Basic complete CI/CD pipeline
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins
 
 # Build-only pipeline
-python3 cicd/jenkins-pipeline-generator-improved.py --type build
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins --type build
 
-# Complete CI/CD pipeline
-python3 cicd/jenkins-pipeline-generator-improved.py --type complete
+# Complete CI/CD pipeline for a named application
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins --name my-app --type complete
 
 # Pipeline with Kubernetes deployment
-python3 cicd/jenkins-pipeline-generator-improved.py --kubernetes --k8s-method kubectl
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins --name my-app --kubernetes --k8s-method kubectl
 
 # Parameterized pipeline
-python3 cicd/jenkins-pipeline-generator-improved.py --parameters
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins --parameters
 
 # Specify languages to enable
-python3 cicd/jenkins-pipeline-generator-improved.py --languages java,go
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins --languages java,go
 
 # Specify SCM type
-python3 cicd/jenkins-pipeline-generator-improved.py --scm git
-
-# Custom container image
-python3 cicd/jenkins-pipeline-generator-improved.py --image docker.io/myorg/devops-os:latest
+python -m cli.scaffold_jenkins --scm git
 
 # Custom output location
-python3 cicd/jenkins-pipeline-generator-improved.py --output ./Jenkinsfile
+# Output: pipelines/Jenkinsfile
+python -m cli.scaffold_jenkins --output pipelines/Jenkinsfile
 ```
 
 ### Use Environment Variables Instead
 ```bash
-# Set environment variables
+export DEVOPS_OS_JENKINS_NAME=my-app
 export DEVOPS_OS_JENKINS_TYPE=complete
 export DEVOPS_OS_JENKINS_LANGUAGES=python,javascript
 export DEVOPS_OS_JENKINS_KUBERNETES=true
 export DEVOPS_OS_JENKINS_K8S_METHOD=kustomize
 export DEVOPS_OS_JENKINS_PARAMETERS=true
 
-# Run generator (will use environment variables)
-python3 cicd/jenkins-pipeline-generator-improved.py
+# Output: Jenkinsfile
+python -m cli.scaffold_jenkins
 ```
 
-## Kubernetes Deployments
+## GitOps / ArgoCD & Flux CD
 
-### Generate Kubernetes Configurations
+### Generate ArgoCD Configurations
 ```bash
-# Generate basic Kubernetes configuration
-python3 kubernetes/k8s-config-generator.py
+# ArgoCD Application CR + AppProject CR
+# Output: argocd/application.yaml
+#         argocd/appproject.yaml
+python -m cli.scaffold_argocd --name my-app \
+       --repo https://github.com/myorg/my-app.git \
+       --namespace production
 
-# Specify application name
-python3 kubernetes/k8s-config-generator.py --name my-app
-
-# Multi-container application
-python3 kubernetes/k8s-config-generator.py --containers app,db,cache
-
-# Generate with specific namespace
-python3 kubernetes/k8s-config-generator.py --namespace my-namespace
-
-# Generate with Ingress
-python3 kubernetes/k8s-config-generator.py --ingress
-
-# Generate with specific resource limits
-python3 kubernetes/k8s-config-generator.py --cpu 500m --memory 512Mi
-
-# Generate with persistent storage
-python3 kubernetes/k8s-config-generator.py --storage
-
-# Generate with Kustomize support
-python3 kubernetes/k8s-config-generator.py --kustomize
-
-# Generate configurations for multiple environments
-python3 kubernetes/k8s-config-generator.py --environments dev,test,prod
+# ArgoCD with automated sync and canary rollout
+# Output: argocd/application.yaml
+#         argocd/appproject.yaml
+#         argocd/rollout.yaml
+python -m cli.scaffold_argocd --name my-app \
+       --repo https://github.com/myorg/my-app.git \
+       --auto-sync --rollouts
 
 # Custom output directory
-python3 kubernetes/k8s-config-generator.py --output ./k8s-configs
+# Output: gitops/argocd/application.yaml  (etc.)
+python -m cli.scaffold_argocd --name my-app \
+       --repo https://github.com/myorg/my-app.git \
+       --output-dir gitops
 ```
 
-### Deploy Kubernetes Resources
+### Generate Flux CD Configurations
 ```bash
-# Apply generated configurations
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
+# Flux GitRepository + Kustomization + Image Automation
+# Output: flux/git-repository.yaml
+#         flux/kustomization.yaml
+#         flux/image-update-automation.yaml
+python -m cli.scaffold_argocd --name my-app --method flux \
+       --repo https://github.com/myorg/my-app.git \
+       --image ghcr.io/myorg/my-app
+```
 
-# Apply with Kustomize
-kubectl apply -k k8s/overlays/dev
+## SRE Configuration
 
-# Deploy with ArgoCD
-argocd app create my-app --repo https://github.com/myorg/myrepo.git --path k8s --dest-server https://kubernetes.default.svc --dest-namespace default
-argocd app sync my-app
+### Generate SRE Configs
+```bash
+# All SRE configs
+# Output: sre/alert-rules.yaml
+#         sre/grafana-dashboard.json
+#         sre/slo.yaml
+#         sre/alertmanager-config.yaml
+python -m cli.scaffold_sre --name my-app --team platform
 
-# Deploy with Flux
-flux create source git my-app --url=https://github.com/myorg/myrepo.git --branch=main
-flux create kustomization my-app --source=my-app --path="./k8s" --prune=true --interval=10m
+# Availability-only SLO
+# Output: sre/alert-rules.yaml  (etc.)
+python -m cli.scaffold_sre --name my-app --slo-type availability --slo-target 99.9
+
+# Latency SLO with 200ms threshold
+python -m cli.scaffold_sre --name my-app --slo-type latency --latency-threshold 0.2
+
+# With PagerDuty integration
+python -m cli.scaffold_sre --name my-app \
+       --pagerduty-key YOUR_PD_KEY \
+       --slack-channel "#platform-alerts"
+
+# Custom output directory
+# Output: monitoring/alert-rules.yaml  (etc.)
+python -m cli.scaffold_sre --name my-app --output-dir monitoring
 ```
 
 ## Container Configuration
 
 ### Generate Dev Container Config via CLI
 ```bash
-# Generate devcontainer.json and devcontainer.env.json with selected tools
+# Python + Go dev container
+# Output: .devcontainer/devcontainer.json
+#         .devcontainer/devcontainer.env.json
 python -m cli.scaffold_devcontainer \
-  --languages python,java,go \
+  --languages python,go \
+  --cicd-tools docker,kubectl,helm
+
+# Full-stack container with Kubernetes tools
+# Output: .devcontainer/devcontainer.json
+#         .devcontainer/devcontainer.env.json
+python -m cli.scaffold_devcontainer \
+  --languages python,java,javascript \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,kustomize,argocd_cli,flux \
   --devops-tools prometheus,grafana \
   --python-version 3.12
+
+# Write to a specific project directory
+# Output: /path/to/myproject/.devcontainer/devcontainer.json
+#         /path/to/myproject/.devcontainer/devcontainer.env.json
+python -m cli.scaffold_devcontainer \
+  --languages python,go \
+  --output-dir /path/to/myproject
 
 # Or via the unified CLI
 python -m cli.devopsos scaffold devcontainer
@@ -290,81 +335,40 @@ cat > .devcontainer/devcontainer.env.json << EOF
 EOF
 ```
 
-### Build Custom DevOps-OS Container
-```bash
-# Build container with custom name and tag
-docker build -t myorg/devops-os:latest -f .devcontainer/Dockerfile .
-
-# Push custom container to registry
-docker push myorg/devops-os:latest
-
-# Use custom container in generators
-python3 .devcontainer/github-actions-generator-improved.py --image myorg/devops-os:latest
-python3 .devcontainer/jenkins-pipeline-generator-improved.py --image myorg/devops-os:latest
-```
-
-## Examples for Common Technology Stacks
-
-### Python Web Application (FastAPI)
-```bash
-# Generate Python-focused CI/CD
-cicd/generate-cicd.py --languages python --name "FastAPI CI/CD"
-
-# Add Python test stage with coverage
-python3 cicd/github-actions-generator-improved.py --type test --languages python
-```
-
-### Java Spring Boot Application
-```bash
-# Generate Java-focused CI/CD
-cicd/generate-cicd.py --languages java --name "Spring Boot CI/CD"
-
-# Generate Kubernetes deployment for Spring Boot
-python3 cicd/k8s-config-generator.py --name spring-app --port 8080
-```
-
-### JavaScript/Node.js Application
-```bash
-# Generate JavaScript-focused CI/CD
-cicd/generate-cicd.py --languages javascript --name "Node.js CI/CD"
-
-# Generate with npm caching
-python3 cicd/github-actions-generator-improved.py --languages javascript --custom-values node-config.json
-```
-
-### Microservices Project
-```bash
-# Generate complete CI/CD for multiple services
-cicd/generate-cicd.py --kubernetes --k8s-method kustomize --custom-values microservices.json
-```
-
 ## Common Options for All Generators
 
-|Option|GitHub Actions|Jenkins|Kubernetes|Description|
-|------|--------------|-------|----------|-----------|
-|`--name`|✓|✓|✓|Name of the workflow/pipeline/app|
-|`--type`|✓|✓|✗|Type of workflow/pipeline|
-|`--languages`|✓|✓|✗|Languages to enable|
-|`--kubernetes`|✓|✓|✗|Include K8s deployment steps|
-|`--k8s-method`|✓|✓|✗|K8s deployment method|
-|`--output`|✓|✓|✓|Output directory/file path|
-|`--custom-values`|✓|✓|✓|Custom configuration file|
-|`--image`|✓|✓|✗|Container image to use|
+| Option | `scaffold_gha` | `scaffold_gitlab` | `scaffold_jenkins` | `scaffold_argocd` | `scaffold_sre` | `scaffold_devcontainer` | Description |
+|--------|:-:|:-:|:-:|:-:|:-:|:-:|-------------|
+| `--name` | ✓ | ✓ | ✓ | ✓ | ✓ | — | Name of the workflow/pipeline/app |
+| `--type` | ✓ | ✓ | ✓ | — | — | — | Type of workflow/pipeline |
+| `--languages` | ✓ | ✓ | ✓ | — | — | ✓ | Languages to enable |
+| `--kubernetes` | ✓ | ✓ | ✓ | — | — | — | Include K8s deployment steps |
+| `--k8s-method` | ✓ | ✓ | ✓ | — | — | — | K8s deployment method |
+| `--output` | ✓ | ✓ | ✓ | — | — | — | Output file path |
+| `--output-dir` | — | — | — | ✓ | ✓ | ✓ | Output directory |
+| `--custom-values` | ✓ | ✓ | ✓ | — | — | — | Custom configuration JSON file |
+| `--image` | ✓ | ✓ | ✓ | ✓ | — | — | Container image to use |
 
 ## Troubleshooting
 
 ```bash
 # Show help for each generator
-python3 cicd/github-actions-generator-improved.py --help
-python3 cicd/jenkins-pipeline-generator-improved.py --help
-python3 kubernetes/k8s-config-generator.py --help
-python3 cicd/generate-cicd.py --help
+python -m cli.scaffold_gha --help
+python -m cli.scaffold_gitlab --help
+python -m cli.scaffold_jenkins --help
+python -m cli.scaffold_argocd --help
+python -m cli.scaffold_sre --help
+python -m cli.scaffold_devcontainer --help
 
-# Verify container configuration
+# Verify generated output locations
+ls -la .github/workflows/      # GitHub Actions
+cat .gitlab-ci.yml             # GitLab CI
+cat Jenkinsfile                # Jenkins
+ls -la argocd/                 # ArgoCD
+ls -la flux/                   # Flux CD
+ls -la sre/                    # SRE configs
+ls -la .devcontainer/          # Dev container
+
+# Verify dev container configuration
 cat .devcontainer/devcontainer.env.json
-
-# Check generator output
-ls -la .github/workflows/
-cat Jenkinsfile
-ls -la k8s/
 ```

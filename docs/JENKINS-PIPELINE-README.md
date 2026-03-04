@@ -24,10 +24,13 @@ The Jenkins pipeline generator (`jenkins-pipeline-generator-improved.py`) create
 To generate a basic Jenkins pipeline:
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "My Pipeline" --type complete
+python -m cli.scaffold_jenkins --name "My Pipeline" --type complete
 ```
 
 This generates a complete CI/CD pipeline including build, test, and deploy stages.
+
+**Output:** `Jenkinsfile` (default)  
+Change the output file path with `--output <path>` (e.g. `--output pipelines/Jenkinsfile`).
 
 ## Pipeline Types
 
@@ -50,7 +53,8 @@ The generator supports several types of pipelines:
 ### Example with Basic Options
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Python API" --languages python --output ./Jenkinsfile
+python -m cli.scaffold_jenkins --name "Python API" --languages python --output ./Jenkinsfile
+# Output: Jenkinsfile
 ```
 
 ## Parameterized Pipelines
@@ -58,7 +62,8 @@ python jenkins-pipeline-generator-improved.py --name "Python API" --languages py
 Parameterized pipelines allow for runtime configuration of the pipeline:
 
 ```bash
-python jenkins-pipeline-generator-improved.py --parameters
+python -m cli.scaffold_jenkins --parameters
+# Output: Jenkinsfile
 ```
 
 This creates a pipeline with parameters that can be configured when the pipeline is run.
@@ -86,7 +91,8 @@ parameters {
 To include Kubernetes deployment steps in your pipeline:
 
 ```bash
-python jenkins-pipeline-generator-improved.py --kubernetes --k8s-method kubectl
+python -m cli.scaffold_jenkins --kubernetes --k8s-method kubectl
+# Output: Jenkinsfile
 ```
 
 ### Kubernetes Deployment Methods
@@ -103,7 +109,8 @@ Four Kubernetes deployment methods are supported:
 The pipeline generator integrates with Jenkins credentials for secure management of sensitive information:
 
 ```bash
-python jenkins-pipeline-generator-improved.py --type complete --kubernetes
+python -m cli.scaffold_jenkins --type complete --kubernetes
+# Output: Jenkinsfile
 ```
 
 ### Credentials in Generated Pipelines
@@ -143,7 +150,8 @@ export DEVOPS_OS_JENKINS_KUBERNETES="true"
 export DEVOPS_OS_JENKINS_K8S_METHOD="kustomize"
 export DEVOPS_OS_JENKINS_PARAMETERS="true"
 
-python jenkins-pipeline-generator-improved.py
+python -m cli.scaffold_jenkins
+# Output: Jenkinsfile
 ```
 
 ## Advanced Customization
@@ -200,7 +208,8 @@ For advanced customization, create a custom values JSON file:
 ```
 
 ```bash
-python jenkins-pipeline-generator-improved.py --custom-values advanced-config.json
+python -m cli.scaffold_jenkins --custom-values advanced-config.json
+# Output: Jenkinsfile
 ```
 
 ### Integration with DevOps-OS Configuration
@@ -208,7 +217,8 @@ python jenkins-pipeline-generator-improved.py --custom-values advanced-config.js
 The generator integrates with the DevOps-OS `devcontainer.env.json` file to ensure consistency between your development environment and CI/CD pipelines:
 
 ```bash
-python jenkins-pipeline-generator-improved.py --env-file ./devcontainer.env.json
+python -m cli.scaffold_jenkins --env-file ./devcontainer.env.json
+# Output: Jenkinsfile
 ```
 
 ## Examples
@@ -216,31 +226,36 @@ python jenkins-pipeline-generator-improved.py --env-file ./devcontainer.env.json
 ### Basic Python Application Pipeline
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Python App" --languages python --type complete
+python -m cli.scaffold_jenkins --name "Python App" --languages python --type complete
+# Output: Jenkinsfile
 ```
 
 ### Java Application with Maven
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Java Service" --languages java --custom-values maven-config.json
+python -m cli.scaffold_jenkins --name "Java Service" --languages java --custom-values maven-config.json
+# Output: Jenkinsfile
 ```
 
 ### Multi-language Microservices
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Microservices" --languages python,javascript,go --kubernetes --k8s-method kustomize
+python -m cli.scaffold_jenkins --name "Microservices" --languages python,javascript,go --kubernetes --k8s-method kustomize
+# Output: Jenkinsfile
 ```
 
 ### Parameterized Deployment Pipeline
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Deployment" --languages go --kubernetes --k8s-method argocd --parameters
+python -m cli.scaffold_jenkins --name "Deployment" --languages go --kubernetes --k8s-method argocd --parameters
+# Output: Jenkinsfile
 ```
 
 ### Complete Docker and Kubernetes Pipeline
 
 ```bash
-python jenkins-pipeline-generator-improved.py --name "Container Deploy" --languages go --kubernetes --k8s-method kubectl --registry docker.io
+python -m cli.scaffold_jenkins --name "Container Deploy" --languages go --kubernetes --k8s-method kubectl --registry docker.io
+# Output: Jenkinsfile
 ```
 
 ## Understanding the Generated Pipeline

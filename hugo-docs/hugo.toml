@@ -1,0 +1,50 @@
+baseURL = 'https://cloudengine-labs.github.io/devops_os/'
+languageCode = 'en-us'
+title = 'DevOps-OS'
+
+# Enable Git info for Last Modified dates
+enableGitInfo = true
+
+# Handle HTML in Markdown
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.highlight]
+  style = 'github'
+  lineNos = false
+  codeFences = true
+  noClasses = false
+
+# Hugo Book Theme Parameters
+[params]
+  # light, dark, or auto
+  BookTheme = 'auto'
+
+  # Show table-of-contents on each page
+  BookToC = true
+
+  # Path to favicon (relative to static/)
+  BookFavicon = '/favicon.png'
+
+  # GitHub repo for "Edit this page" links
+  BookRepo = 'https://github.com/cloudengine-labs/devops_os'
+
+  # Path segment after BookRepo for "Edit this page" links
+  BookEditPath = 'edit/main/hugo-docs/content'
+
+  # Enable in-page search (powered by lunr.js)
+  BookSearch = true
+
+  # Disable comments
+  BookComments = false
+
+  # Enable portable links (useful for offline builds)
+  BookPortableLinks = false
+
+  # Enable service worker for offline support
+  BookServiceWorker = false
+
+# Hugo modules: pull in the Book theme
+[module]
+  [[module.imports]]
+    path = 'github.com/alex-shpak/hugo-book'

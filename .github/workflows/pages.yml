@@ -1,9 +1,12 @@
-name: Deploy GitHub Pages
+name: Deploy Hugo Documentation
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'hugo-docs/**'
+      - '.github/workflows/pages.yml'
   workflow_dispatch:
 
 permissions:
@@ -15,26 +18,53 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
+# Default shell
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: "0.147.0"
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Full history for .GitInfo / LastMod
 
-      - name: Setup Pages
+      - name: Setup Go (required for Hugo modules)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install Hugo CLI
+        run: |
+          wget -O ${{ runner.temp }}/hugo.deb \
+            https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb
+          sudo dpkg -i ${{ runner.temp }}/hugo.deb
+
+      - name: Setup GitHub Pages
+        id: pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
+      - name: Download Hugo modules
+        working-directory: ./hugo-docs
+        run: hugo mod tidy
 
-      - name: Upload artifact
+      - name: Build Hugo site
+        working-directory: ./hugo-docs
+        env:
+          HUGO_ENVIRONMENT: production
+          # Use the Pages URL configured above
+          HUGO_BASEURL: ${{ steps.pages.outputs.base_url }}/
+        run: hugo --gc --minify
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./hugo-docs/public
 
   deploy:
     environment:
