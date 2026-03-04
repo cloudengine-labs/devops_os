@@ -112,7 +112,7 @@ test:python:
 
 deploy:kubernetes:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image: bitnami/kubectl:1.29
   script:
     - kubectl set image deployment/flask-api ...
     - kubectl rollout status ...
