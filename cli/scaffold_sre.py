@@ -255,7 +255,7 @@ def generate_grafana_dashboard(args):
         panel(2, "Error Rate",
               f"rate(http_requests_total{{job=\"{name}\",status=~\"5..\"}}[5m]) / rate(http_requests_total{{job=\"{name}\"}}[5m])",
               gridx=12, gridy=0, unit="percentunit"),
-        panel(3, "p50 / p95 / p99 Latency",
+        panel(3, "p99 Latency",
               f"histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{{job=\"{name}\"}}[5m]))",
               gridx=0, gridy=8, unit="s"),
         panel(4, "Pod Restarts",
