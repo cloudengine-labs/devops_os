@@ -243,6 +243,7 @@ For more examples and detailed usage, see the [DevOps-OS Quick Start Guide](docs
 ## 🧪 Testing
 
 The test suite covers all CLI scaffold commands, the MCP server, and AI skill definitions.
+A dedicated **Sanity Tests** GitHub Actions workflow (`.github/workflows/sanity.yml`) runs every scenario automatically on every push and pull request — no real infrastructure required; all tests use in-memory mock data.
 
 ```bash
 pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
@@ -256,6 +257,7 @@ python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehens
 | [**Detailed Test Report**](docs/TEST_REPORT.md) | Full test results with CLI output samples for every scaffold command |
 | [**Interactive HTML Report**](docs/test-reports/test-report.html) | Self-contained pytest HTML report (download and open in browser) |
 | [**CLI Output Examples**](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
+| [**Sanity Workflow**](.github/workflows/sanity.yml) | GitHub Actions workflow that runs all scenario tests on every push |
 
 ---
 
