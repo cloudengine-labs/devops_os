@@ -91,7 +91,28 @@ source .venv/bin/activate        # macOS / Linux
 pip install -r cli/requirements.txt
 ```
 
-### 2 — Generate a GitHub Actions workflow
+### 2 — Learn the Process-First philosophy *(recommended first step)*
+
+DevOps-OS is built on the **Process-First** SDLC philosophy from [cloudenginelabs.io](https://cloudenginelabs.io). Run the `process-first` command to understand *why* each tool exists before you start using it:
+
+```bash
+# Full overview — what Process-First is, how it maps to DevOps-OS, and learning tips
+python -m cli.devopsos process-first
+
+# Just the 5 core principles
+python -m cli.devopsos process-first --section what
+
+# Table: which scaffold command encodes which principle
+python -m cli.devopsos process-first --section mapping
+
+# AI prompts and book recommendations for beginners
+python -m cli.devopsos process-first --section tips
+```
+
+> **Tip:** Run `--section mapping` to see exactly which `devopsos scaffold` command to use for each DevOps goal before generating any config.  
+> See [docs/PROCESS-FIRST.md](docs/PROCESS-FIRST.md) for the full reference.
+
+### 3 — Generate a GitHub Actions workflow
 
 ```bash
 # Complete CI/CD for a Python + JavaScript project
@@ -101,7 +122,7 @@ python -m cli.scaffold_gha --name my-app --languages python,javascript --type co
 python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
-### 3 — Generate other pipelines & configs
+### 4 — Generate other pipelines & configs
 
 ```bash
 # Jenkins pipeline → Jenkinsfile
@@ -128,7 +149,7 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
-### 4 — Interactive wizard (all-in-one)
+### 5 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
@@ -138,15 +159,9 @@ python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
 python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
 python -m cli.devopsos scaffold sre          # scaffold SRE configs
 python -m cli.devopsos scaffold devcontainer # scaffold dev container config
-
-# Learn the Process-First philosophy and how it maps to DevOps-OS tooling
-python -m cli.devopsos process-first                  # full overview
-python -m cli.devopsos process-first --section what   # ideology & core principles
-python -m cli.devopsos process-first --section mapping # principle → tool mapping
-python -m cli.devopsos process-first --section tips   # AI prompts for beginners
 ```
 
-### 5 — Use with AI (MCP Server)
+### 6 — Use with AI (MCP Server)
 
 ```bash
 pip install -r mcp_server/requirements.txt

@@ -358,3 +358,14 @@ def test_process_first_module_section_mapping():
     assert result.returncode == 0
     assert "scaffold" in result.stdout.lower()
 
+
+def test_process_first_invalid_section_clean_error():
+    """Invalid --section value gives a clean CLI error, not a Python traceback."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--section", "invalid"])
+    assert result.returncode != 0
+    combined = result.stdout + result.stderr
+    # Typer enum validation produces: "Invalid value for '--section': 'invalid' is not one of ..."
+    assert "Traceback" not in combined, "Expected clean CLI error, not a Python traceback"
+    assert "ValueError" not in combined, "Expected clean CLI error, not a ValueError"
+    assert "is not one of" in combined or "Invalid value" in combined
+
