@@ -12,6 +12,7 @@ import cli.scaffold_gitlab as scaffold_gitlab
 import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
+import cli.process_first as process_first
 
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
 
@@ -150,6 +151,14 @@ def scaffold(
         scaffold_devcontainer.main()
     else:
         typer.echo("Unknown scaffold target.")
+
+@app.command("process-first")
+def process_first_cmd(
+    section: str = typer.Option("all", help="Section to display: what | mapping | tips | all"),
+):
+    """Learn about the Process-First SDLC philosophy and how it maps to DevOps-OS tooling."""
+    process_first.display(section)
+
 
 if __name__ == "__main__":
     app()
