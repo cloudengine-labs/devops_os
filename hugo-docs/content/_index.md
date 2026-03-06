@@ -26,6 +26,7 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 | 📊 | **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests — [→ SRE Configuration]({{< relref "/docs/sre" >}}) |
 | 🤖 | **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills — [→ AI Integration]({{< relref "/docs/ai-integration" >}}) |
 | 🛠️ | **Dev Container** | Pre-configured multi-language environment: Python · Java · Go · JavaScript — [→ Dev Container]({{< relref "/docs/dev-container" >}}) |
+| 🔄 | **Process-First** | Built-in education on the Process-First SDLC philosophy and how every tool maps to an SDLC principle — [→ Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) |
 | 📖 | **CLI Reference** | Complete option tables, input files, and exact output paths for every command — [→ CLI Reference]({{< relref "/docs/reference" >}}) |
 
 ---
@@ -38,15 +39,18 @@ git clone https://github.com/cloudengine-labs/devops_os.git
 cd devops_os
 pip install -r cli/requirements.txt
 
-# 2. Generate a GitHub Actions workflow
+# 2. Learn the Process-First philosophy (recommended first step)
+python -m cli.devopsos process-first
+
+# 3. Generate a GitHub Actions workflow
 python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
 # Output: .github/workflows/my-app-complete.yml
 
-# 3. Generate a GitLab CI pipeline
+# 4. Generate a GitLab CI pipeline
 python -m cli.scaffold_gitlab --name my-app --languages python --type complete
 # Output: .gitlab-ci.yml
 
-# 4. Generate SRE configs (Prometheus + Grafana + SLO)
+# 5. Generate SRE configs (Prometheus + Grafana + SLO)
 python -m cli.scaffold_sre --name my-app --team platform
 # Output: sre/ directory
 ```
@@ -74,6 +78,7 @@ python -m cli.scaffold_sre --name my-app --team platform
 | Guide | Description |
 |-------|-------------|
 | [Getting Started]({{< relref "/docs/getting-started" >}}) | Zero to first pipeline in 5 minutes |
+| [Process-First Philosophy]({{< relref "/docs/getting-started/process-first" >}}) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [Quick Start Reference]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands at a glance |
 | [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) | Generate GHA workflows |
 | [GitLab CI]({{< relref "/docs/ci-cd/gitlab-ci" >}}) | Generate GitLab pipelines |

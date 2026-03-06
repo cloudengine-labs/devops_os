@@ -23,6 +23,28 @@ pip install -r cli/requirements.txt
 
 ---
 
+## Process-First Philosophy
+
+Before running any generator, learn *why* each tool exists:
+
+```bash
+# Full overview (Process-First ideology + tooling map + beginner tips)
+python -m cli.devopsos process-first
+
+# Core principles only
+python -m cli.devopsos process-first --section what
+
+# Principle → devopsos scaffold command mapping
+python -m cli.devopsos process-first --section mapping
+
+# AI prompts for deeper learning
+python -m cli.devopsos process-first --section tips
+```
+
+See the [Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) for the full reference.
+
+---
+
 ## GitHub Actions Workflows
 
 ```bash
@@ -189,6 +211,7 @@ python -m cli.scaffold_jenkins --help
 python -m cli.scaffold_argocd --help
 python -m cli.scaffold_sre --help
 python -m cli.scaffold_devcontainer --help
+python -m cli.devopsos process-first --help
 
 # Verify generated output
 ls -la .github/workflows/      # GitHub Actions
