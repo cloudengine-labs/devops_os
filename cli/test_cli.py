@@ -369,3 +369,24 @@ def test_process_first_invalid_section_clean_error():
     assert "ValueError" not in combined, "Expected clean CLI error, not a ValueError"
     assert "is not one of" in combined or "Invalid value" in combined
 
+
+def test_process_first_default_output_includes_usage_footer():
+    """Default output (no --section) includes a HOW TO USE footer with section examples."""
+    result = _run(["-m", "cli.devopsos", "process-first"])
+    assert result.returncode == 0
+    assert "HOW TO USE THIS COMMAND" in result.stdout
+    assert "--section what" in result.stdout
+    assert "--section mapping" in result.stdout
+    assert "--section tips" in result.stdout
+    assert "--help" in result.stdout
+
+
+def test_process_first_specific_section_no_usage_footer():
+    """Specific sections (not 'all') do NOT include the usage footer."""
+    for section in ("what", "mapping", "tips"):
+        result = _run(["-m", "cli.devopsos", "process-first", "--section", section])
+        assert result.returncode == 0
+        assert "HOW TO USE THIS COMMAND" not in result.stdout, (
+            f"--section {section} should not show the usage footer"
+        )
+

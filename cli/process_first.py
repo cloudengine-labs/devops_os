@@ -139,6 +139,25 @@ BEGINNER_TIPS = """\
 
 """
 
+USAGE_FOOTER = """\
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  HOW TO USE THIS COMMAND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  python -m cli.devopsos process-first                     # full overview (this output)
+  python -m cli.devopsos process-first --section what      # 5 core principles only
+  python -m cli.devopsos process-first --section mapping   # devopsos scaffold command map
+  python -m cli.devopsos process-first --section tips      # AI prompts for beginners
+  python -m cli.devopsos process-first --help              # full option reference
+
+  You can also run the standalone module:
+
+  python -m cli.process_first [--section what|mapping|tips|all]
+
+  📖  Full docs: docs/PROCESS-FIRST.md
+
+"""
+
 FULL_TEXT = (
     PROCESS_FIRST_SUMMARY
     + WHAT_IS_PROCESS_FIRST
@@ -155,7 +174,7 @@ SECTIONS = {
     "what": PROCESS_FIRST_SUMMARY + WHAT_IS_PROCESS_FIRST,
     "mapping": PROCESS_FIRST_SUMMARY + MAPPING_TO_TOOLING,
     "tips": PROCESS_FIRST_SUMMARY + BEGINNER_TIPS,
-    "all": FULL_TEXT,
+    "all": FULL_TEXT + USAGE_FOOTER,
 }
 
 
