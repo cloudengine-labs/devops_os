@@ -302,3 +302,91 @@ def test_scaffold_devcontainer_via_scaffold_command():
     assert result.returncode == 0
     # Verify devcontainer is listed alongside other targets
     assert "devcontainer" in result.stdout or "devcontainer" in result.stderr or result.returncode == 0
+
+# -- Process-First command -------------------------------------------------
+
+def test_process_first_help():
+    """process-first command is registered and shows help."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--help"])
+    assert result.returncode == 0
+    assert "Process-First" in result.stdout or "process" in result.stdout.lower()
+
+
+def test_process_first_all_sections():
+    """Default output (all sections) contains expected keywords."""
+    result = _run(["-m", "cli.devopsos", "process-first"])
+    assert result.returncode == 0
+    assert "process-first" in result.stdout.lower() or "PROCESS-FIRST" in result.stdout
+    assert "cloudenginelabs" in result.stdout.lower()
+    assert "devopsos scaffold" in result.stdout.lower() or "devopsos" in result.stdout.lower()
+
+
+def test_process_first_section_what():
+    """--section what shows ideology overview."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--section", "what"])
+    assert result.returncode == 0
+    assert "PROCESS-FIRST" in result.stdout or "process" in result.stdout.lower()
+    assert "DEFINE" in result.stdout or "define" in result.stdout.lower()
+
+
+def test_process_first_section_mapping():
+    """--section mapping shows the tooling mapping table."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--section", "mapping"])
+    assert result.returncode == 0
+    assert "scaffold" in result.stdout.lower()
+    assert "argocd" in result.stdout.lower() or "gitops" in result.stdout.lower()
+
+
+def test_process_first_section_tips():
+    """--section tips shows AI beginner prompts."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--section", "tips"])
+    assert result.returncode == 0
+    assert "AI" in result.stdout or "ai" in result.stdout.lower()
+    assert "beginner" in result.stdout.lower() or "BEGINNER" in result.stdout
+
+
+def test_process_first_module_direct():
+    """process_first module can be run directly as __main__."""
+    result = _run(["-m", "cli.process_first"])
+    assert result.returncode == 0
+    assert "PROCESS-FIRST" in result.stdout or "process" in result.stdout.lower()
+
+
+def test_process_first_module_section_mapping():
+    """process_first module --section mapping works standalone."""
+    result = _run(["-m", "cli.process_first", "--section", "mapping"])
+    assert result.returncode == 0
+    assert "scaffold" in result.stdout.lower()
+
+
+def test_process_first_invalid_section_clean_error():
+    """Invalid --section value gives a clean CLI error, not a Python traceback."""
+    result = _run(["-m", "cli.devopsos", "process-first", "--section", "invalid"])
+    assert result.returncode != 0
+    combined = result.stdout + result.stderr
+    # Typer enum validation produces: "Invalid value for '--section': 'invalid' is not one of ..."
+    assert "Traceback" not in combined, "Expected clean CLI error, not a Python traceback"
+    assert "ValueError" not in combined, "Expected clean CLI error, not a ValueError"
+    assert "is not one of" in combined or "Invalid value" in combined
+
+
+def test_process_first_default_output_includes_usage_footer():
+    """Default output (no --section) includes a HOW TO USE footer with section examples."""
+    result = _run(["-m", "cli.devopsos", "process-first"])
+    assert result.returncode == 0
+    assert "HOW TO USE THIS COMMAND" in result.stdout
+    assert "--section what" in result.stdout
+    assert "--section mapping" in result.stdout
+    assert "--section tips" in result.stdout
+    assert "--help" in result.stdout
+
+
+def test_process_first_specific_section_no_usage_footer():
+    """Specific sections (not 'all') do NOT include the usage footer."""
+    for section in ("what", "mapping", "tips"):
+        result = _run(["-m", "cli.devopsos", "process-first", "--section", section])
+        assert result.returncode == 0
+        assert "HOW TO USE THIS COMMAND" not in result.stdout, (
+            f"--section {section} should not show the usage footer"
+        )
+

@@ -9,6 +9,7 @@ Welcome to the DevOps-OS documentation! This set of guides will help you use and
 | [**CLI Commands Reference**](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location for all CLI commands |
 | [Getting Started](docs/GETTING-STARTED.md) | First pipeline in 5 minutes |
 | [Quick Start Guide](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
+| [Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips for beginners |
 | [GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
 | [GitLab CI Generator](docs/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
 | [Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |

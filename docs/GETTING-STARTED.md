@@ -176,6 +176,23 @@ python -m cli.devopsos scaffold argocd
 python -m cli.devopsos scaffold sre
 ```
 
+### Learn the Process-First philosophy
+
+Before running any scaffold command, it helps to understand *why* you are building the process that way.
+Run the `process-first` command to read the Process-First SDLC philosophy from cloudenginelabs.io,
+see how each principle maps directly to a DevOps-OS tool, and get AI prompts for going deeper:
+
+```bash
+# Full overview — what Process-First is, the tooling map, and beginner tips
+python -m cli.devopsos process-first
+
+# Focus on the principle → tool mapping
+python -m cli.devopsos process-first --section mapping
+
+# AI prompts and book recommendations for beginners
+python -m cli.devopsos process-first --section tips
+```
+
 ---
 
 ## 6 — Use with an AI assistant
@@ -254,6 +271,7 @@ A: Copy the generated file(s) to your project repository, commit, and push. No f
 
 | I want to… | Read |
 |-----------|------|
+| Understand why DevOps-OS is Process-First | [PROCESS-FIRST.md](PROCESS-FIRST.md) |
 | See every option and output path | [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md) |
 | Deep-dive GitHub Actions options | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
 | Deep-dive GitLab CI options | [GITLAB-CI-README.md](GITLAB-CI-README.md) |

@@ -6,6 +6,7 @@ This guide provides the essential CLI commands for using all functionalities of 
 
 ## Table of Contents
 - [Setting Up DevOps-OS](#setting-up-devops-os)
+- [Process-First Philosophy](#process-first-philosophy)
 - [GitHub Actions Workflows](#github-actions-workflows)
 - [GitLab CI Pipelines](#gitlab-ci-pipelines)
 - [Jenkins Pipelines](#jenkins-pipelines)
@@ -63,6 +64,38 @@ vim .devcontainer/devcontainer.env.json
 code .
 # Then use Command Palette (Cmd+Shift+P): "Remote-Containers: Reopen in Container"
 ```
+
+## Process-First Philosophy
+
+**CloudEngineLabs** ([cloudenginelabs.io](https://cloudenginelabs.io)) is a **Process-First** SDLC automation company. Before running any scaffold command,
+use the `process-first` CLI option to understand the philosophy behind DevOps-OS and how it drives
+every tool in this project.
+
+```bash
+# Full overview — ideology, tooling map, and beginner tips
+python -m cli.devopsos process-first
+
+# What is Process-First? (core principles)
+python -m cli.devopsos process-first --section what
+
+# How each principle maps to a DevOps-OS scaffold command
+python -m cli.devopsos process-first --section mapping
+
+# AI prompts and book recommendations for DevOps beginners
+python -m cli.devopsos process-first --section tips
+```
+
+### Where does process-first help?
+
+| When you are… | Run |
+|---------------|-----|
+| New to DevOps-OS | `process-first` — understand *why* before *how* |
+| Onboarding a team | `process-first --section mapping` — show how each scaffold encodes a process |
+| Learning DevOps from scratch | `process-first --section tips` — get AI prompts to study CI/CD, GitOps, and SRE |
+| Choosing which scaffold to run first | `process-first --section what` — align on the 5 core principles first |
+
+> **Tip:** Run `process-first --section mapping` alongside `scaffold` commands to see exactly which
+> Process-First principle each generated artefact satisfies.
 
 ## GitHub Actions Workflows
 

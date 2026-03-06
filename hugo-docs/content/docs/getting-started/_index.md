@@ -65,7 +65,22 @@ pip install -r cli/requirements.txt
 
 ---
 
-## 2 — Generate your first CI/CD pipeline
+## 2 — Learn the Process-First philosophy *(recommended)*
+
+Before running any generator, understand *why* each tool exists:
+
+```bash
+python -m cli.devopsos process-first                    # full overview
+python -m cli.devopsos process-first --section what     # 5 core principles
+python -m cli.devopsos process-first --section mapping  # which scaffold encodes which principle
+python -m cli.devopsos process-first --section tips     # AI prompts for deeper learning
+```
+
+See the [Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) for the full reference.
+
+---
+
+## 3 — Generate your first CI/CD pipeline
 
 ### GitHub Actions
 
@@ -93,7 +108,7 @@ python -m cli.scaffold_jenkins --name my-app --languages java --type complete
 
 ---
 
-## 3 — Generate Kubernetes / GitOps configs
+## 4 — Generate Kubernetes / GitOps configs
 
 ```bash
 # ArgoCD Application CR + AppProject
@@ -110,7 +125,7 @@ python -m cli.scaffold_argocd --name my-app --method flux \
 
 ---
 
-## 4 — Generate SRE configs
+## 5 — Generate SRE configs
 
 ```bash
 python -m cli.scaffold_sre --name my-app --team platform
@@ -124,7 +139,7 @@ python -m cli.scaffold_sre --name my-app --team platform
 
 ---
 
-## 5 — Interactive wizard (all-in-one)
+## 6 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
@@ -137,7 +152,7 @@ python -m cli.devopsos scaffold sre      # scaffold SRE configs
 
 ---
 
-## 6 — Use with an AI assistant
+## 7 — Use with an AI assistant
 
 ```bash
 pip install -r mcp_server/requirements.txt
@@ -166,6 +181,7 @@ Then ask Claude: *"Generate a complete GitLab CI pipeline for a Python Flask API
 
 | I want to… | Read |
 |-----------|------|
+| Understand the Process-First philosophy | [Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) |
 | See every CLI option and output path | [CLI Reference]({{< relref "/docs/reference" >}}) |
 | Deep-dive GitHub Actions | [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) |
 | Deep-dive GitLab CI | [GitLab CI]({{< relref "/docs/ci-cd/gitlab-ci" >}}) |

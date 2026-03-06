@@ -1,3 +1,4 @@
+import enum
 import typer
 from InquirerPy import inquirer
 import json
@@ -12,6 +13,15 @@ import cli.scaffold_gitlab as scaffold_gitlab
 import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
+import cli.process_first as process_first
+
+class ProcessFirstSection(str, enum.Enum):
+    """Valid sections for the process-first command."""
+    what = "what"
+    mapping = "mapping"
+    tips = "tips"
+    all = "all"
+
 
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
 
@@ -150,6 +160,38 @@ def scaffold(
         scaffold_devcontainer.main()
     else:
         typer.echo("Unknown scaffold target.")
+
+@app.command("process-first")
+def process_first_cmd(
+    section: ProcessFirstSection = typer.Option(
+        ProcessFirstSection.all,
+        help=(
+            "Section to display:\n\n"
+            "  'what'    — What Process-First is and its 5 core principles\n\n"
+            "  'mapping' — How each principle maps to a devopsos scaffold command\n\n"
+            "  'tips'    — AI prompts and book recommendations for DevOps beginners\n\n"
+            "  'all'     — All sections combined (default)"
+        ),
+        show_choices=True,
+    ),
+):
+    """Learn about the Process-First SDLC philosophy and how it maps to DevOps-OS tooling.
+
+    \b
+    Quick invocation guide:
+
+      python -m cli.devopsos process-first                    # full overview
+      python -m cli.devopsos process-first --section what     # core principles
+      python -m cli.devopsos process-first --section mapping  # tool mapping table
+      python -m cli.devopsos process-first --section tips     # AI prompts for beginners
+
+    You can also run the module directly:
+
+      python -m cli.process_first
+      python -m cli.process_first --section mapping
+    """
+    process_first.display(section.value)
+
 
 if __name__ == "__main__":
     app()

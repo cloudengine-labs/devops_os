@@ -21,7 +21,8 @@ Complete reference for every DevOps-OS CLI command: options, default values, env
 | Flux CD | `python -m cli.scaffold_argocd --method flux` | `flux/` directory |
 | SRE configs | `python -m cli.scaffold_sre` | `sre/` directory |
 | Dev Container | `python -m cli.scaffold_devcontainer` | `.devcontainer/` directory |
-| Interactive wizard | `python -m cli.devopsos` | varies |
+| Interactive wizard | `python -m cli.devopsos init` | varies |
+| Process-First guide | `python -m cli.devopsos process-first` | stdout (educational content) |
 
 ---
 
@@ -181,6 +182,7 @@ python -m cli.devopsos COMMAND [options]
 |---------|-------------|
 | `init` | Interactive wizard (select languages, tools, generate dev container) |
 | `scaffold TARGET` | Non-interactive generator (delegates to `scaffold_*` modules) |
+| `process-first` | Learn the Process-First SDLC philosophy and how it maps to DevOps-OS tooling |
 
 ### Scaffold targets
 
@@ -192,6 +194,31 @@ python -m cli.devopsos scaffold argocd       # ArgoCD / Flux
 python -m cli.devopsos scaffold sre          # SRE configs
 python -m cli.devopsos scaffold devcontainer # Dev container
 ```
+
+### process-first command
+
+Prints the Process-First SDLC philosophy to stdout. Accepts an optional `--section` flag to display a focused sub-section.
+
+```bash
+# Full overview (all sections, default)
+python -m cli.devopsos process-first
+
+# Core principles only
+python -m cli.devopsos process-first --section what
+
+# Principle → DevOps-OS tooling mapping table
+python -m cli.devopsos process-first --section mapping
+
+# AI prompts and book recommendations for beginners
+python -m cli.devopsos process-first --section tips
+
+# Run the standalone module (same output)
+python -m cli.process_first --section mapping
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--section SECTION` | `all` | Section to display: `what` \| `mapping` \| `tips` \| `all` |
 
 ---
 
