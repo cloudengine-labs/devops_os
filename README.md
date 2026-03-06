@@ -29,6 +29,7 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 | 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
 | 🤖 **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills |
 | 🛠️ **Dev Container** | Pre-configured multi-language environment (Python · Java · Go · JavaScript) |
+| 🔄 **Process-First** | Built-in education on the Process-First SDLC philosophy and how it maps to every DevOps-OS tool |
 
 ---
 
@@ -137,6 +138,12 @@ python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
 python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
 python -m cli.devopsos scaffold sre          # scaffold SRE configs
 python -m cli.devopsos scaffold devcontainer # scaffold dev container config
+
+# Learn the Process-First philosophy and how it maps to DevOps-OS tooling
+python -m cli.devopsos process-first                  # full overview
+python -m cli.devopsos process-first --section what   # ideology & core principles
+python -m cli.devopsos process-first --section mapping # principle → tool mapping
+python -m cli.devopsos process-first --section tips   # AI prompts for beginners
 ```
 
 ### 5 — Use with AI (MCP Server)
@@ -239,6 +246,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 |-------|-------------|
 | [🚀 Getting Started](docs/GETTING-STARTED.md) | Easy step-by-step guide — **start here** |
 | [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
+| [🔄 Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
 | [⚙️ GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |

@@ -16,6 +16,7 @@ For each command you will find the **complete option table**, the **input files*
 - [scaffold_sre — SRE Config Generator](#scaffold_sre--sre-config-generator)
 - [scaffold_devcontainer — Dev Container Generator](#scaffold_devcontainer--dev-container-generator)
 - [devopsos — Unified CLI](#devopsos--unified-cli)
+- [process-first — Process-First Philosophy](#process-first--process-first-philosophy)
 - [Environment Variable Reference](#environment-variable-reference)
 - [Input File Formats](#input-file-formats)
 
@@ -45,6 +46,7 @@ pip install -r cli/requirements.txt
 | SRE configs | `python -m cli.scaffold_sre` | `sre/` directory |
 | Dev Container | `python -m cli.scaffold_devcontainer` | `.devcontainer/` directory |
 | Interactive wizard | `python -m cli.devopsos` | varies (see below) |
+| Process-First | `python -m cli.devopsos process-first` | stdout (educational content) |
 
 All generators also accept environment variables as an alternative to flags —
 see [Environment Variable Reference](#environment-variable-reference).
@@ -527,6 +529,7 @@ python -m cli.devopsos COMMAND [options]
 |---------|-------------|
 | `init` | Interactive wizard to select tools/languages and optionally generate dev container files |
 | `scaffold TARGET` | Non-interactive generator (delegates to the corresponding `scaffold_*` module) |
+| `process-first` | Display the Process-First SDLC philosophy, tooling map, and beginner learning tips |
 
 ### `devopsos init`
 
@@ -560,6 +563,74 @@ python -m cli.devopsos scaffold argocd     # uses DEVOPS_OS_ARGOCD_* env vars
 python -m cli.devopsos scaffold sre        # uses DEVOPS_OS_SRE_* env vars
 python -m cli.devopsos scaffold devcontainer
 ```
+
+### `devopsos process-first`
+
+Prints educational content about the **Process-First** SDLC philosophy used by [cloudenginelabs.io](https://cloudenginelabs.io) and shows exactly how each principle maps to DevOps-OS tooling.
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--section SECTION` | `all` | Section to display: `what` \| `mapping` \| `tips` \| `all` |
+
+| Section | Content |
+|---------|---------|
+| `what` | What Process-First is and its 5 core principles |
+| `mapping` | Table mapping each principle to a specific `devopsos scaffold` command |
+| `tips` | AI prompts and book recommendations for DevOps beginners |
+| `all` *(default)* | All sections in order |
+
+```bash
+# Full overview (all sections)
+python -m cli.devopsos process-first
+
+# Ideology & core principles only
+python -m cli.devopsos process-first --section what
+
+# Principle → DevOps-OS tooling map
+python -m cli.devopsos process-first --section mapping
+
+# AI learning tips for beginners
+python -m cli.devopsos process-first --section tips
+
+# Run the module directly (same output)
+python -m cli.process_first
+python -m cli.process_first --section mapping
+```
+
+**When to use this command:**
+
+- **Onboarding new engineers** — run `process-first` before introducing any other `scaffold` command so they understand *why* before *how*.
+- **Team workshops** — show the `--section mapping` table to demonstrate which DevOps-OS tool encodes which SDLC process.
+- **Self-study** — the `--section tips` output contains copy-paste AI prompts that let any beginner explore CI/CD, GitOps, and SRE concepts in depth.
+
+---
+
+## process-first — Process-First Philosophy
+
+The `process-first` command is also available as a standalone module.
+
+### Invocation
+
+```bash
+python -m cli.process_first [--section SECTION]
+```
+
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--section SECTION` | `all` | Which section to display: `what` \| `mapping` \| `tips` \| `all` |
+
+### Output
+
+Prints formatted text to **stdout** — no files are created.
+
+| Section | What it covers |
+|---------|---------------|
+| `what` | The Process-First philosophy: define before build, standardise before scale, automate the repeatable, observe and iterate, culture over tooling |
+| `mapping` | A table mapping each of the 5 principles to the corresponding `devopsos scaffold` sub-command |
+| `tips` | Ready-to-paste AI prompts (Claude / ChatGPT / Gemini) for deepening DevOps knowledge, plus book recommendations |
+| `all` | All three sections combined (default) |
 
 ---
 
@@ -679,6 +750,7 @@ Accepted by `scaffold_gha`, `scaffold_jenkins`, and `scaffold_gitlab` via `--cus
 | Topic | Document |
 |-------|---------|
 | Getting started (first pipeline in 5 min) | [GETTING-STARTED.md](GETTING-STARTED.md) |
+| Process-First philosophy & tooling map | [PROCESS-FIRST.md](PROCESS-FIRST.md) |
 | GitHub Actions deep dive | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
 | GitLab CI deep dive | [GITLAB-CI-README.md](GITLAB-CI-README.md) |
 | Jenkins deep dive | [JENKINS-PIPELINE-README.md](JENKINS-PIPELINE-README.md) |
