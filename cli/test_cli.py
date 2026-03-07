@@ -69,6 +69,99 @@ def test_init_dir_option_creates_devcontainer_in_specified_dir():
             "Expected devcontainer.env.json inside .devcontainer"
         )
 
+def test_init_checkbox_includes_space_instruction():
+    """Each checkbox prompt must include an instruction so users know to press Space."""
+    from unittest.mock import MagicMock, patch, call
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_skip = MagicMock()
+    confirm_skip.execute.return_value = False
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock) as mock_cb, \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_skip]):
+            CliRunner().invoke(app, ["init", "--dir", tmp])
+
+    # Every checkbox call must pass a non-empty 'instruction' keyword argument
+    assert mock_cb.call_count > 0, "checkbox was never called"
+    for c in mock_cb.call_args_list:
+        instruction = c.kwargs.get("instruction", "")
+        assert instruction, (
+            f"checkbox call missing 'instruction' kwarg — "
+            f"users cannot tell they must press Space to select items. Call: {c}"
+        )
+        assert "space" in instruction.lower(), (
+            f"instruction '{instruction}' should mention Space so users know how to select"
+        )
+
+def test_init_selections_written_to_config():
+    """Selections made in the wizard must be reflected as True in devcontainer.env.json."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    # Simulate user selecting one tool in each group
+    selections = [
+        ["python"],          # Languages
+        ["docker"],          # Containerization
+        ["gradle"],          # Build Tools
+        ["sonarqube"],       # Test & Quality
+        ["kubectl", "k9s"],  # Kubernetes
+        ["github_actions"],  # CI/CD & Deploy
+        ["prometheus"],      # SRE & Monitoring
+    ]
+    sel_iter = iter(selections)
+
+    def _checkbox_factory(**kwargs):
+        mock = MagicMock()
+        mock.execute.return_value = next(sel_iter)
+        return mock
+
+    text_mock = MagicMock()
+    text_mock.execute.return_value = "3.11"
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_skip = MagicMock()
+    confirm_skip.execute.return_value = False
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with patch("cli.devopsos.inquirer.checkbox", side_effect=_checkbox_factory), \
+             patch("cli.devopsos.inquirer.text", return_value=text_mock), \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_skip]):
+            result = CliRunner().invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+
+        cfg_path = Path(tmp) / ".devcontainer" / "devcontainer.env.json"
+        assert cfg_path.exists()
+        cfg = json.loads(cfg_path.read_text())
+
+        # Selected tools must be True; unselected must be False
+        assert cfg["languages"]["python"] is True, "python should be True"
+        assert cfg["languages"]["java"] is False, "java should be False"
+        assert cfg["cicd"]["docker"] is True, "docker should be True"
+        assert cfg["cicd"]["podman"] is False, "podman should be False"
+        assert cfg["cicd"]["github_actions"] is True, "github_actions should be True"
+        # kubectl and helm are mapped into the "cicd" section
+        assert cfg["cicd"]["kubectl"] is True, "kubectl should be True"
+        assert cfg["cicd"]["helm"] is False, "helm (not selected) should be False"
+        assert cfg["kubernetes"]["k9s"] is True, "k9s should be True"
+        assert cfg["kubernetes"]["flux"] is False, "flux should be False"
+        assert cfg["build_tools"]["gradle"] is True, "gradle should be True"
+        assert cfg["build_tools"]["maven"] is False, "maven should be False"
+        assert cfg["code_analysis"]["sonarqube"] is True, "sonarqube should be True"
+        assert cfg["devops_tools"]["prometheus"] is True, "prometheus should be True"
+        assert cfg["devops_tools"]["grafana"] is False, "grafana should be False"
+
 def test_scaffold_unknown():
     result = _run(["-m", "cli.devopsos", "scaffold", "unknown"])
     assert "Unknown scaffold target" in result.stdout

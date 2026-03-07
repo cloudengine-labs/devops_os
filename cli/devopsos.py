@@ -93,6 +93,7 @@ def init(
         selected = inquirer.checkbox(
             message=f"Select {group_label}:",
             choices=group_info["choices"],
+            instruction="(Space to select, ↑↓ to navigate, Enter to confirm)",
         ).execute()
         selected_by_group[group_label] = selected
 
