@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import re
 import tempfile
 import os
 import yaml
@@ -15,11 +16,58 @@ def _run_module(module, extra_args=None):
     args = ["-m", module] + (extra_args or [])
     return _run(args)
 
+_ANSI_ESCAPE = re.compile(r'\x1b\[[0-9;]*[mK]')
+
+def _strip_ansi(s):
+    """Remove ANSI escape codes so plain-text assertions work regardless of terminal colour."""
+    return _ANSI_ESCAPE.sub('', s)
+
 # -- devopsos CLI ----------------------------------------------------------
 
 def test_help():
     result = _run(["-m", "cli.devopsos", "--help"])
     assert "Unified DevOps-OS CLI tool" in result.stdout
+
+def test_init_help_shows_dir_option():
+    """--dir option must appear in `devopsos init --help`."""
+    result = subprocess.run(
+        [sys.executable, "-m", "cli.devopsos", "init", "--help"],
+        capture_output=True, text=True,
+        cwd=os.path.dirname(os.path.dirname(__file__)),
+        env={**os.environ, "NO_COLOR": "1"},
+    )
+    assert result.returncode == 0
+    assert "--dir" in _strip_ansi(result.stdout)
+
+def test_init_dir_option_creates_devcontainer_in_specified_dir():
+    """--dir places .devcontainer inside the given directory, not the cwd."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []  # nothing selected
+
+    # First confirm  → Proceed = True
+    # Second confirm → Generate Dockerfile = False (skip, we only need env.json)
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_skip = MagicMock()
+    confirm_skip.execute.return_value = False
+
+    with tempfile.TemporaryDirectory() as tmp:
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_skip]):
+            runner = CliRunner()
+            result = runner.invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        dc_dir = Path(tmp) / ".devcontainer"
+        assert dc_dir.is_dir(), "Expected .devcontainer dir inside --dir target"
+        assert (dc_dir / "devcontainer.env.json").exists(), (
+            "Expected devcontainer.env.json inside .devcontainer"
+        )
 
 def test_scaffold_unknown():
     result = _run(["-m", "cli.devopsos", "scaffold", "unknown"])
@@ -31,6 +79,45 @@ def test_scaffold_help_lists_new_targets():
     assert "gitlab" in result.stdout
     assert "argocd" in result.stdout
     assert "sre" in result.stdout
+
+def test_scaffold_gha_via_cli():
+    """Regression: `python -m cli.devopsos scaffold gha` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_GHA_OUTPUT": os.path.join(tmp, ".github/workflows")}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gha"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+
+def test_scaffold_gitlab_via_cli():
+    """Regression: `python -m cli.devopsos scaffold gitlab` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_GITLAB_OUTPUT": os.path.join(tmp, ".gitlab-ci.yml")}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gitlab"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+
+def test_scaffold_argocd_via_cli():
+    """Regression: `python -m cli.devopsos scaffold argocd` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_ARGOCD_OUTPUT_DIR": tmp}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "argocd"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
 
 # -- GitLab CI generator ---------------------------------------------------
 
