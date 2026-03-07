@@ -1,4 +1,5 @@
 import enum
+import sys
 import typer
 from InquirerPy import inquirer
 import json
@@ -144,22 +145,33 @@ def scaffold(
     tool: str = typer.Option(None, help="Tool type (e.g., github, jenkins, argo, flux)"),
 ):
     """Scaffold CI/CD or K8s resources."""
-    if target == "cicd":
-        scaffold_cicd.main()
-    elif target == "gha":
-        scaffold_gha.main()
-    elif target == "gitlab":
-        scaffold_gitlab.main()
-    elif target == "jenkins":
-        scaffold_jenkins.main()
-    elif target == "argocd":
-        scaffold_argocd.main()
-    elif target == "sre":
-        scaffold_sre.main()
-    elif target == "devcontainer":
-        scaffold_devcontainer.main()
-    else:
-        typer.echo("Unknown scaffold target.")
+    # Each scaffold module uses argparse internally and calls parse_args() which
+    # reads sys.argv.  When invoked via `python -m cli.devopsos scaffold <target>`
+    # sys.argv still contains the parent CLI tokens (e.g. ['devopsos.py', 'scaffold',
+    # 'gha']).  Temporarily strip those extra tokens so argparse inside each
+    # scaffold module only sees the program name and falls back to env-var / default
+    # values, then restore sys.argv afterwards.
+    _saved_argv = sys.argv[:]
+    sys.argv = sys.argv[:1]
+    try:
+        if target == "cicd":
+            scaffold_cicd.main()
+        elif target == "gha":
+            scaffold_gha.main()
+        elif target == "gitlab":
+            scaffold_gitlab.main()
+        elif target == "jenkins":
+            scaffold_jenkins.main()
+        elif target == "argocd":
+            scaffold_argocd.main()
+        elif target == "sre":
+            scaffold_sre.main()
+        elif target == "devcontainer":
+            scaffold_devcontainer.main()
+        else:
+            typer.echo("Unknown scaffold target.")
+    finally:
+        sys.argv = _saved_argv
 
 @app.command("process-first")
 def process_first_cmd(

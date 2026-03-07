@@ -32,6 +32,45 @@ def test_scaffold_help_lists_new_targets():
     assert "argocd" in result.stdout
     assert "sre" in result.stdout
 
+def test_scaffold_gha_via_cli():
+    """Regression: `python -m cli.devopsos scaffold gha` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_GHA_OUTPUT": os.path.join(tmp, ".github/workflows")}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gha"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+
+def test_scaffold_gitlab_via_cli():
+    """Regression: `python -m cli.devopsos scaffold gitlab` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_GITLAB_OUTPUT": os.path.join(tmp, ".gitlab-ci.yml")}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gitlab"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+
+def test_scaffold_argocd_via_cli():
+    """Regression: `python -m cli.devopsos scaffold argocd` must not raise argparse error."""
+    with tempfile.TemporaryDirectory() as tmp:
+        env = {**os.environ, "DEVOPS_OS_ARGOCD_OUTPUT_DIR": tmp}
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "argocd"],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+            env=env,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+
 # -- GitLab CI generator ---------------------------------------------------
 
 def test_scaffold_gitlab_build():
