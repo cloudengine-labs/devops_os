@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CloudEngine Labs News</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+–ink: #1a1008;
+–paper: #f2e8d5;
+–paper-dark: #e8d9bc;
+–aged: #c9a96e;
+–rule: #2a1a08;
+–faded: #7a6040;
+}
+
+body {
+background: #4a3728;
+display: flex;
+justify-content: center;
+align-items: flex-start;
+min-height: 100vh;
+padding: 40px 20px;
+font-family: ‘Libre Baskerville’, serif;
+}
+
+.newspaper {
+width: 900px;
+background: var(–paper);
+color: var(–ink);
+padding: 0;
+position: relative;
+box-shadow:
+0 0 0 1px #8a6a40,
+4px 4px 0 #3a2a18,
+8px 8px 0 #2a1a0a,
+0 20px 60px rgba(0,0,0,0.6);
+/* Paper texture via layered gradients */
+background-image:
+repeating-linear-gradient(
+0deg,
+transparent,
+transparent 28px,
+rgba(120,80,30,0.04) 28px,
+rgba(120,80,30,0.04) 29px
+),
+radial-gradient(ellipse at 20% 30%, rgba(200,160,80,0.15) 0%, transparent 60%),
+radial-gradient(ellipse at 80% 70%, rgba(160,120,60,0.12) 0%, transparent 50%);
+}
+
+/* Aged paper edge */
+.newspaper::before {
+content: ‘’;
+position: absolute;
+inset: 0;
+background:
+linear-gradient(to right, rgba(100,60,20,0.08) 0%, transparent 3%, transparent 97%, rgba(100,60,20,0.08) 100%),
+linear-gradient(to bottom, rgba(100,60,20,0.06) 0%, transparent 5%, transparent 95%, rgba(100,60,20,0.06) 100%);
+pointer-events: none;
+z-index: 10;
+}
+
+/* Grain overlay */
+.newspaper::after {
+content: ‘’;
+position: absolute;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
+opacity: 0.4;
+pointer-events: none;
+z-index: 11;
+}
+
+.inner {
+padding: 28px 36px;
+position: relative;
+z-index: 1;
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+text-align: center;
+border-bottom: 3px double var(–rule);
+padding-bottom: 10px;
+margin-bottom: 6px;
+}
+
+.edition-bar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-family: ‘IM Fell English’, serif;
+font-size: 10px;
+letter-spacing: 0.08em;
+color: var(–faded);
+margin-bottom: 6px;
+padding: 0 2px;
+}
+
+.paper-name {
+font-family: ‘UnifrakturMaguntia’, cursive;
+font-size: 68px;
+line-height: 1;
+color: var(–ink);
+letter-spacing: 0.02em;
+text-shadow: 2px 2px 0 rgba(100,60,20,0.2);
+margin-bottom: 4px;
+}
+
+.paper-tagline {
+font-family: ‘IM Fell English’, serif;
+font-style: italic;
+font-size: 12px;
+letter-spacing: 0.15em;
+color: var(–faded);
+text-transform: uppercase;
+}
+
+.edition-bar-bottom {
+display: flex;
+justify-content: space-between;
+font-family: ‘IM Fell English’, serif;
+font-size: 10px;
+color: var(–faded);
+margin-top: 6px;
+padding-top: 6px;
+border-top: 1px solid var(–aged);
+}
+
+/* ── RULES ── */
+.rule-thick { border: none; border-top: 3px solid var(–rule); margin: 8px 0; }
+.rule-thin  { border: none; border-top: 1px solid var(–rule); margin: 6px 0; }
+.rule-double { border: none; border-top: 3px double var(–rule); margin: 8px 0; }
+.rule-ornate {
+text-align: center;
+color: var(–aged);
+font-size: 14px;
+margin: 8px 0;
+letter-spacing: 6px;
+}
+
+/* ── KICKER ── */
+.kicker {
+text-align: center;
+font-family: ‘IM Fell English’, serif;
+font-size: 11px;
+letter-spacing: 0.3em;
+text-transform: uppercase;
+color: var(–faded);
+margin: 10px 0 4px;
+}
+
+/* ── HEADLINE ── */
+.headline-main {
+font-family: ‘Playfair Display’, serif;
+font-size: 58px;
+font-weight: 900;
+line-height: 1.0;
+text-align: center;
+color: var(–ink);
+margin: 6px 0 4px;
+text-transform: uppercase;
+letter-spacing: -0.01em;
+}
+
+.headline-main span {
+font-style: italic;
+font-weight: 700;
+}
+
+.headline-deck {
+font-family: ‘Playfair Display’, serif;
+font-size: 22px;
+font-weight: 400;
+font-style: italic;
+text-align: center;
+color: var(–ink);
+margin: 4px 0 8px;
+line-height: 1.3;
+}
+
+/* ── BYLINE ── */
+.byline {
+text-align: center;
+font-family: ‘IM Fell English’, serif;
+font-size: 11px;
+letter-spacing: 0.1em;
+color: var(–faded);
+margin: 4px 0;
+}
+
+/* ── COLUMNS ── */
+.col-layout {
+display: grid;
+gap: 0;
+}
+
+.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+.col-2-1 { grid-template-columns: 2fr 1fr; }
+.col-1-2 { grid-template-columns: 1fr 2fr; }
+.col-2 { grid-template-columns: 1fr 1fr; }
+
+.col {
+padding: 10px 14px;
+border-right: 1px solid var(–rule);
+}
+.col:last-child { border-right: none; }
+
+/* ── BODY TEXT ── */
+p.body {
+font-family: ‘IM Fell English’, serif;
+font-size: 12.5px;
+line-height: 1.65;
+text-align: justify;
+hyphens: auto;
+color: var(–ink);
+margin-bottom: 8px;
+}
+
+p.body::first-line {
+font-variant: small-caps;
+letter-spacing: 0.05em;
+}
+
+/* Drop cap */
+.dropcap::first-letter {
+font-family: ‘Playfair Display’, serif;
+font-size: 52px;
+font-weight: 900;
+float: left;
+line-height: 0.8;
+margin: 4px 6px 0 0;
+color: var(–ink);
+}
+
+/* ── SECTION HEADS ── */
+.col-head {
+font-family: ‘Playfair Display’, serif;
+font-size: 17px;
+font-weight: 700;
+text-align: center;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+margin-bottom: 6px;
+padding-bottom: 4px;
+border-bottom: 2px solid var(–rule);
+color: var(–ink);
+}
+
+.col-subhead {
+font-family: ‘Playfair Display’, serif;
+font-size: 13px;
+font-weight: 700;
+font-style: italic;
+margin: 8px 0 4px;
+color: var(–ink);
+}
+
+/* ── FEATURE BOX ── */
+.feature-box {
+border: 2px solid var(–rule);
+padding: 12px 16px;
+margin: 10px 0;
+background: var(–paper-dark);
+position: relative;
+}
+
+.feature-box::before {
+content: ‘✦ ✦ ✦’;
+position: absolute;
+top: -10px;
+left: 50%;
+transform: translateX(-50%);
+background: var(–paper-dark);
+padding: 0 8px;
+font-size: 10px;
+color: var(–aged);
+letter-spacing: 4px;
+}
+
+.feature-box-title {
+font-family: ‘Playfair Display’, serif;
+font-size: 14px;
+font-weight: 700;
+text-align: center;
+text-transform: uppercase;
+letter-spacing: 0.1em;
+margin-bottom: 8px;
+color: var(–ink);
+}
+
+/* ── TOOLS LIST ── */
+.tools-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 3px 10px;
+}
+
+.tool-item {
+font-family: ‘IM Fell English’, serif;
+font-size: 11px;
+color: var(–ink);
+padding: 2px 0;
+border-bottom: 1px dotted var(–aged);
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.tool-item::before {
+content: ‘▸’;
+color: var(–aged);
+font-size: 9px;
+flex-shrink: 0;
+}
+
+/* ── PULL QUOTE ── */
+.pull-quote {
+border-top: 2px solid var(–rule);
+border-bottom: 2px solid var(–rule);
+padding: 10px 6px;
+margin: 10px 0;
+text-align: center;
+}
+
+.pull-quote p {
+font-family: ‘Playfair Display’, serif;
+font-size: 15px;
+font-style: italic;
+font-weight: 700;
+line-height: 1.4;
+color: var(–ink);
+}
+
+.pull-quote cite {
+font-family: ‘IM Fell English’, serif;
+font-size: 10px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: var(–faded);
+display: block;
+margin-top: 5px;
+}
+
+/* ── LIVE NOTICE BOX ── */
+.live-box {
+border: 3px solid var(–rule);
+text-align: center;
+padding: 14px;
+margin: 10px 0;
+background: var(–ink);
+color: var(–paper);
+position: relative;
+}
+
+.live-box-corner {
+position: absolute;
+width: 10px;
+height: 10px;
+border: 2px solid var(–paper);
+}
+.live-box-corner.tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
+.live-box-corner.tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
+.live-box-corner.bl { bottom: 4px; left: 4px; border-right: none; border-top: none; }
+.live-box-corner.br { bottom: 4px; right: 4px; border-left: none; border-top: none; }
+
+.live-label {
+font-family: ‘IM Fell English’, serif;
+font-size: 10px;
+letter-spacing: 0.4em;
+text-transform: uppercase;
+color: var(–aged);
+margin-bottom: 4px;
+}
+
+.live-headline {
+font-family: ‘Playfair Display’, serif;
+font-size: 26px;
+font-weight: 900;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+color: var(–paper);
+line-height: 1.1;
+margin-bottom: 6px;
+}
+
+.live-detail {
+font-family: ‘IM Fell English’, serif;
+font-size: 13px;
+color: var(–paper-dark);
+margin: 3px 0;
+}
+
+.live-cta {
+font-family: ‘Playfair Display’, serif;
+font-size: 12px;
+font-style: italic;
+color: var(–aged);
+margin-top: 8px;
+}
+
+/* ── BOTTOM BANNER ── */
+.bottom-banner {
+background: var(–ink);
+color: var(–paper);
+text-align: center;
+padding: 12px 20px;
+margin-top: 10px;
+}
+
+.bottom-banner-text {
+font-family: ‘Playfair Display’, serif;
+font-size: 13px;
+font-style: italic;
+letter-spacing: 0.05em;
+color: var(–aged);
+margin-bottom: 4px;
+}
+
+.bottom-banner-url {
+font-family: ‘IM Fell English’, serif;
+font-size: 15px;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: var(–paper);
+}
+
+/* ── ORNAMENTS ── */
+.ornament {
+text-align: center;
+font-size: 16px;
+color: var(–aged);
+letter-spacing: 8px;
+margin: 6px 0;
+}
+
+.star-rule {
+text-align: center;
+color: var(–aged);
+font-size: 12px;
+letter-spacing: 10px;
+margin: 5px 0;
+}
+
+/* ── AD NOTICE ── */
+.ad-notice {
+text-align: center;
+font-family: ‘IM Fell English’, serif;
+font-size: 9px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–faded);
+margin: 5px 0;
+}
+
+/* ── STAMP ── */
+.stamp {
+border: 3px solid var(–aged);
+display: inline-block;
+padding: 4px 10px;
+font-family: ‘Playfair Display’, serif;
+font-size: 11px;
+font-weight: 700;
+text-transform: uppercase;
+letter-spacing: 0.15em;
+color: var(–aged);
+transform: rotate(-2deg);
+margin: 4px auto;
+}
+
+.stamp-wrap {
+text-align: center;
+margin: 8px 0;
+}
+</style>
+
+</head>
+<body>
+<div class="newspaper">
+<div class="inner">
+
+  <!-- MASTHEAD -->
+
+  <div class="masthead">
+    <div class="edition-bar">
+      <span>VOL. I &nbsp;·&nbsp; NO. 1</span>
+      <span>FOUNDED MMXXIII &nbsp;·&nbsp; CHENNAI, INDIA</span>
+      <span>SATURDAY, MARCH 2026</span>
+    </div>
+    <div class="paper-name">CloudEngine Labs News</div>
+    <div class="paper-tagline">— Automating the Future, One Pipeline at a Time —</div>
+    <div class="edition-bar-bottom">
+      <span>SPECIAL LAUNCH EDITION</span>
+      <span>☞ &nbsp; FREE TO READ &nbsp; ·&nbsp; FREE TO USE &nbsp; ·&nbsp; OPEN SOURCE FOREVER &nbsp; ☜</span>
+      <span>PRICE: ONE ⭐ STAR</span>
+    </div>
+  </div>
+
+  <hr class="rule-thick">
+  <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <hr class="rule-thin">
+
+  <!-- KICKER + HEADLINE -->
+
+  <div class="kicker">✦ &nbsp; A Historic Announcement from CloudEngine Labs &nbsp; ✦</div>
+
+  <div class="headline-main">DevOps-<span>OS</span></div>
+  <div class="headline-deck">
+    The Open-Source Platform That Scaffolds Your Entire DevOps Stack<br>
+    — From a Single Command —
+  </div>
+
+  <hr class="rule-thin">
+  <div class="byline">By &nbsp; SARAVANAN G &nbsp; · &nbsp; AWS Community Builder &nbsp; · &nbsp; Founder, CloudEngine Labs &nbsp; · &nbsp; Chennai, India</div>
+  <hr class="rule-double">
+
+  <!-- ROW 1: 3 columns -->
+
+  <div class="col-layout col-3" style="margin-top:10px;">
+
+```
+<div class="col">
+  <div class="col-head">The Problem</div>
+  <p class="body dropcap">Every DevOps engineer, at some point in their career, has stared at a blank YAML file and written — from memory — the same GitHub Actions workflow they wrote for the last project, and the project before that.</p>
+  <p class="body">The same Prometheus alert rules. The same ArgoCD Application manifest. The same Kubernetes deployment scaffold. Copied, pasted, tweaked, committed. A ritual of repetition that consumes hours every week across every engineering team on the planet.</p>
+  <p class="body">After two decades consulting across Wipro, Accenture, Capgemini, HCL Technologies, and Infracloud — watching this pattern repeat in enterprise after enterprise — this correspondent resolved that the problem deserved a proper solution.</p>
+
+  <div class="pull-quote">
+    <p>"The configs that run the world's software should not be written from scratch, every time, by every team."</p>
+    <cite>— Saravanan G, Founder</cite>
+  </div>
+</div>
+
+<div class="col">
+  <div class="col-head">The Solution</div>
+  <p class="body dropcap">DevOps-OS is an open-source DevOps automation platform that generates production-ready CI/CD pipelines, Kubernetes manifests, GitOps configurations, and SRE observability setups — in seconds, from a single CLI command or a conversational AI prompt.</p>
+  <p class="body">The platform supports the complete modern DevOps toolchain: GitHub Actions, GitLab CI, and Jenkins for continuous integration; ArgoCD and Flux CD for GitOps deployment; Prometheus, Grafana, and Sloth-compatible SLO manifests for site reliability engineering.</p>
+  <p class="body">Crucially, DevOps-OS ships with a native MCP server — enabling Claude and other AI assistants to scaffold DevOps configurations as a built-in skill, making intelligent automation accessible to every practitioner regardless of expertise.</p>
+  <p class="body">The project is ideated from real industry experience and developed with AI pair programming — proof that a solo maintainer, armed with domain expertise and modern tooling, can ship what once required an entire platform team.</p>
+</div>
+
+<div class="col">
+  <div class="col-head">A Gift to the Community</div>
+  <p class="body dropcap">DevOps-OS is released under the MIT licence — free to use, free to modify, free to distribute, forever. It represents something more personal than a software release.</p>
+  <p class="body">"I have grown with so many extraordinary tech communities over the years," the founder stated in an exclusive interview with this publication. "The AWS Community Builder programme, the HashiCorp and Terraform meetup circuits, the conference stages — these communities shaped me as an engineer and as a person."</p>
+  <p class="body">"DevOps-OS is my small token of thanks. My way of giving back to the community that gave me so much."</p>
+
+  <div class="stamp-wrap">
+    <div class="stamp">MIT Licensed</div>
+  </div>
+
+  <p class="body">The project is actively maintained with commits as recently as this fortnight, and the maintainer invites contributors of all experience levels to participate in its growth.</p>
+</div>
+```
+
+  </div>
+
+  <hr class="rule-thick">
+  <div class="star-rule">★ &nbsp; ★ &nbsp; ★ &nbsp; ★ &nbsp; ★</div>
+  <hr class="rule-thick">
+
+  <!-- ROW 2: Features + Live box -->
+
+  <div class="col-layout col-2-1" style="margin-top:8px;">
+
+```
+<div class="col">
+  <div class="col-head">Capabilities at a Glance</div>
+  <div class="col-layout col-2" style="margin-top:6px;">
+    <div>
+      <div class="col-subhead">CI/CD Generation</div>
+      <div class="tools-grid">
+        <div class="tool-item">GitHub Actions</div>
+        <div class="tool-item">GitLab CI</div>
+        <div class="tool-item">Jenkins</div>
+        <div class="tool-item">Multi-language</div>
+      </div>
+      <div class="col-subhead">GitOps & Deploy</div>
+      <div class="tools-grid">
+        <div class="tool-item">ArgoCD</div>
+        <div class="tool-item">Flux CD</div>
+        <div class="tool-item">Kustomize</div>
+        <div class="tool-item">Helm</div>
+      </div>
+    </div>
+    <div>
+      <div class="col-subhead">SRE & Observability</div>
+      <div class="tools-grid">
+        <div class="tool-item">Prometheus</div>
+        <div class="tool-item">Grafana</div>
+        <div class="tool-item">SLO (Sloth)</div>
+        <div class="tool-item">Alert Rules</div>
+      </div>
+      <div class="col-subhead">AI Integration</div>
+      <div class="tools-grid">
+        <div class="tool-item">Claude MCP</div>
+        <div class="tool-item">OpenAI Fn</div>
+        <div class="tool-item">Dev Container</div>
+        <div class="tool-item">CLI Reference</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-box" style="margin-top:12px;">
+    <div class="feature-box-title">Quick Start — Five Minutes to Your First Pipeline</div>
+    <p style="font-family:'IM Fell English',serif; font-size:11px; line-height:1.7; color:var(--ink); text-align:center;">
+      <code style="background:var(--paper);font-size:10.5px;">git clone github.com/cloudengine-labs/devops_os</code><br>
+      <code style="background:var(--paper);font-size:10.5px;">pip install -r cli/requirements.txt</code><br>
+      <code style="background:var(--paper);font-size:10.5px;">python -m cli.scaffold_gha --name my-app --type complete</code><br><br>
+      <em>Your pipeline awaits.</em>
+    </p>
+  </div>
+</div>
+
+<div class="col">
+  <div class="col-head">Live Event</div>
+
+  <div class="live-box">
+    <div class="live-box-corner tl"></div>
+    <div class="live-box-corner tr"></div>
+    <div class="live-box-corner bl"></div>
+    <div class="live-box-corner br"></div>
+    <div class="live-label">⬛ &nbsp; Live Broadcast &nbsp; ⬛</div>
+    <div class="live-headline">Join the<br>Live Demo</div>
+    <div class="live-detail">📅 &nbsp; Saturday, March 2026</div>
+    <div class="live-detail">🕙 &nbsp; 10:00 AM IST</div>
+    <div class="live-detail">🔴 &nbsp; LinkedIn Live</div>
+    <div class="live-cta">Watch a complete DevOps stack<br>scaffolded live — in seconds.</div>
+  </div>
+
+  <div class="pull-quote" style="margin-top:10px;">
+    <p>"Star it. Fork it. Build with it."</p>
+    <cite>— The Editors</cite>
+  </div>
+
+  <p class="body" style="font-size:11px; margin-top:6px; text-align:center;">
+    <strong>github.com/cloudengine-labs/devops_os</strong>
+  </p>
+</div>
+```
+
+  </div>
+
+  <hr class="rule-thick">
+  <div class="ornament">— &nbsp; ❧ &nbsp; —</div>
+  <hr class="rule-thick">
+
+</div>
+
+<!-- BOTTOM BANNER -->
+
+<div class="bottom-banner">
+  <div class="bottom-banner-text">Read the full documentation & contribute at</div>
+  <div class="bottom-banner-url">cloudengine-labs.github.io/devops_os &nbsp;·&nbsp; github.com/cloudengine-labs/devops_os</div>
+</div>
+
+</div>
+</body>
+</html>
