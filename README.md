@@ -78,6 +78,8 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 - Docker *(for the dev container)*
 - VS Code + [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) *(optional)*
 
+---
+
 ### 1 — Clone & install
 
 ```bash
@@ -91,6 +93,8 @@ source .venv/bin/activate        # macOS / Linux
 
 pip install -r cli/requirements.txt
 ```
+
+---
 
 ### 2 — Learn the Process-First philosophy *(recommended first step)*
 
@@ -113,6 +117,8 @@ python -m cli.devopsos process-first --section tips
 > **Tip:** Run `--section mapping` to see exactly which `devopsos scaffold` command to use for each DevOps goal before generating any config.  
 > See [docs/PROCESS-FIRST.md](docs/PROCESS-FIRST.md) for the full reference.
 
+---
+
 ### 3 — Generate a GitHub Actions workflow
 
 ```bash
@@ -122,6 +128,8 @@ python -m cli.scaffold_gha --name my-app --languages python,javascript --type co
 # With Kubernetes deployment via Kustomize
 python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
+
+---
 
 ### 4 — Generate other pipelines & configs
 
@@ -150,6 +158,8 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
+---
+
 ### 5 — Interactive wizard (all-in-one) - **WIP**
 
 ```bash
@@ -161,6 +171,10 @@ python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
 python -m cli.devopsos scaffold sre          # scaffold SRE configs
 python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
+
+Single Click Platform Engineering Capabilities
+
+---
 
 ### 6 — Use with AI (MCP Server) - **WIP**
 
