@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevOps-OS Launch Presentation</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── Slide container ── */
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 10%;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      text-align: center;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* ── Typography ── */
+    h1 {
+      font-size: clamp(32px, 5vw, 64px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: clamp(26px, 3.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #58a6ff;
+    }
+
+    p, li {
+      font-size: clamp(16px, 1.8vw, 22px);
+      line-height: 1.7;
+      color: #b1bac4;
+      max-width: 800px;
+    }
+
+    ul {
+      list-style: none;
+      text-align: left;
+      margin: 16px auto;
+      max-width: 720px;
+    }
+
+    ul li::before {
+      content: '▸ ';
+      color: #58a6ff;
+      font-weight: bold;
+    }
+
+    ul li {
+      margin-bottom: 8px;
+    }
+
+    /* ── Accent colors ── */
+    .accent {
+      color: #58a6ff;
+    }
+
+    .highlight {
+      color: #3fb950;
+    }
+
+    .dim {
+      color: #8b949e;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(56, 139, 253, 0.15);
+      color: #58a6ff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* ── Cards grid ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: left;
+    }
+
+    .card h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .card p {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #8b949e;
+    }
+
+    /* ── Quote block ── */
+    blockquote {
+      border-left: 4px solid #58a6ff;
+      padding: 16px 24px;
+      background: rgba(56, 139, 253, 0.06);
+      border-radius: 0 8px 8px 0;
+      max-width: 720px;
+      margin: 16px auto;
+      text-align: left;
+      font-style: italic;
+      color: #b1bac4;
+      font-size: clamp(16px, 1.8vw, 22px);
+      line-height: 1.7;
+    }
+
+    /* ── CTA button ── */
+    .cta-btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 36px;
+      background: #238636;
+      color: #ffffff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .cta-btn:hover {
+      background: #2ea043;
+    }
+
+    /* ── Steps list ── */
+    .steps {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-top: 20px;
+      max-width: 900px;
+    }
+
+    .step {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-size: 16px;
+      color: #e6edf3;
+    }
+
+    .step .num {
+      color: #3fb950;
+      font-weight: 700;
+      margin-right: 6px;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #58a6ff, #3fb950);
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* ── Navigation ── */
+    .nav {
+      position: fixed;
+      bottom: 24px;
+      right: 32px;
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .nav button {
+      background: #21262d;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .nav button:hover {
+      background: #30363d;
+    }
+
+    .slide-counter {
+      position: fixed;
+      bottom: 30px;
+      left: 32px;
+      font-size: 14px;
+      color: #484f58;
+      z-index: 100;
+    }
+
+    /* ── Decorative background shapes ── */
+    .bg-glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .bg-glow.blue {
+      width: 500px;
+      height: 500px;
+      background: #58a6ff;
+      top: -150px;
+      right: -100px;
+    }
+
+    .bg-glow.green {
+      width: 400px;
+      height: 400px;
+      background: #3fb950;
+      bottom: -120px;
+      left: -80px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1 – Title -->
+  <section class="slide active">
+    <div class="bg-glow blue"></div>
+    <div class="bg-glow green"></div>
+    <span class="tag">Open Source</span>
+    <h1>🚀 DevOps-OS <span class="highlight">Launch</span></h1>
+    <p>A single open source project for creating configuration scaffolding across the delivery stack.</p>
+  </section>
+
+  <!-- Slide 2 – Why I Built DevOps-OS -->
+  <section class="slide">
+    <h2>Why I Built <span class="accent">DevOps-OS</span></h2>
+    <p>Thanks for joining. Today, I'm launching an open source project called DevOps-OS.</p>
+    <p style="margin-top:12px;">Over the years, while working across DevOps, cloud automation, software delivery, and platform-related implementation work, I kept seeing the same pattern again and again.</p>
+    <ul>
+      <li>A lot of repeated setup work</li>
+      <li>The same kinds of configurations</li>
+      <li>The same initial scaffolding effort</li>
+      <li>The same delivery foundations being recreated across project after project</li>
+    </ul>
+    <p>After seeing that enough times, I felt this was worth solving in a more reusable way.</p>
+  </section>
+
+  <!-- Slide 3 – The Real Problem -->
+  <section class="slide">
+    <h2>The Real Problem Behind <span class="accent">DevOps Tooling</span></h2>
+    <p>When people talk about DevOps, they usually talk about tools.</p>
+    <ul>
+      <li>Tools for CI/CD</li>
+      <li>Tools for deployment</li>
+      <li>Tools for GitOps</li>
+      <li>Tools for SRE</li>
+      <li>Tools for observability</li>
+    </ul>
+    <p style="margin-top:12px;">Yes, those tools matter. But every tool comes with its own configuration model, setup flow, structure, and operating pattern.</p>
+    <p style="margin-top:12px;">Even when teams have the right tools, they still spend a lot of time figuring out how to make all of them work together in a practical and repeatable way.</p>
+  </section>
+
+  <!-- Slide 4 – The Question -->
+  <section class="slide">
+    <h2>The Question That <span class="accent">Started This Project</span></h2>
+    <p>There are tools for CI/CD. There are tools for SRE. There are tools for deployment.</p>
+    <p style="margin-top:12px;">Behind all of them, teams keep writing configuration. Again and again. Different tools. Same setup pain.</p>
+    <blockquote>What if one project could help create that starting layer?</blockquote>
+    <p style="margin-top:16px;">Today, that project has a name.</p>
+  </section>
+
+  <!-- Slide 5 – Introducing DevOps-OS -->
+  <section class="slide">
+    <div class="bg-glow blue"></div>
+    <span class="tag">Introducing</span>
+    <h1>DevOps-OS</h1>
+    <p>A single open source project for creating <strong style="color:#3fb950;">configuration scaffolding</strong> across the delivery stack.</p>
+    <p class="dim" style="margin-top:16px;font-size:18px;">That is what I have built.</p>
+  </section>
+
+  <!-- Slide 6 – More Than Scripts -->
+  <section class="slide">
+    <h2>More Than Scripts: <span class="accent">A Foundation Project</span></h2>
+    <p>DevOps-OS is not just a repository of scripts or templates. It is a practical foundation project.</p>
+    <div class="card-grid">
+      <div class="card">
+        <h3>🔄 CI/CD</h3>
+        <p>Pipeline scaffolding for GitHub Actions, GitLab CI, Jenkins</p>
+      </div>
+      <div class="card">
+        <h3>🚀 Deployment</h3>
+        <p>Environment setup and deployment configuration</p>
+      </div>
+      <div class="card">
+        <h3>☸️ GitOps</h3>
+        <p>ArgoCD, Flux CD, and Kubernetes manifests</p>
+      </div>
+      <div class="card">
+        <h3>📊 SRE</h3>
+        <p>Reliability-oriented configuration and observability</p>
+      </div>
+      <div class="card">
+        <h3>🛠️ Dev Workflows</h3>
+        <p>Developer workflow foundations and containers</p>
+      </div>
+      <div class="card">
+        <h3>🧩 Connected Layers</h3>
+        <p>Not isolated tools, but connected setup layers that need structure</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Slide 7 – Process-First -->
+  <section class="slide">
+    <h2>Why <span class="highlight">Process-First</span> Matters</h2>
+    <p>DevOps is not just tooling. It is not just YAML. It is not just automation commands.</p>
+    <p style="margin-top:12px;">It is a <strong style="color:#3fb950;">process-first, system-thinking discipline</strong>.</p>
+    <ul>
+      <li>Before scaffolding config, understand the process</li>
+      <li>Before generating files, understand the lifecycle</li>
+      <li>Before choosing tools, understand the delivery flow</li>
+    </ul>
+    <p style="margin-top:12px;">Then the config becomes meaningful. Then the scaffolding becomes reusable. Then the tooling starts serving the workflow.</p>
+  </section>
+
+  <!-- Slide 8 – From Config to Delivery -->
+  <section class="slide">
+    <h2>From Config Generation to <span class="accent">Delivery Structure</span></h2>
+    <p>DevOps-OS is really two things together:</p>
+    <ul>
+      <li><strong style="color:#e6edf3;">Config scaffolding</strong> across CI/CD, GitOps, Kubernetes, SRE, and developer environments</li>
+      <li><strong style="color:#e6edf3;">Process-First thinking</strong> in how those configurations are created and used</li>
+    </ul>
+    <p style="margin-top:16px;">Configuration alone is not the goal. The goal is <strong style="color:#3fb950;">better delivery structure</strong>.</p>
+    <p style="margin-top:8px;">From isolated setup tasks to a more connected and intentional way of building, shipping, and operating software.</p>
+  </section>
+
+  <!-- Slide 9 – Why Open Source -->
+  <section class="slide">
+    <h2>Why I Chose to <span class="accent">Open Source It</span></h2>
+    <p>I have always leaned more toward sharing than holding back.</p>
+    <p style="margin-top:12px;">Open source is not just about sharing code. It is also about sharing <strong style="color:#e6edf3;">patterns, structure, and thought process</strong>.</p>
+    <p style="margin-top:12px;">It allows others to inspect the work, use it, question it, improve it, and learn from it.</p>
+    <p style="margin-top:12px;">Especially in DevOps and automation work, where so much real learning comes from practical implementation.</p>
+  </section>
+
+  <!-- Slide 10 – What It Reduces -->
+  <section class="slide">
+    <h2>What DevOps-OS Is <span class="accent">Trying to Reduce</span></h2>
+    <ul>
+      <li>Blank-page setup friction</li>
+      <li>Repeated configuration effort</li>
+      <li>Inconsistency across projects</li>
+      <li>Slow onboarding into delivery systems</li>
+      <li>Fragmented setup thinking across tools</li>
+    </ul>
+    <blockquote>Let us make the first layer easier, more structured, and more repeatable.</blockquote>
+  </section>
+
+  <!-- Slide 11 – Why This Matters Now -->
+  <section class="slide">
+    <h2>Why This <span class="highlight">Matters Now</span></h2>
+    <p>Software teams are building faster. More code. More automation. More infrastructure. More platform-oriented ways of working.</p>
+    <p style="margin-top:12px;">When speed increases, setup quality matters even more.</p>
+    <ul>
+      <li>In delivery</li>
+      <li>In maintenance</li>
+      <li>In onboarding</li>
+      <li>In reliability</li>
+      <li>In scale</li>
+    </ul>
+    <p style="margin-top:12px;">Improving the starting layer is not a small thing. It affects everything that comes after.</p>
+  </section>
+
+  <!-- Slide 12 – About the Launch -->
+  <section class="slide">
+    <h2>About the <span class="accent">Launch</span></h2>
+    <p>We already have many good tools across CI/CD, SRE, deployment, and operations.</p>
+    <p style="margin-top:12px;">But behind all of them, teams still spend a lot of time creating the scaffolding around those tools.</p>
+    <p style="margin-top:12px;">I wanted to build something that brings that configuration scaffolding mindset into one project.</p>
+    <ul>
+      <li>Something open</li>
+      <li>Something reusable</li>
+      <li>Something grounded in real implementation patterns</li>
+    </ul>
+  </section>
+
+  <!-- Slide 13 – Live Demo -->
+  <section class="slide">
+    <h2>Live Demo <span class="accent">Walkthrough</span></h2>
+    <p>The project does not begin with "generate YAML first." It begins with understanding the process behind the config.</p>
+    <div class="steps">
+      <div class="step"><span class="num">1</span> Process-First Philosophy</div>
+      <div class="step"><span class="num">2</span> CI/CD Scaffolding</div>
+      <div class="step"><span class="num">3</span> Deployment-Aware Pipeline Setup</div>
+      <div class="step"><span class="num">4</span> GitOps Scaffolding</div>
+      <div class="step"><span class="num">5</span> SRE-Oriented Configuration</div>
+    </div>
+    <p style="margin-top:20px;">This sequence matters — making the starting point across the SDLC more structured and more reusable.</p>
+  </section>
+
+  <!-- Slide 14 – Contribute -->
+  <section class="slide">
+    <h2>Invite <span class="highlight">Contributions</span></h2>
+    <p>I want this project to grow in the open.</p>
+    <div class="steps">
+      <div class="step">Try it</div>
+      <div class="step">Test it</div>
+      <div class="step">Break it</div>
+      <div class="step">Raise issues</div>
+      <div class="step">Suggest improvements</div>
+      <div class="step">Contribute PRs</div>
+    </div>
+    <p style="margin-top:20px;">This project will become stronger not just by what I build alone, but by how people use it, test it, question it, and improve it.</p>
+    <p style="margin-top:8px;">That is one of the real strengths of open source.</p>
+  </section>
+
+  <!-- Slide 15 – Closing -->
+  <section class="slide">
+    <div class="bg-glow blue"></div>
+    <div class="bg-glow green"></div>
+    <span class="tag">Thank You</span>
+    <h1>DevOps-OS</h1>
+    <p>A project built from a simple belief: teams should not have to keep rebuilding the configuration scaffolding around their tools from zero.</p>
+    <p style="margin-top:12px;">If this project helps even a few teams reduce setup friction, think more clearly about process, and move faster with better foundations — then it has done its job.</p>
+    <a class="cta-btn" href="https://github.com/cloudengine-labs/devops_os">Explore on GitHub</a>
+  </section>
+
+</div>
+
+<!-- Navigation -->
+<div class="slide-counter" id="slideCounter">1 / 15</div>
+<div class="nav">
+  <button onclick="prevSlide()" aria-label="Previous slide">◀</button>
+  <button onclick="nextSlide()" aria-label="Next slide">▶</button>
+</div>
+
+<script>
+  (function () {
+    var slides = document.querySelectorAll('.slide');
+    var current = 0;
+    var total = slides.length;
+    var counter = document.getElementById('slideCounter');
+    var bar = document.getElementById('progressBar');
+
+    function show(index) {
+      if (index < 0 || index >= total) return;
+      slides[current].classList.remove('active');
+      current = index;
+      slides[current].classList.add('active');
+      counter.textContent = (current + 1) + ' / ' + total;
+      bar.style.width = ((current + 1) / total * 100) + '%';
+    }
+
+    window.nextSlide = function () { show(current + 1); };
+    window.prevSlide = function () { show(current - 1); };
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); window.nextSlide(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); window.prevSlide(); }
+    });
+
+    show(0);
+  })();
+</script>
+
+</body>
+</html>
