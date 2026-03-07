@@ -150,7 +150,7 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
-### 5 — Interactive wizard (all-in-one)
+### 5 — Interactive wizard (all-in-one) - **WIP**
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
@@ -162,7 +162,7 @@ python -m cli.devopsos scaffold sre          # scaffold SRE configs
 python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
 
-### 6 — Use with AI (MCP Server)
+### 6 — Use with AI (MCP Server) - **WIP**
 
 ```bash
 pip install -r mcp_server/requirements.txt
