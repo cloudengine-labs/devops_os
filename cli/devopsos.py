@@ -27,7 +27,9 @@ class ProcessFirstSection(str, enum.Enum):
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
 
 @app.command()
-def init():
+def init(
+    directory: str = typer.Option(".", "--dir", help="Target directory in which the .devcontainer folder will be created (defaults to the current directory)"),
+):
     """Interactive project initializer."""
     typer.echo("Welcome to DevOps-OS Init Wizard!")
 
@@ -73,8 +75,8 @@ def init():
         raise typer.Exit(1)
 
     # Write to .devcontainer/devcontainer.env.json
-    devcontainer_dir = Path(".devcontainer")
-    devcontainer_dir.mkdir(exist_ok=True)
+    devcontainer_dir = Path(directory) / ".devcontainer"
+    devcontainer_dir.mkdir(parents=True, exist_ok=True)
     env_json_path = devcontainer_dir / "devcontainer.env.json"
     with open(env_json_path, "w") as f:
         json.dump(config, f, indent=2)
