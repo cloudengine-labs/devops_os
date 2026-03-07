@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DevOps-OS Launch Announcement</title>
+  <style>
+    body {
+      font-family: Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background-color: #1a1a2e;
+      color: #ffffff;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 48px;
+      margin: 0 0 10px;
+    }
+
+    header p {
+      font-size: 20px;
+      margin: 0;
+      color: #a0c4ff;
+    }
+
+    .badge-row {
+      text-align: center;
+      padding: 20px;
+      background-color: #16213e;
+    }
+
+    .badge-row img {
+      margin: 4px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    h2 {
+      color: #1a1a2e;
+      border-bottom: 2px solid #a0c4ff;
+      padding-bottom: 8px;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .feature-card {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature-card h3 {
+      margin-top: 0;
+      color: #1a1a2e;
+    }
+
+    .feature-card p {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+    }
+
+    .cta {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .cta a {
+      display: inline-block;
+      background-color: #1a1a2e;
+      color: #ffffff;
+      padding: 14px 32px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 16px;
+      margin: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .cta a:hover {
+      background-color: #16213e;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 13px;
+      background-color: #1a1a2e;
+      color: #a0c4ff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 DevOps-OS</h1>
+    <p>Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments and SRE dashboards.</p>
+  </header>
+
+  <div class="badge-row">
+    <img src="https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg" alt="CI" />
+    <img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+" />
+    <img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT" />
+    <img src="https://img.shields.io/badge/open%20source-%E2%9D%A4-red" alt="Open Source" />
+  </div>
+
+  <div class="container">
+
+    <h2>🎉 Announcing the DevOps-OS Launch</h2>
+    <p>
+      We are thrilled to announce the official launch of <strong>DevOps-OS</strong> — an open-source DevOps automation
+      platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs
+      in seconds, from a single CLI command or an AI chat prompt.
+    </p>
+
+    <h2>✨ Key Features</h2>
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <h3>🚀 CI/CD Generators</h3>
+        <p>One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines — production-ready from day one.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>☸️ GitOps Config Generator</h3>
+        <p>Generate Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations with a single command.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>📊 SRE Config Generator</h3>
+        <p>Create Prometheus alert rules, Grafana dashboards, and SLO manifests aligned with your reliability targets.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>🤖 MCP Server</h3>
+        <p>Plug DevOps-OS tools directly into Claude or ChatGPT as native AI skills for conversational DevOps automation.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>🛠️ Dev Container</h3>
+        <p>Pre-configured multi-language development environment supporting Python, Java, Go, and JavaScript out of the box.</p>
+      </div>
+
+      <div class="feature-card">
+        <h3>🔄 Process-First Philosophy</h3>
+        <p>Built-in education on the Process-First SDLC philosophy and how it maps to every DevOps-OS tool and workflow.</p>
+      </div>
+
+    </div>
+
+    <h2>🏗️ Tech Stack</h2>
+    <p>DevOps-OS integrates with industry-leading tools across the DevOps lifecycle:</p>
+    <ul>
+      <li><strong>CI/CD:</strong> GitHub Actions, GitLab CI, Jenkins</li>
+      <li><strong>GitOps:</strong> ArgoCD, Flux CD</li>
+      <li><strong>Infrastructure:</strong> Kubernetes, Helm, Kustomize</li>
+      <li><strong>Observability:</strong> Prometheus, Grafana</li>
+      <li><strong>AI Integration:</strong> MCP Server (Claude, ChatGPT)</li>
+    </ul>
+
+    <h2>🚦 Getting Started</h2>
+    <p>Install the CLI and scaffold your first pipeline in under a minute:</p>
+    <pre style="background:#1a1a2e;color:#a0c4ff;padding:16px;border-radius:6px;overflow-x:auto;">
+pip install devops-os
+devops-os scaffold github-actions --app my-app --language python
+    </pre>
+
+    <div class="cta">
+      <a href="https://github.com/cloudengine-labs/devops_os">View on GitHub</a>
+      <a href="https://github.com/cloudengine-labs/devops_os/blob/main/README.md">Read the Docs</a>
+    </div>
+
+  </div>
+
+  <footer>
+    <p>© 2024 DevOps-OS · Open Source · MIT License · Built with ❤️ by the CloudEngine Labs community</p>
+  </footer>
+
+</body>
+</html>
