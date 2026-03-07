@@ -3,6 +3,32 @@
 > *"Tools are only as good as the processes that govern them."*
 > — Saravanan Gnanagur, Founder, CloudEngineLabs
 
+**Process-First is the Systems Thinking of DevOps.**
+
+---
+
+## Thought Leaders on Process-First & Systems Thinking
+
+> *"The First Way emphasises the performance of the entire system, as opposed to
+> the performance of a specific silo of work or department."*
+>
+> — **Gene Kim, Kevin Behr, and George Spafford** (*The Phoenix Project* / *The DevOps Handbook*)
+
+Gene Kim, Kevin Behr, and George Spafford define the **"Three Ways"** of DevOps in
+*The Phoenix Project* and *The DevOps Handbook*. The **First Way** focuses on
+**Systems Thinking** — optimising the flow from development through operations to
+the customer, rather than maximising the throughput of any single stage.
+
+> *"DevOps is about fixing the broken, inefficient processes between developers
+> and operations before introducing new tools."*
+>
+> — **Patrick Debois** (Founder of DevOpsDays)
+
+Patrick Debois, as the founder of DevOpsDays, emphasised that cultural and
+process problems — not technology gaps — are the root cause of slow, unreliable
+software delivery. He showed that bringing developers and operations together
+through shared processes is the prerequisite for any tooling to succeed.
+
 ---
 
 ## What is Process-First?
@@ -55,7 +81,7 @@ interactively in your terminal.
 # Full overview (default)
 python -m cli.devopsos process-first
 
-# Section: what Process-First is and the 5 core principles
+# Section: what Process-First is, 5 core principles + thought leaders
 python -m cli.devopsos process-first --section what
 
 # Section: how each principle maps to a DevOps-OS scaffold command
@@ -63,20 +89,23 @@ python -m cli.devopsos process-first --section mapping
 
 # Section: AI prompts and reading recommendations for beginners
 python -m cli.devopsos process-first --section tips
+
+# Section: best practices for each stage (build/test/iac/deploy/sre/monitoring/security)
+python -m cli.devopsos process-first --section best_practices
 ```
 
 You can also invoke the module directly:
 
 ```bash
 python -m cli.process_first
-python -m cli.process_first --section mapping
+python -m cli.process_first --section best_practices
 ```
 
 ### Options
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--section` | `all` | `what` · `mapping` · `tips` · `all` |
+| `--section` | `all` | `what` · `mapping` · `tips` · `best_practices` · `all` |
 
 ### Where does this command help?
 
@@ -85,7 +114,83 @@ python -m cli.process_first --section mapping
 | New team member onboarding | `all` — read the full overview first |
 | Pre-sprint process alignment meeting | `mapping` — show how each scaffold encodes a principle |
 | Self-study / learning DevOps from scratch | `tips` — use the AI prompts to go deep |
-| Quick philosophy refresh | `what` — re-read the 5 core principles |
+| Quick philosophy refresh | `what` — re-read the 5 core principles and thought leaders |
+| Setting up a new DevOps pipeline | `best_practices` — best practices for each stage |
+
+---
+
+## Best Practices by Stage — Systems Thinking in DevOps
+
+Applying Systems Thinking means defining the right process at each stage of the value
+stream **before** selecting or configuring any tool.
+
+### 🔨 Build
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define build standards before choosing tools (Docker, Gradle, Maven, Make) | Prevents tool sprawl and ensures consistent outputs |
+| Standardise base images and dependency management across all teams | Reduces "works on my machine" issues |
+| Enforce reproducible builds with version-pinned dependencies | Makes builds auditable and roll-backable |
+| Use an artifact repository (Nexus) to cache, version, and audit build outputs | Provides a single source of truth for artifacts |
+
+### 🧪 Test & Quality
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define quality gates and acceptance criteria before writing tests | Ensures tests validate business intent, not just code paths |
+| Automate unit, integration, and end-to-end tests in every pipeline run | Catches regressions before they reach production |
+| Enforce code standards with static analysis (SonarQube, Checkstyle, ESLint, Pylint) | Maintains code quality at scale without manual review |
+| Fail fast: surface failures early to prevent bad code advancing | Reduces the cost of fixing defects |
+
+### 🏗️ IaC & Infrastructure
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define infrastructure requirements before writing Terraform or Helm code | Prevents over-engineering and unnecessary complexity |
+| Version-control every infrastructure definition — no manual changes to production | Makes infrastructure changes auditable and reproducible |
+| Use Kustomize overlays for environment-specific config (dev/staging/prod) | Reduces duplication and drift between environments |
+| Detect and alert on infrastructure drift regularly | Ensures the running state matches the declared state |
+
+### 🚀 Deploy & GitOps
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define deployment runbooks and rollback procedures before the first release | Prevents panicked, undocumented changes during incidents |
+| Use GitOps (ArgoCD, Flux) to make deployment intent explicit in Git | Creates a full audit trail for every change |
+| Implement blue/green or canary deployments for zero-downtime releases | Reduces blast radius of bad deployments |
+| Gate production deployments with automated approvals and smoke tests | Prevents untested code from reaching users |
+
+### 📈 SRE
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define SLOs and SLAs before deploying to production | You cannot measure reliability you haven't defined |
+| Use error budgets to balance reliability with feature velocity | Gives teams a data-driven way to decide when to slow down |
+| Alert on symptoms (SLO burn rate), not causes (CPU spikes) | Reduces alert fatigue and improves signal quality |
+| Establish on-call rotations and incident runbooks before going live | Prevents chaotic, undocumented incident response |
+
+### 📊 Monitoring
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define golden signals (Rate, Errors, Duration, Saturation) before building dashboards | Ensures dashboards answer real operational questions |
+| Instrument applications with standard metrics from day one | Eliminates blind spots in your observability stack |
+| Centralise logs, metrics, and traces in one platform (ELK, Prometheus, Grafana) | Enables faster root-cause analysis during incidents |
+| Set alerting thresholds based on SLO objectives, not arbitrary values | Prevents noisy, meaningless alerts that erode trust |
+
+### 🔒 Security
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Shift security left: enforce scanning in the CI pipeline | Catches vulnerabilities before they reach production |
+| Manage Kubernetes secrets with Sealed Secrets (Kubeseal) | Prevents plaintext secrets from being stored in Git |
+| Scan container images for vulnerabilities on every build | Ensures base images are kept up to date and safe |
+| Enforce least-privilege access controls for all service accounts | Limits the blast radius of a compromised component |
+
+```bash
+# View best practices in your terminal
+python -m cli.devopsos process-first --section best_practices
+```
 
 ---
 

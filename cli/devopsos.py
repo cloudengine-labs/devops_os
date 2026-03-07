@@ -21,6 +21,7 @@ class ProcessFirstSection(str, enum.Enum):
     what = "what"
     mapping = "mapping"
     tips = "tips"
+    best_practices = "best_practices"
     all = "all"
 
 
@@ -32,40 +33,123 @@ def init(
 ):
     """Interactive project initializer."""
     typer.echo("Welcome to DevOps-OS Init Wizard!")
+    typer.echo("Tools are grouped by Process-First DevOps principles (Systems Thinking).\n")
 
-    categories = {
-        "languages": ["python", "java", "node", "ruby", "csharp", "php", "rust", "typescript", "kotlin", "c", "cpp", "javascript", "go"],
-        "cicd": ["docker", "terraform", "kubectl", "helm", "github_actions", "jenkins"],
-        "kubernetes": ["k9s", "kustomize", "argocd_cli", "lens", "kubeseal", "flux", "kind", "minikube", "openshift_cli"],
-        "build_tools": ["gradle", "maven", "ant", "make", "cmake"],
-        "code_analysis": ["sonarqube", "checkstyle", "pmd", "eslint", "pylint"],
-        "devops_tools": ["nexus", "prometheus", "grafana", "elk", "jenkins"]
-    }
+    # ── Canonical tool lists ──────────────────────────────────────────────
+    ALL_LANGUAGES    = ["python", "java", "node", "ruby", "csharp", "php", "rust",
+                        "typescript", "kotlin", "c", "cpp", "javascript", "go"]
+    ALL_CICD         = ["docker", "terraform", "kubectl", "helm", "github_actions", "jenkins"]
+    ALL_KUBERNETES   = ["k9s", "kustomize", "argocd_cli", "lens", "kubeseal",
+                        "flux", "kind", "minikube", "openshift_cli"]
+    ALL_BUILD_TOOLS  = ["gradle", "maven", "ant", "make", "cmake"]
+    ALL_CODE_ANALYSIS = ["sonarqube", "checkstyle", "pmd", "eslint", "pylint"]
+    ALL_DEVOPS_TOOLS  = ["nexus", "prometheus", "grafana", "elk", "jenkins"]
+
     versions_defaults = {
         "python": "3.11", "java": "17", "node": "20", "go": "1.21", "nexus": "3.50.0",
         "prometheus": "2.45.0", "grafana": "10.0.0", "k9s": "0.29.1", "argocd": "2.8.4",
         "flux": "2.1.2", "kustomize": "5.2.1", "jenkins": "2.440.1"
     }
-    config = {}
-    selected_versions = {}
-    selected_options = {}
-    for cat, opts in categories.items():
-        selected = inquirer.checkbox(message=f"Select {cat.replace('_', ' ').title()}:", choices=opts).execute()
-        selected_options[cat] = selected
-    # Now build config with True/False for each option
-    for cat, opts in categories.items():
-        config[cat] = {opt: (opt in selected_options[cat]) for opt in opts}
-        # Prompt for version only for selected
-        if cat == "languages" or cat == "devops_tools":
-            for opt in selected_options[cat]:
-                if opt in versions_defaults:
-                    selected_versions[opt] = inquirer.text(message=f"{opt.title()} version:", default=versions_defaults[opt]).execute()
-        if cat == "kubernetes":
-            for opt in selected_options[cat]:
-                if opt in ["k9s", "argocd_cli", "flux", "kustomize"]:
-                    vkey = opt if opt != "argocd_cli" else "argocd"
-                    selected_versions[vkey] = inquirer.text(message=f"{opt.title()} version:", default=versions_defaults.get(vkey, "")).execute()
-    config["versions"] = selected_versions
+
+    # ── Wizard groups aligned with Process-First DevOps principles ────────
+    # Each group maps to a DevOps stage in the Systems Thinking value stream.
+    wizard_groups = {
+        "Languages": {
+            "choices": ALL_LANGUAGES,
+            "description": "Programming languages for your project",
+        },
+        "Build Tools  [BUILD stage]": {
+            "choices": ["docker", "gradle", "maven", "ant", "make", "cmake", "nexus"],
+            "description": "Tools to compile, package, and store build artifacts",
+        },
+        "Test & Quality  [TEST stage]": {
+            "choices": ["sonarqube", "checkstyle", "pmd", "eslint", "pylint"],
+            "description": "Static analysis and quality gates to enforce standards early",
+        },
+        "IaC & Infrastructure  [IaC stage]": {
+            "choices": ["terraform", "kubectl", "helm", "kustomize"],
+            "description": "Infrastructure as Code tools for reproducible environments",
+        },
+        "Deploy & GitOps  [DEPLOY stage]": {
+            "choices": ["github_actions", "jenkins", "argocd_cli", "flux"],
+            "description": "CI/CD pipelines and GitOps delivery tools",
+        },
+        "SRE & Monitoring  [SRE/MONITORING stage]": {
+            "choices": ["prometheus", "grafana", "elk", "k9s"],
+            "description": "Observability stack: metrics, dashboards, and logs",
+        },
+        "Security & Kubernetes Dev  [SECURITY stage]": {
+            "choices": ["kubeseal", "lens", "kind", "minikube", "openshift_cli"],
+            "description": "Secret management, security scanning, and local K8s dev tools",
+        },
+    }
+
+    selected_by_group: dict = {}
+    selected_versions: dict = {}
+
+    for group_label, group_info in wizard_groups.items():
+        typer.echo(f"\n  📌 {group_info['description']}")
+        selected = inquirer.checkbox(
+            message=f"Select {group_label}:",
+            choices=group_info["choices"],
+        ).execute()
+        selected_by_group[group_label] = selected
+
+    # ── Version prompts ───────────────────────────────────────────────────
+    all_selected = {tool for tools in selected_by_group.values() for tool in tools}
+    for tool in all_selected:
+        vkey = "argocd" if tool == "argocd_cli" else tool
+        if vkey in versions_defaults:
+            selected_versions[vkey] = inquirer.text(
+                message=f"{tool.title()} version:",
+                default=versions_defaults[vkey],
+            ).execute()
+
+    # ── Map wizard selections back to legacy JSON structure ───────────────
+    # Keep the devcontainer.env.json keys identical to scaffold_devcontainer
+    # output for backward compatibility.
+    def _sel(group): return selected_by_group.get(group, [])
+
+    build_sel     = _sel("Build Tools  [BUILD stage]")
+    test_sel      = _sel("Test & Quality  [TEST stage]")
+    iac_sel       = _sel("IaC & Infrastructure  [IaC stage]")
+    deploy_sel    = _sel("Deploy & GitOps  [DEPLOY stage]")
+    sre_sel       = _sel("SRE & Monitoring  [SRE/MONITORING stage]")
+    security_sel  = _sel("Security & Kubernetes Dev  [SECURITY stage]")
+    lang_sel      = _sel("Languages")
+
+    config = {
+        "languages": {opt: opt in lang_sel for opt in ALL_LANGUAGES},
+        "cicd": {
+            "docker":         "docker"         in build_sel,
+            "terraform":      "terraform"      in iac_sel,
+            "kubectl":        "kubectl"        in iac_sel,
+            "helm":           "helm"           in iac_sel,
+            "github_actions": "github_actions" in deploy_sel,
+            "jenkins":        "jenkins"        in deploy_sel,
+        },
+        "kubernetes": {
+            "k9s":           "k9s"           in sre_sel,
+            "kustomize":     "kustomize"     in iac_sel,
+            "argocd_cli":    "argocd_cli"    in deploy_sel,
+            "lens":          "lens"          in security_sel,
+            "kubeseal":      "kubeseal"      in security_sel,
+            "flux":          "flux"          in deploy_sel,
+            "kind":          "kind"          in security_sel,
+            "minikube":      "minikube"      in security_sel,
+            "openshift_cli": "openshift_cli" in security_sel,
+        },
+        "build_tools": {opt: opt in build_sel for opt in ALL_BUILD_TOOLS},
+        "code_analysis": {opt: opt in test_sel for opt in ALL_CODE_ANALYSIS},
+        "devops_tools": {
+            "nexus":      "nexus"      in build_sel,
+            "prometheus": "prometheus" in sre_sel,
+            "grafana":    "grafana"    in sre_sel,
+            "elk":        "elk"        in sre_sel,
+            "jenkins":    "jenkins"    in deploy_sel,
+        },
+        "versions": selected_versions,
+    }
 
     # Review step: show config and confirm
     typer.echo("\nReview your configuration:")
@@ -88,39 +172,51 @@ def init(
         build_args = {}
         # Languages
         lang_map = {
-            "python": "INSTALL_PYTHON", "java": "INSTALL_JAVA", "node": "INSTALL_JS", "ruby": "INSTALL_RUBY",
-            "csharp": "INSTALL_CSHARP", "php": "INSTALL_PHP", "rust": "INSTALL_RUST", "typescript": "INSTALL_TYPESCRIPT",
-            "kotlin": "INSTALL_KOTLIN", "c": "INSTALL_C", "cpp": "INSTALL_CPP", "javascript": "INSTALL_JAVASCRIPT", "go": "INSTALL_GO"
+            "python": "INSTALL_PYTHON", "java": "INSTALL_JAVA", "node": "INSTALL_JS",
+            "ruby": "INSTALL_RUBY", "csharp": "INSTALL_CSHARP", "php": "INSTALL_PHP",
+            "rust": "INSTALL_RUST", "typescript": "INSTALL_TYPESCRIPT",
+            "kotlin": "INSTALL_KOTLIN", "c": "INSTALL_C", "cpp": "INSTALL_CPP",
+            "javascript": "INSTALL_JAVASCRIPT", "go": "INSTALL_GO"
         }
         for lang, arg in lang_map.items():
             build_args[arg] = str(config["languages"].get(lang, False)).lower()
         # CICD
         cicd_map = {
-            "docker": "INSTALL_DOCKER", "terraform": "INSTALL_TERRAFORM", "kubectl": "INSTALL_KUBECTL", "helm": "INSTALL_HELM", "github_actions": "INSTALL_GITHUB_ACTIONS", "jenkins": "INSTALL_JENKINS"
+            "docker": "INSTALL_DOCKER", "terraform": "INSTALL_TERRAFORM",
+            "kubectl": "INSTALL_KUBECTL", "helm": "INSTALL_HELM",
+            "github_actions": "INSTALL_GITHUB_ACTIONS", "jenkins": "INSTALL_JENKINS"
         }
         for tool, arg in cicd_map.items():
             build_args[arg] = str(config["cicd"].get(tool, False)).lower()
         # Kubernetes
         k8s_map = {
-            "k9s": "INSTALL_K9S", "kustomize": "INSTALL_KUSTOMIZE", "argocd_cli": "INSTALL_ARGOCD_CLI", "lens": "INSTALL_LENS", "kubeseal": "INSTALL_KUBESEAL", "flux": "INSTALL_FLUX", "kind": "INSTALL_KIND", "minikube": "INSTALL_MINIKUBE", "openshift_cli": "INSTALL_OPENSHIFT_CLI"
+            "k9s": "INSTALL_K9S", "kustomize": "INSTALL_KUSTOMIZE",
+            "argocd_cli": "INSTALL_ARGOCD_CLI", "lens": "INSTALL_LENS",
+            "kubeseal": "INSTALL_KUBESEAL", "flux": "INSTALL_FLUX",
+            "kind": "INSTALL_KIND", "minikube": "INSTALL_MINIKUBE",
+            "openshift_cli": "INSTALL_OPENSHIFT_CLI"
         }
         for tool, arg in k8s_map.items():
             build_args[arg] = str(config["kubernetes"].get(tool, False)).lower()
         # Build tools
         build_map = {
-            "gradle": "INSTALL_GRADLE", "maven": "INSTALL_MAVEN", "ant": "INSTALL_ANT", "make": "INSTALL_MAKE", "cmake": "INSTALL_CMAKE"
+            "gradle": "INSTALL_GRADLE", "maven": "INSTALL_MAVEN", "ant": "INSTALL_ANT",
+            "make": "INSTALL_MAKE", "cmake": "INSTALL_CMAKE"
         }
         for tool, arg in build_map.items():
             build_args[arg] = str(config["build_tools"].get(tool, False)).lower()
         # Code analysis
         analysis_map = {
-            "sonarqube": "INSTALL_SONARQUBE", "checkstyle": "INSTALL_CHECKSTYLE", "pmd": "INSTALL_PMD", "eslint": "INSTALL_ESLINT", "pylint": "INSTALL_PYLINT"
+            "sonarqube": "INSTALL_SONARQUBE", "checkstyle": "INSTALL_CHECKSTYLE",
+            "pmd": "INSTALL_PMD", "eslint": "INSTALL_ESLINT", "pylint": "INSTALL_PYLINT"
         }
         for tool, arg in analysis_map.items():
             build_args[arg] = str(config["code_analysis"].get(tool, False)).lower()
         # DevOps tools
         devops_map = {
-            "nexus": "INSTALL_NEXUS", "prometheus": "INSTALL_PROMETHEUS", "grafana": "INSTALL_GRAFANA", "elk": "INSTALL_ELK", "jenkins": "INSTALL_JENKINS"
+            "nexus": "INSTALL_NEXUS", "prometheus": "INSTALL_PROMETHEUS",
+            "grafana": "INSTALL_GRAFANA", "elk": "INSTALL_ELK",
+            "jenkins": "INSTALL_JENKINS"
         }
         for tool, arg in devops_map.items():
             build_args[arg] = str(config["devops_tools"].get(tool, False)).lower()
@@ -181,10 +277,11 @@ def process_first_cmd(
         ProcessFirstSection.all,
         help=(
             "Section to display:\n\n"
-            "  'what'    — What Process-First is and its 5 core principles\n\n"
-            "  'mapping' — How each principle maps to a devopsos scaffold command\n\n"
-            "  'tips'    — AI prompts and book recommendations for DevOps beginners\n\n"
-            "  'all'     — All sections combined (default)"
+            "  'what'           — What Process-First is, 5 core principles + thought leaders\n\n"
+            "  'mapping'        — How each principle maps to a devopsos scaffold command\n\n"
+            "  'tips'           — AI prompts and book recommendations for DevOps beginners\n\n"
+            "  'best_practices' — Best practices by stage (build/test/iac/deploy/sre/monitoring/security)\n\n"
+            "  'all'            — All sections combined (default)"
         ),
         show_choices=True,
     ),
@@ -194,15 +291,16 @@ def process_first_cmd(
     \b
     Quick invocation guide:
 
-      python -m cli.devopsos process-first                    # full overview
-      python -m cli.devopsos process-first --section what     # core principles
-      python -m cli.devopsos process-first --section mapping  # tool mapping table
-      python -m cli.devopsos process-first --section tips     # AI prompts for beginners
+      python -m cli.devopsos process-first                           # full overview
+      python -m cli.devopsos process-first --section what            # core principles + thought leaders
+      python -m cli.devopsos process-first --section mapping         # tool mapping table
+      python -m cli.devopsos process-first --section tips            # AI prompts for beginners
+      python -m cli.devopsos process-first --section best_practices  # best practices by stage
 
     You can also run the module directly:
 
       python -m cli.process_first
-      python -m cli.process_first --section mapping
+      python -m cli.process_first --section best_practices
     """
     process_first.display(section.value)
 

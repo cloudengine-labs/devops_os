@@ -23,6 +23,33 @@ PROCESS_FIRST_SUMMARY = """\
   "Tools are only as good as the processes that govern them."
   — Saravanan Gnanagur, Founder, CloudEngineLabs
 
+  Process-First is the Systems Thinking of DevOps.
+
+"""
+
+THOUGHT_LEADERS = """\
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  THOUGHT LEADERS ON PROCESS-FIRST & SYSTEMS THINKING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Gene Kim, Kevin Behr, and George Spafford
+  (The Phoenix Project / The DevOps Handbook):
+
+    "The First Way emphasises the performance of the entire system, as opposed
+     to the performance of a specific silo of work or department."
+
+    They define the "Three Ways" of DevOps, with the First Way focusing on
+    Systems Thinking — optimising the whole flow from development through
+    operations to the customer, not just individual components or stages.
+
+  Patrick Debois
+  (Founder of DevOpsDays):
+
+    As the founder of DevOpsDays, Patrick Debois emphasised the need to fix
+    the broken, inefficient processes between developers and operations before
+    introducing new tools.  He showed that cultural and process problems, not
+    technology gaps, are the root cause of slow, unreliable software delivery.
+
 """
 
 WHAT_IS_PROCESS_FIRST = """\
@@ -34,6 +61,9 @@ WHAT_IS_PROCESS_FIRST = """\
   repeatable SDLC (Software Development Life Cycle) processes at the
   centre of every engineering decision — before selecting tools, platforms,
   or frameworks.
+
+  It is the Systems Thinking of DevOps: optimise the whole value stream
+  from development to operations before optimising any individual step.
 
   Core principles:
 
@@ -139,20 +169,99 @@ BEGINNER_TIPS = """\
 
 """
 
+BEST_PRACTICES = """\
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BEST PRACTICES BY STAGE — SYSTEMS THINKING IN DEVOPS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  Applying Systems Thinking means defining the right process at each stage
+  of the value stream before selecting or configuring any tool.
+
+  🔨 BUILD
+  ────────
+  • Define build standards and conventions before choosing tools
+    (Docker, Gradle, Maven, Make).
+  • Standardise base images and dependency management across all teams.
+  • Enforce reproducible builds with version-pinned dependencies.
+  • Use an artifact repository (Nexus) to cache, version, and audit
+    build outputs.
+
+  🧪 TEST & QUALITY
+  ─────────────────
+  • Define quality gates and acceptance criteria before writing tests.
+  • Automate unit, integration, and end-to-end tests in every pipeline run.
+  • Enforce code standards with static analysis (SonarQube, Checkstyle,
+    ESLint, Pylint) as non-negotiable pipeline gates.
+  • Fail fast: surface test failures early to prevent bad code from
+    advancing to later stages.
+
+  🏗️  IaC & INFRASTRUCTURE
+  ─────────────────────────
+  • Define infrastructure requirements and constraints before writing
+    Terraform or Helm code.
+  • Version-control every infrastructure definition — no manual changes
+    to production environments.
+  • Use Kustomize overlays to manage environment-specific configuration
+    (dev / staging / production) from a single base.
+  • Detect and alert on infrastructure drift regularly to maintain
+    the desired state.
+
+  🚀 DEPLOY & GITOPS
+  ──────────────────
+  • Define deployment runbooks and rollback procedures before the first
+    production release.
+  • Use GitOps (ArgoCD, Flux) to make deployment intent explicit in Git
+    and fully auditable.
+  • Implement blue/green or canary deployments to achieve zero-downtime
+    releases.
+  • Gate production deployments with automated approval workflows and
+    post-deploy smoke tests.
+
+  📈 SRE
+  ──────
+  • Define SLOs and SLAs before deploying to production — reliability
+    targets must exist before you can measure them.
+  • Use error budgets to balance reliability investment with feature
+    velocity.
+  • Alert on symptoms (SLO burn rate) rather than causes (CPU spikes).
+  • Establish on-call rotations and incident runbooks before going live.
+
+  📊 MONITORING
+  ─────────────
+  • Define what "good" looks like (golden signals: Rate, Errors, Duration,
+    Saturation) before creating dashboards.
+  • Instrument applications with standard metrics from day one.
+  • Centralise logs, metrics, and traces in a single observability
+    platform (ELK, Prometheus, Grafana).
+  • Set alerting thresholds based on SLO objectives, not arbitrary values.
+
+  🔒 SECURITY
+  ───────────
+  • Shift security left: enforce security scanning in the CI pipeline
+    so vulnerabilities are caught before merge.
+  • Manage Kubernetes secrets safely using Sealed Secrets (Kubeseal) —
+    never store plaintext secrets in Git.
+  • Scan container images for vulnerabilities as part of every build.
+  • Enforce least-privilege access controls for all service accounts
+    and CI/CD pipelines.
+
+"""
+
 USAGE_FOOTER = """\
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   HOW TO USE THIS COMMAND
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  python -m cli.devopsos process-first                     # full overview (this output)
-  python -m cli.devopsos process-first --section what      # 5 core principles only
-  python -m cli.devopsos process-first --section mapping   # devopsos scaffold command map
-  python -m cli.devopsos process-first --section tips      # AI prompts for beginners
-  python -m cli.devopsos process-first --help              # full option reference
+  python -m cli.devopsos process-first                              # full overview
+  python -m cli.devopsos process-first --section what              # 5 core principles
+  python -m cli.devopsos process-first --section mapping           # devopsos scaffold map
+  python -m cli.devopsos process-first --section tips              # AI prompts for beginners
+  python -m cli.devopsos process-first --section best_practices    # best practices by stage
+  python -m cli.devopsos process-first --help                      # full option reference
 
   You can also run the standalone module:
 
-  python -m cli.process_first [--section what|mapping|tips|all]
+  python -m cli.process_first [--section what|mapping|tips|best_practices|all]
 
   📖  Full docs: docs/PROCESS-FIRST.md
 
@@ -160,8 +269,10 @@ USAGE_FOOTER = """\
 
 FULL_TEXT = (
     PROCESS_FIRST_SUMMARY
+    + THOUGHT_LEADERS
     + WHAT_IS_PROCESS_FIRST
     + MAPPING_TO_TOOLING
+    + BEST_PRACTICES
     + BEGINNER_TIPS
 )
 
@@ -171,9 +282,10 @@ FULL_TEXT = (
 # ---------------------------------------------------------------------------
 
 SECTIONS = {
-    "what": PROCESS_FIRST_SUMMARY + WHAT_IS_PROCESS_FIRST,
+    "what": PROCESS_FIRST_SUMMARY + THOUGHT_LEADERS + WHAT_IS_PROCESS_FIRST,
     "mapping": PROCESS_FIRST_SUMMARY + MAPPING_TO_TOOLING,
     "tips": PROCESS_FIRST_SUMMARY + BEGINNER_TIPS,
+    "best_practices": PROCESS_FIRST_SUMMARY + BEST_PRACTICES,
     "all": FULL_TEXT + USAGE_FOOTER,
 }
 
@@ -203,9 +315,10 @@ def parse_arguments(argv=None):
         default="all",
         help=(
             "Which section to display: "
-            "'what' (ideology overview), "
+            "'what' (ideology overview + thought leaders), "
             "'mapping' (tooling map), "
             "'tips' (beginner AI prompts), "
+            "'best_practices' (best practices by stage), "
             "or 'all' (default)."
         ),
     )
