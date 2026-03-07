@@ -1,22 +1,107 @@
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
-.pytest_cache/
-*.egg-info/
-dist/
-build/
+*.pyd
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
 .env
-*.log
-_site/
-.jekyll-cache/
 .venv/
 venv/
-docs/test-report.html
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.pytest_cache/
+.hypothesis/
+pytestdebug.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Rope
+.ropeproject
+
+# mkdocs
+site/
+docs/_build/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Jekyll
+_site/
+.jekyll-cache/
 
 # Hugo build artifacts
 hugo-docs/public/
 hugo-docs/resources/
 hugo-docs/.hugo_build.lock
+
+# Test reports
+docs/test-report.html
 
 # Scaffold-generated output files (created by `python -m cli.devopsos scaffold *`)
 .gitlab-ci.yml
