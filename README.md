@@ -285,6 +285,8 @@ Contributions are welcome! Whether it's a bug fix, a new scaffold generator, or 
 3. Commit your changes: `git commit -m 'feat: add my feature'`
 4. Push and open a pull request
 
+Read contribution guideline [here](CONTRIBUTING.md)
+
 ---
 
 ## 📄 License
