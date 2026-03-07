@@ -63,6 +63,7 @@ immediately usable configuration artefact:
 |-------------------------|-------------------|-------------------|
 | **Define before you Build** | `devopsos scaffold cicd` / `gha` / `gitlab` | Interactive wizards capture intent before generating any config file |
 | **Standardise before Scale** | `devopsos scaffold gha`, `gitlab`, `jenkins` | Golden-path templates for GitHub Actions, GitLab CI, and Jenkins — reviewed baselines every team can adopt |
+| **Standardise the container runtime & Kubernetes env** | `devopsos scaffold devcontainer` | Encodes Docker/Podman choice and all Kubernetes CLI tools (kubectl, helm, kustomize, argocd_cli, flux, k9s, kind, minikube, kubeseal …) into a reproducible `devcontainer.json` |
 | **Automate the Repeatable** | `devopsos scaffold argocd` | GitOps sync process encoded as an ArgoCD `Application` + `AppProject` CR |
 | **Automate the Repeatable** | `devopsos scaffold devcontainer` | Developer environment setup encoded as `devcontainer.json` — reproducible for every team member |
 | **Observe and Iterate** | `devopsos scaffold sre` | Prometheus alert rules, Grafana dashboards, and SLO manifests — close the measure-improve feedback loop |
@@ -128,10 +129,32 @@ stream **before** selecting or configuring any tool.
 
 | Best Practice | Why it matters |
 |---------------|----------------|
-| Define build standards before choosing tools (Docker, Gradle, Maven, Make) | Prevents tool sprawl and ensures consistent outputs |
-| Standardise base images and dependency management across all teams | Reduces "works on my machine" issues |
-| Enforce reproducible builds with version-pinned dependencies | Makes builds auditable and roll-backable |
+| Define build standards before choosing tools (Gradle, Maven, Make) | Prevents tool sprawl and ensures consistent outputs |
+| Standardise dependency management and enforce version-pinned builds | Reduces "works on my machine" issues |
+| Enforce reproducible builds across all teams and environments | Makes builds auditable and roll-backable |
 | Use an artifact repository (Nexus) to cache, version, and audit build outputs | Provides a single source of truth for artifacts |
+
+### 🐳 Containerization
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Choose and document your container runtime (Docker or Podman) before writing the first Dockerfile | Consistency prevents environment drift across teams |
+| Standardise base images: use pinned, minimal images (distroless or Alpine) updated on a schedule | Reduces attack surface and image size |
+| Define a container image naming and tagging convention (`<registry>/<org>/<service>:<gitsha>`) | Makes every image traceable back to its source commit |
+| Scan every image for vulnerabilities in the CI build stage before pushing to a registry | Prevents known CVEs from reaching any environment |
+| Use multi-stage Dockerfiles to keep production images free of build-time dependencies | Smaller images, faster pulls, smaller attack surface |
+| Use `devopsos scaffold devcontainer` to standardise the container runtime for every team member | Every engineer starts from the same reproducible baseline |
+
+### ☸️ Kubernetes
+
+| Best Practice | Why it matters |
+|---------------|----------------|
+| Define cluster topology and namespace strategy before deploying any workload | Avoids namespace sprawl and permission confusion |
+| Use a local cluster (kind or minikube) for development so every engineer can reproduce production-like conditions locally | Reduces "it works on staging but not prod" surprises |
+| Manage all manifests through version-controlled Kustomize overlays or Helm charts | No kubectl apply from developer laptops in production |
+| Use GitOps (ArgoCD or Flux) as the single deployment path — direct production kubectl changes are prohibited | Every change is auditable, reviewable, and reversible |
+| Manage Kubernetes secrets with Sealed Secrets (Kubeseal) | Encrypted secrets can be safely stored in Git |
+| Use k9s or Lens for day-two operations and cluster observability | Consistent tooling reduces operator error |
 
 ### 🧪 Test & Quality
 

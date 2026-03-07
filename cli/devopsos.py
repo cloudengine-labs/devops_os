@@ -38,7 +38,7 @@ def init(
     # ── Canonical tool lists ──────────────────────────────────────────────
     ALL_LANGUAGES    = ["python", "java", "node", "ruby", "csharp", "php", "rust",
                         "typescript", "kotlin", "c", "cpp", "javascript", "go"]
-    ALL_CICD         = ["docker", "terraform", "kubectl", "helm", "github_actions", "jenkins"]
+    ALL_CICD         = ["docker", "podman", "terraform", "kubectl", "helm", "github_actions", "jenkins"]
     ALL_KUBERNETES   = ["k9s", "kustomize", "argocd_cli", "lens", "kubeseal",
                         "flux", "kind", "minikube", "openshift_cli"]
     ALL_BUILD_TOOLS  = ["gradle", "maven", "ant", "make", "cmake"]
@@ -58,29 +58,30 @@ def init(
             "choices": ALL_LANGUAGES,
             "description": "Programming languages for your project",
         },
+        "Containerization  [CONTAINER stage]": {
+            "choices": ["docker", "podman"],
+            "description": "Container runtimes to build, ship, and run application images",
+        },
         "Build Tools  [BUILD stage]": {
-            "choices": ["docker", "gradle", "maven", "ant", "make", "cmake", "nexus"],
+            "choices": ["gradle", "maven", "ant", "make", "cmake", "nexus"],
             "description": "Tools to compile, package, and store build artifacts",
         },
         "Test & Quality  [TEST stage]": {
             "choices": ["sonarqube", "checkstyle", "pmd", "eslint", "pylint"],
             "description": "Static analysis and quality gates to enforce standards early",
         },
-        "IaC & Infrastructure  [IaC stage]": {
-            "choices": ["terraform", "kubectl", "helm", "kustomize"],
-            "description": "Infrastructure as Code tools for reproducible environments",
+        "Kubernetes  [KUBERNETES stage]": {
+            "choices": ["kubectl", "helm", "kustomize", "k9s", "argocd_cli",
+                        "flux", "kind", "minikube", "lens", "kubeseal", "openshift_cli"],
+            "description": "Kubernetes CLI tools, GitOps engines, and local cluster runtimes",
         },
-        "Deploy & GitOps  [DEPLOY stage]": {
-            "choices": ["github_actions", "jenkins", "argocd_cli", "flux"],
-            "description": "CI/CD pipelines and GitOps delivery tools",
+        "CI/CD & Deploy  [DEPLOY stage]": {
+            "choices": ["github_actions", "jenkins", "terraform"],
+            "description": "CI/CD pipelines, IaC provisioning, and deployment automation",
         },
         "SRE & Monitoring  [SRE/MONITORING stage]": {
-            "choices": ["prometheus", "grafana", "elk", "k9s"],
-            "description": "Observability stack: metrics, dashboards, and logs",
-        },
-        "Security & Kubernetes Dev  [SECURITY stage]": {
-            "choices": ["kubeseal", "lens", "kind", "minikube", "openshift_cli"],
-            "description": "Secret management, security scanning, and local K8s dev tools",
+            "choices": ["prometheus", "grafana", "elk"],
+            "description": "Observability stack: metrics, dashboards, and centralised logs",
         },
     }
 
@@ -110,34 +111,35 @@ def init(
     # output for backward compatibility.
     def _sel(group): return selected_by_group.get(group, [])
 
+    container_sel = _sel("Containerization  [CONTAINER stage]")
     build_sel     = _sel("Build Tools  [BUILD stage]")
     test_sel      = _sel("Test & Quality  [TEST stage]")
-    iac_sel       = _sel("IaC & Infrastructure  [IaC stage]")
-    deploy_sel    = _sel("Deploy & GitOps  [DEPLOY stage]")
+    k8s_sel       = _sel("Kubernetes  [KUBERNETES stage]")
+    deploy_sel    = _sel("CI/CD & Deploy  [DEPLOY stage]")
     sre_sel       = _sel("SRE & Monitoring  [SRE/MONITORING stage]")
-    security_sel  = _sel("Security & Kubernetes Dev  [SECURITY stage]")
     lang_sel      = _sel("Languages")
 
     config = {
         "languages": {opt: opt in lang_sel for opt in ALL_LANGUAGES},
         "cicd": {
-            "docker":         "docker"         in build_sel,
-            "terraform":      "terraform"      in iac_sel,
-            "kubectl":        "kubectl"        in iac_sel,
-            "helm":           "helm"           in iac_sel,
+            "docker":         "docker"         in container_sel,
+            "podman":         "podman"         in container_sel,
+            "terraform":      "terraform"      in deploy_sel,
+            "kubectl":        "kubectl"        in k8s_sel,
+            "helm":           "helm"           in k8s_sel,
             "github_actions": "github_actions" in deploy_sel,
             "jenkins":        "jenkins"        in deploy_sel,
         },
         "kubernetes": {
-            "k9s":           "k9s"           in sre_sel,
-            "kustomize":     "kustomize"     in iac_sel,
-            "argocd_cli":    "argocd_cli"    in deploy_sel,
-            "lens":          "lens"          in security_sel,
-            "kubeseal":      "kubeseal"      in security_sel,
-            "flux":          "flux"          in deploy_sel,
-            "kind":          "kind"          in security_sel,
-            "minikube":      "minikube"      in security_sel,
-            "openshift_cli": "openshift_cli" in security_sel,
+            "k9s":           "k9s"           in k8s_sel,
+            "kustomize":     "kustomize"     in k8s_sel,
+            "argocd_cli":    "argocd_cli"    in k8s_sel,
+            "lens":          "lens"          in k8s_sel,
+            "kubeseal":      "kubeseal"      in k8s_sel,
+            "flux":          "flux"          in k8s_sel,
+            "kind":          "kind"          in k8s_sel,
+            "minikube":      "minikube"      in k8s_sel,
+            "openshift_cli": "openshift_cli" in k8s_sel,
         },
         "build_tools": {opt: opt in build_sel for opt in ALL_BUILD_TOOLS},
         "code_analysis": {opt: opt in test_sel for opt in ALL_CODE_ANALYSIS},
@@ -180,9 +182,10 @@ def init(
         }
         for lang, arg in lang_map.items():
             build_args[arg] = str(config["languages"].get(lang, False)).lower()
-        # CICD
+        # CICD (includes container runtimes docker/podman)
         cicd_map = {
-            "docker": "INSTALL_DOCKER", "terraform": "INSTALL_TERRAFORM",
+            "docker": "INSTALL_DOCKER", "podman": "INSTALL_PODMAN",
+            "terraform": "INSTALL_TERRAFORM",
             "kubectl": "INSTALL_KUBECTL", "helm": "INSTALL_HELM",
             "github_actions": "INSTALL_GITHUB_ACTIONS", "jenkins": "INSTALL_JENKINS"
         }

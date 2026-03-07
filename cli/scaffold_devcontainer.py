@@ -26,7 +26,7 @@ ALL_LANGUAGES = [
     "rust", "typescript", "kotlin", "c", "cpp", "javascript", "go",
 ]
 ALL_CICD = [
-    "docker", "terraform", "kubectl", "helm", "github_actions", "jenkins",
+    "docker", "podman", "terraform", "kubectl", "helm", "github_actions", "jenkins",
 ]
 ALL_KUBERNETES = [
     "k9s", "kustomize", "argocd_cli", "lens", "kubeseal", "flux",
@@ -47,7 +47,8 @@ LANG_ARG_MAP = {
     "go": "INSTALL_GO",
 }
 CICD_ARG_MAP = {
-    "docker": "INSTALL_DOCKER", "terraform": "INSTALL_TERRAFORM",
+    "docker": "INSTALL_DOCKER", "podman": "INSTALL_PODMAN",
+    "terraform": "INSTALL_TERRAFORM",
     "kubectl": "INSTALL_KUBECTL", "helm": "INSTALL_HELM",
     "github_actions": "INSTALL_GITHUB_ACTIONS", "jenkins": "INSTALL_JENKINS",
 }
@@ -272,8 +273,8 @@ def generate_devcontainer_json(env_config):
         extensions += ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "ms-vscode.vscode-typescript-next"]
     if langs.get("go"):
         extensions.append("golang.go")
-    if cicd.get("docker"):
-        extensions.append("ms-azuretools.vscode-docker")
+    if cicd.get("docker") or cicd.get("podman"):
+        extensions.append("ms-azuretools.vscode-docker")  # Docker extension also works with Podman
     if cicd.get("terraform"):
         extensions.append("hashicorp.terraform")
     if cicd.get("kubectl") or cicd.get("helm"):

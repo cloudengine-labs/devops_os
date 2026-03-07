@@ -107,6 +107,14 @@ MAPPING_TO_TOOLING = """\
   │                             │  ArgoCD, and Flux ensure every team      │
   │                             │  starts from a reviewed baseline.        │
   ├─────────────────────────────┼──────────────────────────────────────────┤
+  │  Standardise the container  │  `devopsos scaffold devcontainer`        │
+  │  runtime & Kubernetes env   │  encodes Docker/Podman runtime choice    │
+  │                             │  and all Kubernetes CLI tools (kubectl,  │
+  │                             │  helm, kustomize, argocd_cli, flux,      │
+  │                             │  k9s, kind, minikube, kubeseal …) into a │
+  │                             │  reproducible devcontainer.json so every │
+  │                             │  engineer starts from the same baseline. │
+  ├─────────────────────────────┼──────────────────────────────────────────┤
   │  Automate the repeatable    │  `devopsos scaffold argocd` encodes      │
   │                             │  the GitOps sync process as code;        │
   │                             │  `devopsos scaffold devcontainer`        │
@@ -180,11 +188,41 @@ BEST_PRACTICES = """\
   🔨 BUILD
   ────────
   • Define build standards and conventions before choosing tools
-    (Docker, Gradle, Maven, Make).
-  • Standardise base images and dependency management across all teams.
-  • Enforce reproducible builds with version-pinned dependencies.
+    (Gradle, Maven, Make).
+  • Standardise dependency management and enforce version-pinned builds.
+  • Enforce reproducible builds across all teams and environments.
   • Use an artifact repository (Nexus) to cache, version, and audit
     build outputs.
+
+  🐳 CONTAINERIZATION
+  ────────────────────
+  • Choose and document your container runtime (Docker or Podman) before
+    writing the first Dockerfile — consistency prevents environment drift.
+  • Standardise base images across all services: use a pinned, minimal
+    base image (e.g. distroless or Alpine) and update it on a schedule.
+  • Define a container image naming and tagging convention (e.g.
+    <registry>/<org>/<service>:<gitsha>) before the first build.
+  • Scan every image for vulnerabilities during the CI build stage —
+    never push an unscanned image to a shared registry.
+  • Use multi-stage Dockerfiles to keep production images small and
+    free of build-time dependencies.
+  • Configure your dev environment with `devopsos scaffold devcontainer`
+    to standardise the container runtime for every team member.
+
+  ☸️  KUBERNETES
+  ──────────────
+  • Define Kubernetes cluster topology and namespace strategy before
+    deploying any workload.
+  • Use a local cluster (kind or minikube) for development so that
+    every engineer can reproduce production-like conditions locally.
+  • Manage all manifests through version-controlled Kustomize overlays
+    or Helm charts — no kubectl apply from a developer laptop in production.
+  • Use GitOps (ArgoCD or Flux) as the single path to deploy and update
+    workloads; direct kubectl changes to production are prohibited.
+  • Manage Kubernetes secrets with Sealed Secrets (Kubeseal) so that
+    encrypted secrets can be safely stored in Git.
+  • Use k9s or Lens for day-two operations and cluster observability
+    rather than ad-hoc kubectl commands.
 
   🧪 TEST & QUALITY
   ─────────────────
