@@ -7,6 +7,8 @@ import os
 from pathlib import Path
 from typing import Optional
 
+from cli.__version__ import __version__
+
 # Import scaffold modules — used as libraries by the unified scaffold sub-commands
 import cli.scaffold_cicd as scaffold_cicd
 import cli.scaffold_gha as scaffold_gha
@@ -26,7 +28,27 @@ class ProcessFirstSection(str, enum.Enum):
     all = "all"
 
 
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"devopsos {__version__}")
+        raise typer.Exit()
+
+
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
+
+
+@app.callback()
+def _main_callback(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        "-V",
+        help="Show the devopsos version and exit.",
+        callback=_version_callback,
+        is_eager=True,
+    ),
+) -> None:
+    """DevOps-OS CLI — scaffold CI/CD configs, GitOps manifests, SRE resources, and more."""
 
 # ---------------------------------------------------------------------------
 # scaffold sub-app — each scaffold target is a proper Typer subcommand so

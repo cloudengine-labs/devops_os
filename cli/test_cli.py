@@ -28,6 +28,19 @@ def test_help():
     result = _run(["-m", "cli.devopsos", "--help"])
     assert "Unified DevOps-OS CLI tool" in result.stdout
 
+
+def test_version_flag():
+    """`devopsos --version` and `devopsos -V` print the current version and exit 0."""
+    from cli.__version__ import __version__
+    for flag in ("--version", "-V"):
+        result = _run(["-m", "cli.devopsos", flag])
+        assert result.returncode == 0, f"{flag} exited non-zero: {result.stderr}"
+        text = _strip_ansi(result.stdout).strip()
+        assert __version__ in text, (
+            f"{flag} output '{text}' should contain version '{__version__}'"
+        )
+        assert "devopsos" in text, f"{flag} output '{text}' should contain 'devopsos'"
+
 def test_init_help_shows_dir_option():
     """--dir option must appear in `devopsos init --help`."""
     result = subprocess.run(
