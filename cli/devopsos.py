@@ -57,10 +57,24 @@ def _run_scaffold(module_main, flags: list):
         sys.argv = _saved
 
 
+def _show_help_if_no_opts(ctx: typer.Context) -> None:
+    """Print the command's help text and exit when the user provides no options.
+
+    This gives a friendly usage summary instead of silently running with all
+    defaults, which can be confusing.  Flags are detected by looking for any
+    ``--`` argument in sys.argv; ``--help`` is always handled by Typer/Click
+    before our function body runs, so that path is unaffected.
+    """
+    if not any(a.startswith("-") for a in sys.argv[1:]):
+        typer.echo(ctx.get_help())
+        raise typer.Exit()
+
+
 # ── scaffold gha ────────────────────────────────────────────────────────────
 
 @scaffold_app.command("gha")
 def scaffold_gha_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_GHA_NAME",
                               help="Workflow name"),
     workflow_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_GHA_TYPE",
@@ -98,6 +112,7 @@ def scaffold_gha_cmd(
       devopsos scaffold gha --name my-app --matrix
       devopsos scaffold gha --name shared --type reusable
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--type", workflow_type,
@@ -125,6 +140,7 @@ def scaffold_gha_cmd(
 
 @scaffold_app.command("jenkins")
 def scaffold_jenkins_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_JENKINS_NAME",
                               help="Pipeline name"),
     pipeline_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_JENKINS_TYPE",
@@ -159,6 +175,7 @@ def scaffold_jenkins_cmd(
       devopsos scaffold jenkins --name my-app --languages python --type parameterized
       devopsos scaffold jenkins --name my-app --languages go --kubernetes --k8s-method argocd
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--type", pipeline_type,
@@ -184,6 +201,7 @@ def scaffold_jenkins_cmd(
 
 @scaffold_app.command("gitlab")
 def scaffold_gitlab_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_GITLAB_NAME",
                               help="Application / pipeline name"),
     pipeline_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_GITLAB_TYPE",
@@ -213,6 +231,7 @@ def scaffold_gitlab_cmd(
       devopsos scaffold gitlab --name java-api --languages java --type test
       devopsos scaffold gitlab --name my-app --languages python,go --kubernetes --k8s-method argocd
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--type", pipeline_type,
@@ -235,6 +254,7 @@ def scaffold_gitlab_cmd(
 
 @scaffold_app.command("argocd")
 def scaffold_argocd_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_ARGOCD_NAME",
                               help="Application name"),
     method: str = typer.Option("argocd", envvar="DEVOPS_OS_ARGOCD_METHOD",
@@ -271,6 +291,7 @@ def scaffold_argocd_cmd(
       devopsos scaffold argocd --name my-app --auto-sync --rollouts
       devopsos scaffold argocd --name my-app --method flux --image ghcr.io/org/app:latest
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--method", method,
@@ -296,6 +317,7 @@ def scaffold_argocd_cmd(
 
 @scaffold_app.command("sre")
 def scaffold_sre_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_SRE_NAME",
                               help="Application / service name"),
     team: str = typer.Option("platform", envvar="DEVOPS_OS_SRE_TEAM",
@@ -331,6 +353,7 @@ def scaffold_sre_cmd(
       devopsos scaffold sre --name my-app --slo-type availability --slo-target 99.9
       devopsos scaffold sre --name my-api --slo-type latency --latency-threshold 0.2
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--team", team,
@@ -350,6 +373,7 @@ def scaffold_sre_cmd(
 
 @scaffold_app.command("devcontainer")
 def scaffold_devcontainer_cmd(
+    ctx: typer.Context,
     languages: str = typer.Option("python", envvar="DEVOPS_OS_DEVCONTAINER_LANGUAGES",
                                    help="Comma-separated languages to enable (default: python)"),
     cicd_tools: str = typer.Option("docker,github_actions", "--cicd-tools",
@@ -413,6 +437,7 @@ def scaffold_devcontainer_cmd(
       devopsos scaffold devcontainer --kubernetes-tools kubectl,helm,argocd_cli
       devopsos scaffold devcontainer --languages go --go-version 1.22 --output-dir myproject
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--languages", languages,
         "--cicd-tools", cicd_tools,
@@ -440,6 +465,7 @@ def scaffold_devcontainer_cmd(
 
 @scaffold_app.command("cicd")
 def scaffold_cicd_cmd(
+    ctx: typer.Context,
     name: str = typer.Option("DevOps-OS", help="CI/CD pipeline name"),
     cicd_type: str = typer.Option("complete", "--type",
                                    help="Pipeline type: build | test | deploy | complete"),
@@ -471,6 +497,7 @@ def scaffold_cicd_cmd(
       devopsos scaffold cicd --name my-app --github
       devopsos scaffold cicd --name my-app --jenkins --type build
     """
+    _show_help_if_no_opts(ctx)
     flags = [
         "--name", name,
         "--type", cicd_type,

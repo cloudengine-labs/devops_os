@@ -667,3 +667,100 @@ def test_scaffold_via_cli_matches_direct_module_output():
             "Unified CLI and direct module should produce identical output"
         )
 
+
+# ── scaffold cicd (fixed) ────────────────────────────────────────────────────
+
+def test_scaffold_cicd_generates_both_outputs():
+    """`devopsos scaffold cicd --github --jenkins` generates both GHA workflow and Jenkinsfile."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "ci-test",
+                "--type", "build",
+                "--languages", "python",
+                "--output-dir", tmp,
+                "--github",
+                "--jenkins",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert "error" not in result.stdout.lower() and "completed successfully" in result.stdout.lower()
+        gha_files = list(Path(tmp, ".github", "workflows").glob("*.yml"))
+        assert gha_files, "GitHub Actions workflow file should have been created"
+        assert Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should have been created"
+        content = Path(gha_files[0]).read_text()
+        assert "ci-test" in content.lower() or "build" in content.lower(), (
+            "Generated workflow should reference the app name or type"
+        )
+
+
+def test_scaffold_cicd_github_only():
+    """`devopsos scaffold cicd --github` generates only a GHA workflow, no Jenkinsfile."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "gh-only",
+                "--type", "test",
+                "--output-dir", tmp,
+                "--github",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        gha_files = list(Path(tmp, ".github", "workflows").glob("*.yml"))
+        assert gha_files, "GitHub Actions workflow should have been created"
+        assert not Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should NOT be created with --github only"
+
+
+def test_scaffold_cicd_jenkins_only():
+    """`devopsos scaffold cicd --jenkins` generates only a Jenkinsfile, no GHA workflow."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "jk-only",
+                "--type", "build",
+                "--output-dir", tmp,
+                "--jenkins",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should have been created"
+        gha_dir = Path(tmp, ".github", "workflows")
+        assert not gha_dir.exists() or not list(gha_dir.glob("*.yml")), (
+            "GHA workflow should NOT be created with --jenkins only"
+        )
+
+
+# ── graceful exit (no opts) ──────────────────────────────────────────────────
+
+def test_scaffold_no_opts_shows_help():
+    """Each scaffold subcommand shows usage help (not an error) when invoked with no options."""
+    targets = ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd")
+    for target in targets:
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", target],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        text = _strip_ansi(result.stdout + result.stderr)
+        assert result.returncode == 0, (
+            f"scaffold {target} with no opts should exit 0, got {result.returncode}.\n{text}"
+        )
+        assert "Usage:" in text, (
+            f"scaffold {target} with no opts should print 'Usage:', got:\n{text}"
+        )
+        assert "Examples:" in text, (
+            f"scaffold {target} with no opts should show Examples section, got:\n{text}"
+        )
+
