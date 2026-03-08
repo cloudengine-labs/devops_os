@@ -21,15 +21,22 @@ Welcome to the DevOps-OS documentation! This set of guides will help you use and
 
 ## CLI Generator Quick Reference
 
+All commands are accessed through the unified `devopsos` CLI:
+
+```bash
+python -m cli.devopsos scaffold --help   # list all scaffold targets
+python -m cli.devopsos scaffold gha --help   # see all GHA options
+```
+
 | Command | Default output |
 |---------|---------------|
-| `python -m cli.scaffold_gha` | `.github/workflows/<name>-<type>.yml` |
-| `python -m cli.scaffold_gitlab` | `.gitlab-ci.yml` |
-| `python -m cli.scaffold_jenkins` | `Jenkinsfile` |
-| `python -m cli.scaffold_argocd` | `argocd/` directory |
-| `python -m cli.scaffold_argocd --method flux` | `flux/` directory |
-| `python -m cli.scaffold_sre` | `sre/` directory |
-| `python -m cli.scaffold_devcontainer` | `.devcontainer/` directory |
+| `python -m cli.devopsos scaffold gha` | `.github/workflows/<name>-<type>.yml` |
+| `python -m cli.devopsos scaffold gitlab` | `.gitlab-ci.yml` |
+| `python -m cli.devopsos scaffold jenkins` | `Jenkinsfile` |
+| `python -m cli.devopsos scaffold argocd` | `argocd/` directory |
+| `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
+| `python -m cli.devopsos scaffold sre` | `sre/` directory |
+| `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
 
 See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables, input files, and output path details.
 
@@ -41,15 +48,15 @@ cd devops_os
 pip install -r cli/requirements.txt
 
 # GitHub Actions complete pipeline
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 # Output: .github/workflows/my-app-complete.yml
 
 # GitLab CI pipeline
-python -m cli.scaffold_gitlab --name my-app --languages python
+python -m cli.devopsos scaffold gitlab --name my-app --languages python
 # Output: .gitlab-ci.yml
 
 # SRE monitoring stack
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 # Output: sre/ directory
 ```
 

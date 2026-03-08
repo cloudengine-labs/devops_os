@@ -163,8 +163,13 @@ def test_init_selections_written_to_config():
         assert cfg["devops_tools"]["grafana"] is False, "grafana should be False"
 
 def test_scaffold_unknown():
+    """Unknown scaffold subcommand produces a clear Typer error (not a Python traceback)."""
     result = _run(["-m", "cli.devopsos", "scaffold", "unknown"])
-    assert "Unknown scaffold target" in result.stdout
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0
+    # Typer reports: "No such command 'unknown'."
+    assert "no such command" in combined.lower()
+    assert "Traceback" not in combined
 
 def test_scaffold_help_lists_new_targets():
     result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
@@ -573,16 +578,23 @@ def test_process_first_specific_section_no_usage_footer():
 
 # -- scaffold arg pass-through (cli.devopsos vs cli.scaffold_*) ------------
 
-def test_scaffold_help_explains_dual_invocation():
-    """`devopsos scaffold --help` documents both invocation forms and the difference."""
+def test_scaffold_help_shows_all_subcommands():
+    """`devopsos scaffold --help` lists all 7 scaffold subcommands."""
     result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
     assert result.returncode == 0
     text = _strip_ansi(result.stdout)
-    assert "cli.devopsos" in text, "help should mention cli.devopsos"
-    assert "cli.scaffold_" in text, "help should mention cli.scaffold_* modules"
-    assert "forwarded" in text.lower() or "forward" in text.lower(), (
-        "help should mention that extra args are forwarded"
-    )
+    for target in ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd"):
+        assert target in text, f"scaffold --help should list the '{target}' subcommand"
+
+
+def test_scaffold_target_help_shows_native_options():
+    """`devopsos scaffold gha --help` shows all GHA options natively (no argparse delegation needed)."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "gha", "--help"])
+    assert result.returncode == 0
+    text = _strip_ansi(result.stdout)
+    for option in ("--name", "--type", "--languages", "--kubernetes", "--registry",
+                   "--k8s-method", "--output", "--image", "--branches", "--matrix", "--reusable"):
+        assert option in text, f"scaffold gha --help should show '{option}'"
 
 
 def test_scaffold_jenkins_args_forwarded_via_cli():

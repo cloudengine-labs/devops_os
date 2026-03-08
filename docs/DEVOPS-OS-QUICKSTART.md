@@ -49,10 +49,10 @@ To deactivate it later, simply run `deactivate`.
 
 ### Configure Development Container
 ```bash
-# Generate dev container config via CLI (recommended)
+# Generate dev container config via the unified CLI
 # Output: .devcontainer/devcontainer.json
 #         .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,flux
@@ -103,38 +103,38 @@ python -m cli.devopsos process-first --section tips
 ```bash
 # Basic complete CI/CD workflow
 # Output: .github/workflows/devops-os-complete.yml
-python -m cli.scaffold_gha
+python -m cli.devopsos scaffold gha
 
 # Build-only workflow
 # Output: .github/workflows/devops-os-build.yml
-python -m cli.scaffold_gha --type build
+python -m cli.devopsos scaffold gha --type build
 
 # Complete CI/CD workflow for a named application
 # Output: .github/workflows/my-app-complete.yml
-python -m cli.scaffold_gha --name my-app --type complete
+python -m cli.devopsos scaffold gha --name my-app --type complete
 
 # Workflow with Kubernetes deployment
 # Output: .github/workflows/my-app-complete.yml
-python -m cli.scaffold_gha --name my-app --kubernetes --k8s-method kubectl
+python -m cli.devopsos scaffold gha --name my-app --kubernetes --k8s-method kubectl
 
 # Matrix build across multiple platforms
 # Output: .github/workflows/devops-os-complete.yml
-python -m cli.scaffold_gha --matrix
+python -m cli.devopsos scaffold gha --matrix
 
 # Reusable workflow
 # Output: .github/workflows/devops-os-reusable.yml
-python -m cli.scaffold_gha --type reusable
+python -m cli.devopsos scaffold gha --type reusable
 
 # Specify languages to enable
 # Output: .github/workflows/devops-os-complete.yml
-python -m cli.scaffold_gha --languages python,java,go
+python -m cli.devopsos scaffold gha --languages python,java,go
 
 # Custom container image
-python -m cli.scaffold_gha --image ghcr.io/myorg/devops-os:latest
+python -m cli.devopsos scaffold gha --image ghcr.io/myorg/devops-os:latest
 
 # Custom output location
 # Output: my-workflows/devops-os-complete.yml
-python -m cli.scaffold_gha --output my-workflows
+python -m cli.devopsos scaffold gha --output my-workflows
 ```
 
 ### Use Environment Variables Instead
@@ -148,7 +148,7 @@ export DEVOPS_OS_GHA_K8S_METHOD=kustomize
 
 # Run generator (will use environment variables)
 # Output: .github/workflows/my-app-complete.yml
-python -m cli.scaffold_gha
+python -m cli.devopsos scaffold gha
 ```
 
 ## GitLab CI Pipelines
@@ -157,20 +157,20 @@ python -m cli.scaffold_gha
 ```bash
 # Complete pipeline for a Python project
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 
 # Build + test for Java
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name java-api --languages java --type test
+python -m cli.devopsos scaffold gitlab --name java-api --languages java --type test
 
 # Pipeline with Kubernetes deploy via ArgoCD
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python,go \
+python -m cli.devopsos scaffold gitlab --name my-app --languages python,go \
        --kubernetes --k8s-method argocd
 
 # Custom output path
 # Output: ci/my-pipeline.yml
-python -m cli.scaffold_gitlab --name my-app --output ci/my-pipeline.yml
+python -m cli.devopsos scaffold gitlab --name my-app --output ci/my-pipeline.yml
 ```
 
 ### Use Environment Variables Instead
@@ -182,7 +182,7 @@ export DEVOPS_OS_GITLAB_KUBERNETES=true
 export DEVOPS_OS_GITLAB_K8S_METHOD=kustomize
 
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab
+python -m cli.devopsos scaffold gitlab
 ```
 
 ## Jenkins Pipelines
@@ -191,34 +191,34 @@ python -m cli.scaffold_gitlab
 ```bash
 # Basic complete CI/CD pipeline
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins
+python -m cli.devopsos scaffold jenkins
 
 # Build-only pipeline
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --type build
+python -m cli.devopsos scaffold jenkins --type build
 
 # Complete CI/CD pipeline for a named application
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --type complete
 
 # Pipeline with Kubernetes deployment
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --kubernetes --k8s-method kubectl
+python -m cli.devopsos scaffold jenkins --name my-app --kubernetes --k8s-method kubectl
 
 # Parameterized pipeline
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --parameters
+python -m cli.devopsos scaffold jenkins --parameters
 
 # Specify languages to enable
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --languages java,go
+python -m cli.devopsos scaffold jenkins --languages java,go
 
 # Specify SCM type
-python -m cli.scaffold_jenkins --scm git
+python -m cli.devopsos scaffold jenkins --scm git
 
 # Custom output location
 # Output: pipelines/Jenkinsfile
-python -m cli.scaffold_jenkins --output pipelines/Jenkinsfile
+python -m cli.devopsos scaffold jenkins --output pipelines/Jenkinsfile
 ```
 
 ### Use Environment Variables Instead
@@ -231,7 +231,7 @@ export DEVOPS_OS_JENKINS_K8S_METHOD=kustomize
 export DEVOPS_OS_JENKINS_PARAMETERS=true
 
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins
+python -m cli.devopsos scaffold jenkins
 ```
 
 ## GitOps / ArgoCD & Flux CD
@@ -241,7 +241,7 @@ python -m cli.scaffold_jenkins
 # ArgoCD Application CR + AppProject CR
 # Output: argocd/application.yaml
 #         argocd/appproject.yaml
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --namespace production
 
@@ -249,13 +249,13 @@ python -m cli.scaffold_argocd --name my-app \
 # Output: argocd/application.yaml
 #         argocd/appproject.yaml
 #         argocd/rollout.yaml
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --auto-sync --rollouts
 
 # Custom output directory
 # Output: gitops/argocd/application.yaml  (etc.)
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --output-dir gitops
 ```
@@ -266,7 +266,7 @@ python -m cli.scaffold_argocd --name my-app \
 # Output: flux/git-repository.yaml
 #         flux/kustomization.yaml
 #         flux/image-update-automation.yaml
-python -m cli.scaffold_argocd --name my-app --method flux \
+python -m cli.devopsos scaffold argocd --name my-app --method flux \
        --repo https://github.com/myorg/my-app.git \
        --image ghcr.io/myorg/my-app
 ```
@@ -280,23 +280,23 @@ python -m cli.scaffold_argocd --name my-app --method flux \
 #         sre/grafana-dashboard.json
 #         sre/slo.yaml
 #         sre/alertmanager-config.yaml
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 
 # Availability-only SLO
 # Output: sre/alert-rules.yaml  (etc.)
-python -m cli.scaffold_sre --name my-app --slo-type availability --slo-target 99.9
+python -m cli.devopsos scaffold sre --name my-app --slo-type availability --slo-target 99.9
 
 # Latency SLO with 200ms threshold
-python -m cli.scaffold_sre --name my-app --slo-type latency --latency-threshold 0.2
+python -m cli.devopsos scaffold sre --name my-app --slo-type latency --latency-threshold 0.2
 
 # With PagerDuty integration
-python -m cli.scaffold_sre --name my-app \
+python -m cli.devopsos scaffold sre --name my-app \
        --pagerduty-key YOUR_PD_KEY \
        --slack-channel "#platform-alerts"
 
 # Custom output directory
 # Output: monitoring/alert-rules.yaml  (etc.)
-python -m cli.scaffold_sre --name my-app --output-dir monitoring
+python -m cli.devopsos scaffold sre --name my-app --output-dir monitoring
 ```
 
 ## Container Configuration
@@ -306,14 +306,14 @@ python -m cli.scaffold_sre --name my-app --output-dir monitoring
 # Python + Go dev container
 # Output: .devcontainer/devcontainer.json
 #         .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,kubectl,helm
 
 # Full-stack container with Kubernetes tools
 # Output: .devcontainer/devcontainer.json
 #         .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,java,javascript \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,kustomize,argocd_cli,flux \
@@ -323,15 +323,12 @@ python -m cli.scaffold_devcontainer \
 # Write to a specific project directory
 # Output: /path/to/myproject/.devcontainer/devcontainer.json
 #         /path/to/myproject/.devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --output-dir /path/to/myproject
 
-# Or via the unified CLI
-python -m cli.devopsos scaffold devcontainer
-
 # See all available options
-python -m cli.scaffold_devcontainer --help
+python -m cli.devopsos scaffold devcontainer --help
 ```
 
 ### Configure Development Container Manually
@@ -370,7 +367,7 @@ EOF
 
 ## Common Options for All Generators
 
-| Option | `scaffold_gha` | `scaffold_gitlab` | `scaffold_jenkins` | `scaffold_argocd` | `scaffold_sre` | `scaffold_devcontainer` | Description |
+| Option | `scaffold gha` | `scaffold gitlab` | `scaffold jenkins` | `scaffold argocd` | `scaffold sre` | `scaffold devcontainer` | Description |
 |--------|:-:|:-:|:-:|:-:|:-:|:-:|-------------|
 | `--name` | ✓ | ✓ | ✓ | ✓ | ✓ | — | Name of the workflow/pipeline/app |
 | `--type` | ✓ | ✓ | ✓ | — | — | — | Type of workflow/pipeline |
@@ -386,12 +383,12 @@ EOF
 
 ```bash
 # Show help for each generator
-python -m cli.scaffold_gha --help
-python -m cli.scaffold_gitlab --help
-python -m cli.scaffold_jenkins --help
-python -m cli.scaffold_argocd --help
-python -m cli.scaffold_sre --help
-python -m cli.scaffold_devcontainer --help
+python -m cli.devopsos scaffold gha --help
+python -m cli.devopsos scaffold gitlab --help
+python -m cli.devopsos scaffold jenkins --help
+python -m cli.devopsos scaffold argocd --help
+python -m cli.devopsos scaffold sre --help
+python -m cli.devopsos scaffold devcontainer --help
 
 # Verify generated output locations
 ls -la .github/workflows/      # GitHub Actions
