@@ -1,2 +1,2 @@
 # Package marker for cli
-__version__ = "0.2.0"
+from cli.__version__ import __version__
