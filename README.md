@@ -143,11 +143,16 @@ python -m cli.devopsos scaffold gha --name my-app --languages python,javascript 
 
 # With Kubernetes deployment
 python -m cli.devopsos scaffold gha --name my-app --languages python --type complete --kubernetes
+
+# With Kubernetes deployment via Kustomize
+python -m cli.devopsos scaffold gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
 ---
 
 ### 4 — Generate other pipelines & configs
+
+All generators are available as subcommands of the **unified CLI** — `python -m cli.devopsos scaffold <target>`:
 
 ```bash
 # Jenkins pipeline → Jenkinsfile
@@ -172,6 +177,8 @@ python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools 
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
 
+Use `python -m cli.devopsos scaffold --help` to list all available targets and `python -m cli.devopsos scaffold <target> --help` to see every option for a specific target.
+
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
 ---
@@ -180,13 +187,9 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
-python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
-python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
-python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
-python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
-python -m cli.devopsos scaffold sre      # scaffold SRE configs
-python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
+
+Single Cli Command for Platform Engineering Capabilities - Dev Container and CICD Environment Setup
 
 ---
 

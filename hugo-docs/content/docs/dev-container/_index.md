@@ -11,10 +11,8 @@ DevOps-OS provides a pre-configured VS Code Dev Container that gives you a consi
 
 ## Quick Start
 
-### Generate with the CLI (recommended)
-
 ```bash
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,kubectl,helm \
   --kubernetes-tools k9s,argocd_cli,flux
@@ -24,11 +22,7 @@ python -m cli.scaffold_devcontainer \
 
 Then open VS Code and run **"Dev Containers: Reopen in Container"** from the Command Palette.
 
-### Or via the unified CLI
-
-```bash
-python -m cli.devopsos scaffold devcontainer
-```
+Run `python -m cli.devopsos scaffold devcontainer --help` to see all available options.
 
 ---
 
@@ -69,7 +63,7 @@ All options can be set via environment variables prefixed `DEVOPS_OS_DEVCONTAINE
 ## Full-stack Example
 
 ```bash
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,java,javascript \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,kustomize,argocd_cli,flux \
@@ -129,7 +123,7 @@ Copy the generated `.devcontainer/` directory to your project:
 
 ```bash
 # In the devops_os repo:
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --output-dir /path/to/my-project
 

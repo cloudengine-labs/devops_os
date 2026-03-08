@@ -13,20 +13,20 @@ DevOps-OS generates production-grade SRE configuration files for any service wit
 
 ```bash
 # Generate all SRE configs
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 # Output: sre/alert-rules.yaml
 #         sre/grafana-dashboard.json
 #         sre/slo.yaml
 #         sre/alertmanager-config.yaml
 
 # Availability-only SLO with 99.9% target
-python -m cli.scaffold_sre --name my-app --slo-type availability --slo-target 99.9
+python -m cli.devopsos scaffold sre --name my-app --slo-type availability --slo-target 99.9
 
 # Latency SLO with 200ms threshold
-python -m cli.scaffold_sre --name my-app --slo-type latency --latency-threshold 0.2
+python -m cli.devopsos scaffold sre --name my-app --slo-type latency --latency-threshold 0.2
 
 # Send critical alerts to PagerDuty
-python -m cli.scaffold_sre --name my-app \
+python -m cli.devopsos scaffold sre --name my-app \
        --pagerduty-key YOUR_PD_KEY \
        --slack-channel "#platform-alerts"
 ```
