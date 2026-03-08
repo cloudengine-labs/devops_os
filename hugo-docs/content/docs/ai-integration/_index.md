@@ -78,11 +78,11 @@ DevOps-OS MCP Server  ←──────────┐
         │                        │
         │  calls Python functions │
         ▼                        │
-  cli.scaffold_gha               │
-  cli.scaffold_gitlab     (same generators
-  cli.scaffold_jenkins     used by the CLI)
-  cli.scaffold_argocd            │
-  cli.scaffold_sre               │
+  devopsos scaffold gha          │
+  devopsos scaffold gitlab  (same generators
+  devopsos scaffold jenkins  used by the CLI)
+  devopsos scaffold argocd        │
+  devopsos scaffold sre           │
         │                        │
         ▼                        │
   Generated files ───────────────┘

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-03-08
+
+### Fixed
+- **`scaffold cicd` broken subprocess calls** — `scaffold_cicd.py` previously invoked
+  `github-actions-generator-improved.py` and `jenkins-pipeline-generator-improved.py` via
+  `subprocess.run`, which no longer exist. Both generators are now called directly via the
+  `scaffold_gha` and `scaffold_jenkins` modules (same `_run_module_main` pattern used by all
+  other scaffold subcommands).
+
+### Added
+- **Graceful help exit for all scaffold subcommands** — invoking any of the 7 scaffold
+  subcommands (`gha`, `jenkins`, `gitlab`, `argocd`, `sre`, `devcontainer`, `cicd`) with no
+  options now prints the command's full help text (including usage summary and examples) and
+  exits cleanly with code 0, instead of silently running with defaults.
+- **`--version` / `-V` flag** — `devopsos --version` (or `devopsos -V`) prints the current
+  version string and exits. Version is sourced from the new `cli/__version__.py` single source
+  of truth.
+- **`cli/__version__.py`** — single source of truth for the package version (`0.2.0`).
+- **`CHANGELOG.md`** — this file, tracking all notable changes.
+
+---
+
 ## [0.1.0] - 2025-03-08
 
 ### Added
@@ -46,4 +68,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/workflows/sanity.yml` – lightweight sanity-check workflow for PRs.
 - `.github/workflows/pages.yml` – GitHub Pages deployment workflow for the Hugo docs site.
 
+[0.2.0]: https://github.com/cloudengine-labs/devops_os/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cloudengine-labs/devops_os/releases/tag/v0.1.0

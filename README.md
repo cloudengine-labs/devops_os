@@ -33,6 +33,21 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 
 ---
 
+## 👥 Who Is This For?
+
+DevOps-OS is built for anyone who wants to **move faster** and **stop writing boilerplate DevOps configs by hand**.
+
+| Audience | How DevOps-OS helps |
+|----------|---------------------|
+| **Solo developers** | Get a production-ready CI/CD pipeline in under a minute — no DevOps expertise needed |
+| **DevOps / platform engineers** | Standardise pipeline templates across teams with a single CLI command |
+| **SRE teams** | Generate Prometheus alert rules, Grafana dashboards, and SLO manifests instantly |
+| **DevOps learners & students** | Learn the *Process-First* SDLC philosophy through runnable examples, not just theory |
+| **AI / LLM builders** | Plug every scaffold tool into Claude or ChatGPT via the built-in MCP server |
+| **Open-source contributors** | A well-structured Python project with a clean CLI, full test suite, and contribution guide |
+
+---
+
 ## 🏗️ Tech Stack
 
 <div align="center">
@@ -123,56 +138,54 @@ python -m cli.devopsos process-first --section tips
 
 ```bash
 # Complete CI/CD for a Python + JavaScript project
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 
 # With Kubernetes deployment via Kustomize
-python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
+python -m cli.devopsos scaffold gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
 ---
 
 ### 4 — Generate other pipelines & configs
 
+All generators are available as subcommands of the **unified CLI** — `python -m cli.devopsos scaffold <target>`:
+
 ```bash
 # Jenkins pipeline → Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --languages java --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
 
 # GitLab CI pipeline → .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python,go --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python,go --type complete
 
 # ArgoCD GitOps configs → argocd/application.yaml + argocd/appproject.yaml
-python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git
+python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/myorg/my-app.git
 
 # Flux GitOps configs → flux/git-repository.yaml + flux/kustomization.yaml + flux/image-update-automation.yaml
-python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
+python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
 
 # SRE configs (Prometheus, Grafana, SLO) → sre/ directory
-python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
+python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
 
 # Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
+python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
 
 # Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
 
+Use `python -m cli.devopsos scaffold --help` to list all available targets and `python -m cli.devopsos scaffold <target> --help` to see every option for a specific target.
+
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
 ---
 
-### 5 — Interactive wizard (all-in-one) - **WIP**
+### 5 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
-python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
-python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
-python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
-python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
-python -m cli.devopsos scaffold sre          # scaffold SRE configs
-python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
 
-Single Click Platform Engineering Capabilities
+Single Cli Command for Platform Engineering Capabilities - Dev Container and CICD Environment Setup
 
 ---
 
@@ -187,6 +200,60 @@ Add to your `claude_desktop_config.json` and ask Claude:
 > *"Generate a complete CI/CD GitHub Actions workflow for my Python API with Kubernetes deployment using ArgoCD."*
 
 See **[mcp_server/README.md](mcp_server/README.md)** for full setup and **[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
+
+---
+
+## 🗂️ Quick Start Commands
+
+Copy-paste commands for every CLI feature. No config files needed — all options have sensible defaults.
+
+```bash
+# ── Setup ──────────────────────────────────────────────────────────────────
+git clone https://github.com/cloudengine-labs/devops_os.git && cd devops_os
+pip install -r cli/requirements.txt
+
+# ── Check version ──────────────────────────────────────────────────────────
+python -m cli.devopsos --version           # → devopsos version 0.2.0
+
+# ── Interactive project wizard ─────────────────────────────────────────────
+python -m cli.devopsos init                # guided setup for any project
+
+# ── GitHub Actions ─────────────────────────────────────────────────────────
+python -m cli.devopsos scaffold gha --name my-app --type build --languages python
+python -m cli.devopsos scaffold gha --name my-app --type complete --languages python,javascript --kubernetes
+
+# ── Jenkins ────────────────────────────────────────────────────────────────
+python -m cli.devopsos scaffold jenkins --name my-app --type build --languages java
+
+# ── GitLab CI ──────────────────────────────────────────────────────────────
+python -m cli.devopsos scaffold gitlab --name my-app --type build --languages python
+python -m cli.devopsos scaffold gitlab --name my-app --type complete --kubernetes
+
+# ── ArgoCD / Flux GitOps ───────────────────────────────────────────────────
+python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/org/my-app.git
+python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https://github.com/org/my-app.git
+
+# ── SRE (Prometheus + Grafana + SLO) ──────────────────────────────────────
+python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
+
+# ── Dev Container ──────────────────────────────────────────────────────────
+python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform
+
+# ── Combined CI/CD (GHA + Jenkins in one step) ────────────────────────────
+python -m cli.devopsos scaffold cicd --name my-app --type build --languages python --github --jenkins
+
+# ── Process-First philosophy ───────────────────────────────────────────────
+python -m cli.devopsos process-first                      # full overview
+python -m cli.devopsos process-first --section mapping    # which tool for which goal
+
+# ── Help for any command ───────────────────────────────────────────────────
+python -m cli.devopsos --help
+python -m cli.devopsos scaffold --help
+python -m cli.devopsos scaffold gha --help
+```
+
+> **Full option reference:** [docs/CLI-COMMANDS-REFERENCE.md](docs/CLI-COMMANDS-REFERENCE.md)  
+> **CLI test report:** [docs/CLI-TEST-REPORT.md](docs/CLI-TEST-REPORT.md)
 
 ---
 
@@ -223,6 +290,7 @@ python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehens
 
 | Report | Description |
 |--------|-------------|
+| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | CLI v0.2.0 post-revamp test results — 52 tests, all passing |
 | [📋 Detailed Test Report](docs/TEST_REPORT.md) | Full results with CLI output samples for every scaffold command |
 | [🌐 Interactive HTML Report](docs/test-reports/test-report.html) | Self-contained pytest HTML report |
 | [📄 CLI Output Examples](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
@@ -256,14 +324,11 @@ Generate a dev container configuration from the CLI instead of editing JSON by h
 
 ```bash
 # Generate devcontainer.json and devcontainer.env.json for a Python + Go project
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,terraform,kubectl \
   --kubernetes-tools k9s,flux \
   --devops-tools prometheus,grafana
-
-# Or use the unified CLI
-python -m cli.devopsos scaffold devcontainer
 ```
 
 You can also customize `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then reopen in VS Code.
@@ -276,6 +341,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 |-------|-------------|
 | [🚀 Getting Started](docs/GETTING-STARTED.md) | Easy step-by-step guide — **start here** |
 | [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
+| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | v0.2.0 CLI revamp test results — 52 tests, all passing |
 | [🔄 Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |

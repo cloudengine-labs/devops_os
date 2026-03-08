@@ -87,7 +87,7 @@ kubectl apply -f k8s/
 kubectl apply -k k8s/overlays/dev
 
 # Deploy with ArgoCD (after generating ArgoCD configs)
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --path k8s --namespace production
 kubectl apply -f argocd/appproject.yaml
@@ -105,13 +105,13 @@ Use the Kubernetes generator alongside the CI/CD generators for a complete pipel
 python kubernetes/k8s-config-generator.py --name my-api --replicas 3
 
 # Generate a GitHub Actions workflow that deploys to K8s
-python -m cli.scaffold_gha \
+python -m cli.devopsos scaffold gha \
   --name my-api \
   --kubernetes \
   --k8s-method kustomize
 
 # Or generate an ArgoCD Application pointing to the k8s/ directory
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-api \
   --repo https://github.com/myorg/my-api.git \
   --path k8s \
@@ -126,13 +126,13 @@ For GitOps-based deployment, generate ArgoCD or Flux configs that watch the `k8s
 
 ```bash
 # ArgoCD watches k8s/ directory
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app \
   --path k8s \
   --repo https://github.com/myorg/my-app.git
 
 # Flux CD watches k8s/ directory
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app \
   --method flux \
   --path k8s \

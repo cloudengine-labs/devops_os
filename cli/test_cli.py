@@ -28,6 +28,7 @@ def test_help():
     result = _run(["-m", "cli.devopsos", "--help"])
     assert "Unified DevOps-OS CLI tool" in result.stdout
 
+
 def test_init_help_shows_dir_option():
     """--dir option must appear in `devopsos init --help`."""
     result = subprocess.run(
@@ -163,8 +164,13 @@ def test_init_selections_written_to_config():
         assert cfg["devops_tools"]["grafana"] is False, "grafana should be False"
 
 def test_scaffold_unknown():
+    """Unknown scaffold subcommand produces a clear Typer error (not a Python traceback)."""
     result = _run(["-m", "cli.devopsos", "scaffold", "unknown"])
-    assert "Unknown scaffold target" in result.stdout
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0
+    # Typer reports: "No such command 'unknown'."
+    assert "no such command" in combined.lower()
+    assert "Traceback" not in combined
 
 def test_scaffold_help_lists_new_targets():
     result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
@@ -570,6 +576,198 @@ def test_process_first_specific_section_no_usage_footer():
             f"--section {section} should not show the usage footer"
         )
 
+
+# -- scaffold arg pass-through (cli.devopsos vs cli.scaffold_*) ------------
+
+def test_scaffold_help_shows_all_subcommands():
+    """`devopsos scaffold --help` lists all 7 scaffold subcommands."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
+    assert result.returncode == 0
+    text = _strip_ansi(result.stdout)
+    for target in ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd"):
+        assert target in text, f"scaffold --help should list the '{target}' subcommand"
+
+
+def test_scaffold_target_help_shows_native_options():
+    """`devopsos scaffold gha --help` shows all GHA options natively (no argparse delegation needed)."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "gha", "--help"])
+    assert result.returncode == 0
+    text = _strip_ansi(result.stdout)
+    for option in ("--name", "--type", "--languages", "--kubernetes", "--registry",
+                   "--k8s-method", "--output", "--image", "--branches", "--matrix", "--reusable"):
+        assert option in text, f"scaffold gha --help should show '{option}'"
+
+
+def test_scaffold_jenkins_args_forwarded_via_cli():
+    """`devopsos scaffold jenkins --type build --languages python` forwards args to scaffold_jenkins."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, "Jenkinsfile")
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "jenkins",
+                "--type", "build",
+                "--languages", "python",
+                "--output", out,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+        assert os.path.isfile(out), "Jenkinsfile should have been created"
+        content = Path(out).read_text()
+        assert "pipeline" in content.lower() or "node" in content.lower(), (
+            "Jenkinsfile should contain pipeline content"
+        )
+
+
+def test_scaffold_gha_args_forwarded_via_cli():
+    """`devopsos scaffold gha --type build --name my-app` forwards args to scaffold_gha."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out_dir = os.path.join(tmp, ".github", "workflows")
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "gha",
+                "--type", "build",
+                "--name", "my-app",
+                "--output", out_dir,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+        wf_files = list(Path(out_dir).glob("*.yml"))
+        assert wf_files, "At least one workflow YAML should have been created"
+
+
+def test_scaffold_via_cli_matches_direct_module_output():
+    """Output from `devopsos scaffold gitlab` equals `python -m cli.scaffold_gitlab` (same defaults)."""
+    with tempfile.TemporaryDirectory() as tmp1, tempfile.TemporaryDirectory() as tmp2:
+        out1 = os.path.join(tmp1, ".gitlab-ci.yml")
+        out2 = os.path.join(tmp2, ".gitlab-ci.yml")
+
+        base_args = ["--name", "test-app", "--type", "build"]
+
+        result_unified = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gitlab"] + base_args + ["--output", out1],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        result_direct = subprocess.run(
+            [sys.executable, "-m", "cli.scaffold_gitlab"] + base_args + ["--output", out2],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+
+        assert result_unified.returncode == 0, result_unified.stderr
+        assert result_direct.returncode == 0, result_direct.stderr
+        assert Path(out1).read_text() == Path(out2).read_text(), (
+            "Unified CLI and direct module should produce identical output"
+        )
+
+
+# ── scaffold cicd (fixed) ────────────────────────────────────────────────────
+
+def test_scaffold_cicd_generates_both_outputs():
+    """`devopsos scaffold cicd --github --jenkins` generates both GHA workflow and Jenkinsfile."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "ci-test",
+                "--type", "build",
+                "--languages", "python",
+                "--output-dir", tmp,
+                "--github",
+                "--jenkins",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert "error" not in result.stdout.lower() and "completed successfully" in result.stdout.lower()
+        gha_files = list(Path(tmp, ".github", "workflows").glob("*.yml"))
+        assert gha_files, "GitHub Actions workflow file should have been created"
+        assert Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should have been created"
+        content = Path(gha_files[0]).read_text()
+        assert "ci-test" in content.lower() or "build" in content.lower(), (
+            "Generated workflow should reference the app name or type"
+        )
+
+
+def test_scaffold_cicd_github_only():
+    """`devopsos scaffold cicd --github` generates only a GHA workflow, no Jenkinsfile."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "gh-only",
+                "--type", "test",
+                "--output-dir", tmp,
+                "--github",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        gha_files = list(Path(tmp, ".github", "workflows").glob("*.yml"))
+        assert gha_files, "GitHub Actions workflow should have been created"
+        assert not Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should NOT be created with --github only"
+
+
+def test_scaffold_cicd_jenkins_only():
+    """`devopsos scaffold cicd --jenkins` generates only a Jenkinsfile, no GHA workflow."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "cicd",
+                "--name", "jk-only",
+                "--type", "build",
+                "--output-dir", tmp,
+                "--jenkins",
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert Path(tmp, "Jenkinsfile").is_file(), "Jenkinsfile should have been created"
+        gha_dir = Path(tmp, ".github", "workflows")
+        assert not gha_dir.exists() or not list(gha_dir.glob("*.yml")), (
+            "GHA workflow should NOT be created with --jenkins only"
+        )
+
+
+# ── graceful exit (no opts) ──────────────────────────────────────────────────
+
+def test_scaffold_no_opts_shows_help():
+    """Each scaffold subcommand shows usage help (not an error) when invoked with no options."""
+    targets = ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd")
+    for target in targets:
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", target],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        text = _strip_ansi(result.stdout + result.stderr)
+        assert result.returncode == 0, (
+            f"scaffold {target} with no opts should exit 0, got {result.returncode}.\n{text}"
+        )
+        assert "Usage:" in text, (
+            f"scaffold {target} with no opts should print 'Usage:', got:\n{text}"
+        )
+        assert "Examples:" in text, (
+            f"scaffold {target} with no opts should show Examples section, got:\n{text}"
+        )
+
+
+
+# -- versioning ------------------------------------------------------------
 
 
 # -- versioning ------------------------------------------------------------
