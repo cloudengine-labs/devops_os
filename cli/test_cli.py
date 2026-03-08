@@ -570,3 +570,88 @@ def test_process_first_specific_section_no_usage_footer():
             f"--section {section} should not show the usage footer"
         )
 
+
+# -- scaffold arg pass-through (cli.devopsos vs cli.scaffold_*) ------------
+
+def test_scaffold_help_explains_dual_invocation():
+    """`devopsos scaffold --help` documents both invocation forms and the difference."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
+    assert result.returncode == 0
+    text = _strip_ansi(result.stdout)
+    assert "cli.devopsos" in text, "help should mention cli.devopsos"
+    assert "cli.scaffold_" in text, "help should mention cli.scaffold_* modules"
+    assert "forwarded" in text.lower() or "forward" in text.lower(), (
+        "help should mention that extra args are forwarded"
+    )
+
+
+def test_scaffold_jenkins_args_forwarded_via_cli():
+    """`devopsos scaffold jenkins --type build --languages python` forwards args to scaffold_jenkins."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out = os.path.join(tmp, "Jenkinsfile")
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "jenkins",
+                "--type", "build",
+                "--languages", "python",
+                "--output", out,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+        assert os.path.isfile(out), "Jenkinsfile should have been created"
+        content = Path(out).read_text()
+        assert "pipeline" in content.lower() or "node" in content.lower(), (
+            "Jenkinsfile should contain pipeline content"
+        )
+
+
+def test_scaffold_gha_args_forwarded_via_cli():
+    """`devopsos scaffold gha --type build --name my-app` forwards args to scaffold_gha."""
+    with tempfile.TemporaryDirectory() as tmp:
+        out_dir = os.path.join(tmp, ".github", "workflows")
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "gha",
+                "--type", "build",
+                "--name", "my-app",
+                "--output", out_dir,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "error: unrecognized arguments" not in result.stderr
+        wf_files = list(Path(out_dir).glob("*.yml"))
+        assert wf_files, "At least one workflow YAML should have been created"
+
+
+def test_scaffold_via_cli_matches_direct_module_output():
+    """Output from `devopsos scaffold gitlab` equals `python -m cli.scaffold_gitlab` (same defaults)."""
+    with tempfile.TemporaryDirectory() as tmp1, tempfile.TemporaryDirectory() as tmp2:
+        out1 = os.path.join(tmp1, ".gitlab-ci.yml")
+        out2 = os.path.join(tmp2, ".gitlab-ci.yml")
+
+        base_args = ["--name", "test-app", "--type", "build"]
+
+        result_unified = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "gitlab"] + base_args + ["--output", out1],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        result_direct = subprocess.run(
+            [sys.executable, "-m", "cli.scaffold_gitlab"] + base_args + ["--output", out2],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+
+        assert result_unified.returncode == 0, result_unified.stderr
+        assert result_direct.returncode == 0, result_direct.stderr
+        assert Path(out1).read_text() == Path(out2).read_text(), (
+            "Unified CLI and direct module should produce identical output"
+        )
+

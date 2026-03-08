@@ -241,20 +241,59 @@ def init(
         # Optionally, update Dockerfile (not strictly needed if it uses build args)
         typer.echo("Dockerfile uses build args; ensure it references the correct ARGs.")
 
-@app.command()
+@app.command(context_settings={"allow_extra_args": True, "ignore_unknown_options": True})
 def scaffold(
+    ctx: typer.Context,
     target: str = typer.Argument(..., help="What to scaffold: cicd | gha | gitlab | jenkins | argocd | sre | devcontainer"),
-    tool: str = typer.Option(None, help="Tool type (e.g., github, jenkins, argo, flux)"),
 ):
-    """Scaffold CI/CD or K8s resources."""
-    # Each scaffold module uses argparse internally and calls parse_args() which
-    # reads sys.argv.  When invoked via `python -m cli.devopsos scaffold <target>`
-    # sys.argv still contains the parent CLI tokens (e.g. ['devopsos.py', 'scaffold',
-    # 'gha']).  Temporarily strip those extra tokens so argparse inside each
-    # scaffold module only sees the program name and falls back to env-var / default
-    # values, then restore sys.argv afterwards.
+    """Scaffold CI/CD or K8s resources.
+
+    \b
+    ┌─ Two ways to invoke scaffold commands ──────────────────────────────────┐
+    │                                                                         │
+    │  1. Via the unified CLI (this command):                                 │
+    │       python -m cli.devopsos scaffold <TARGET> [OPTIONS]                │
+    │                                                                         │
+    │  2. Directly as a standalone module:                                    │
+    │       python -m cli.scaffold_<TARGET> [OPTIONS]                         │
+    │                                                                         │
+    │  Both forms are equivalent. Any OPTIONS you pass after TARGET are       │
+    │  forwarded verbatim to the underlying scaffold module.                  │
+    └─────────────────────────────────────────────────────────────────────────┘
+
+    \b
+    DIFFERENCE BETWEEN cli.devopsos AND cli.scaffold_*
+      cli.devopsos      — unified entry point; provides init, scaffold, and
+                          process-first commands under one roof.  Use this
+                          when you want a single consistent CLI.
+
+      cli.scaffold_*    — standalone, tool-specific generators (e.g.
+                          cli.scaffold_jenkins, cli.scaffold_argocd).  Each
+                          module can be run on its own via `python -m` and
+                          supports the full set of argparse options for that
+                          tool.  They are also the engine behind `devopsos
+                          scaffold <target>`.
+
+    \b
+    EXAMPLES
+      # Unified CLI — args forwarded to the Jenkins generator:
+      python -m cli.devopsos scaffold jenkins --type complete --languages python
+
+      # Direct module invocation — identical result:
+      python -m cli.scaffold_jenkins --type complete --languages python
+
+      # See all options available for a specific scaffold target:
+      python -m cli.scaffold_jenkins --help
+      python -m cli.scaffold_gha --help
+      python -m cli.scaffold_argocd --help
+    """
+    # Each scaffold module uses argparse internally and reads sys.argv.
+    # We temporarily replace sys.argv so argparse sees only the program name
+    # plus any extra arguments the user passed after the TARGET token.
+    # This lets `devopsos scaffold jenkins --type complete` work identically
+    # to `python -m cli.scaffold_jenkins --type complete`.
     _saved_argv = sys.argv[:]
-    sys.argv = sys.argv[:1]
+    sys.argv = sys.argv[:1] + ctx.args
     try:
         if target == "cicd":
             scaffold_cicd.main()
