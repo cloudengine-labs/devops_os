@@ -10,12 +10,12 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-–ink: #1a1008;
-–paper: #f2e8d5;
-–paper-dark: #e8d9bc;
-–aged: #c9a96e;
-–rule: #2a1a08;
-–faded: #7a6040;
+--ink: #1a1008;
+--paper: #f2e8d5;
+--paper-dark: #e8d9bc;
+--aged: #c9a96e;
+--rule: #2a1a08;
+--faded: #7a6040;
 }
 
 body {
@@ -30,8 +30,8 @@ font-family: ‘Libre Baskerville’, serif;
 
 .newspaper {
 width: 900px;
-background: var(–paper);
-color: var(–ink);
+background: var(--paper);
+color: var(--ink);
 padding: 0;
 position: relative;
 box-shadow:
@@ -84,7 +84,7 @@ z-index: 1;
 /* ── MASTHEAD ── */
 .masthead {
 text-align: center;
-border-bottom: 3px double var(–rule);
+border-bottom: 3px double var(--rule);
 padding-bottom: 10px;
 margin-bottom: 6px;
 }
@@ -96,7 +96,7 @@ align-items: center;
 font-family: ‘IM Fell English’, serif;
 font-size: 10px;
 letter-spacing: 0.08em;
-color: var(–faded);
+color: var(--faded);
 margin-bottom: 6px;
 padding: 0 2px;
 }
@@ -105,7 +105,7 @@ padding: 0 2px;
 font-family: ‘UnifrakturMaguntia’, cursive;
 font-size: 68px;
 line-height: 1;
-color: var(–ink);
+color: var(--ink);
 letter-spacing: 0.02em;
 text-shadow: 2px 2px 0 rgba(100,60,20,0.2);
 margin-bottom: 4px;
@@ -116,7 +116,7 @@ font-family: ‘IM Fell English’, serif;
 font-style: italic;
 font-size: 12px;
 letter-spacing: 0.15em;
-color: var(–faded);
+color: var(--faded);
 text-transform: uppercase;
 }
 
@@ -125,19 +125,19 @@ display: flex;
 justify-content: space-between;
 font-family: ‘IM Fell English’, serif;
 font-size: 10px;
-color: var(–faded);
+color: var(--faded);
 margin-top: 6px;
 padding-top: 6px;
-border-top: 1px solid var(–aged);
+border-top: 1px solid var(--aged);
 }
 
 /* ── RULES ── */
-.rule-thick { border: none; border-top: 3px solid var(–rule); margin: 8px 0; }
-.rule-thin  { border: none; border-top: 1px solid var(–rule); margin: 6px 0; }
-.rule-double { border: none; border-top: 3px double var(–rule); margin: 8px 0; }
+.rule-thick { border: none; border-top: 3px solid var(--rule); margin: 8px 0; }
+.rule-thin  { border: none; border-top: 1px solid var(--rule); margin: 6px 0; }
+.rule-double { border: none; border-top: 3px double var(--rule); margin: 8px 0; }
 .rule-ornate {
 text-align: center;
-color: var(–aged);
+color: var(--aged);
 font-size: 14px;
 margin: 8px 0;
 letter-spacing: 6px;
@@ -150,7 +150,7 @@ font-family: ‘IM Fell English’, serif;
 font-size: 11px;
 letter-spacing: 0.3em;
 text-transform: uppercase;
-color: var(–faded);
+color: var(--faded);
 margin: 10px 0 4px;
 }
 
@@ -161,7 +161,7 @@ font-size: 58px;
 font-weight: 900;
 line-height: 1.0;
 text-align: center;
-color: var(–ink);
+color: var(--ink);
 margin: 6px 0 4px;
 text-transform: uppercase;
 letter-spacing: -0.01em;
@@ -178,7 +178,7 @@ font-size: 22px;
 font-weight: 400;
 font-style: italic;
 text-align: center;
-color: var(–ink);
+color: var(--ink);
 margin: 4px 0 8px;
 line-height: 1.3;
 }
@@ -189,7 +189,7 @@ text-align: center;
 font-family: ‘IM Fell English’, serif;
 font-size: 11px;
 letter-spacing: 0.1em;
-color: var(–faded);
+color: var(--faded);
 margin: 4px 0;
 }
 
@@ -206,7 +206,7 @@ gap: 0;
 
 .col {
 padding: 10px 14px;
-border-right: 1px solid var(–rule);
+border-right: 1px solid var(--rule);
 }
 .col:last-child { border-right: none; }
 
@@ -217,7 +217,7 @@ font-size: 12.5px;
 line-height: 1.65;
 text-align: justify;
 hyphens: auto;
-color: var(–ink);
+color: var(--ink);
 margin-bottom: 8px;
 }
 
@@ -234,7 +234,7 @@ font-weight: 900;
 float: left;
 line-height: 0.8;
 margin: 4px 6px 0 0;
-color: var(–ink);
+color: var(--ink);
 }
 
 /* ── SECTION HEADS ── */
@@ -247,8 +247,8 @@ text-transform: uppercase;
 letter-spacing: 0.05em;
 margin-bottom: 6px;
 padding-bottom: 4px;
-border-bottom: 2px solid var(–rule);
-color: var(–ink);
+border-bottom: 2px solid var(--rule);
+color: var(--ink);
 }
 
 .col-subhead {
@@ -257,15 +257,15 @@ font-size: 13px;
 font-weight: 700;
 font-style: italic;
 margin: 8px 0 4px;
-color: var(–ink);
+color: var(--ink);
 }
 
 /* ── FEATURE BOX ── */
 .feature-box {
-border: 2px solid var(–rule);
+border: 2px solid var(--rule);
 padding: 12px 16px;
 margin: 10px 0;
-background: var(–paper-dark);
+background: var(--paper-dark);
 position: relative;
 }
 
@@ -275,10 +275,10 @@ position: absolute;
 top: -10px;
 left: 50%;
 transform: translateX(-50%);
-background: var(–paper-dark);
+background: var(--paper-dark);
 padding: 0 8px;
 font-size: 10px;
-color: var(–aged);
+color: var(--aged);
 letter-spacing: 4px;
 }
 
@@ -290,7 +290,7 @@ text-align: center;
 text-transform: uppercase;
 letter-spacing: 0.1em;
 margin-bottom: 8px;
-color: var(–ink);
+color: var(--ink);
 }
 
 /* ── TOOLS LIST ── */
@@ -303,9 +303,9 @@ gap: 3px 10px;
 .tool-item {
 font-family: ‘IM Fell English’, serif;
 font-size: 11px;
-color: var(–ink);
+color: var(--ink);
 padding: 2px 0;
-border-bottom: 1px dotted var(–aged);
+border-bottom: 1px dotted var(--aged);
 display: flex;
 align-items: center;
 gap: 5px;
@@ -313,15 +313,15 @@ gap: 5px;
 
 .tool-item::before {
 content: ‘▸’;
-color: var(–aged);
+color: var(--aged);
 font-size: 9px;
 flex-shrink: 0;
 }
 
 /* ── PULL QUOTE ── */
 .pull-quote {
-border-top: 2px solid var(–rule);
-border-bottom: 2px solid var(–rule);
+border-top: 2px solid var(--rule);
+border-bottom: 2px solid var(--rule);
 padding: 10px 6px;
 margin: 10px 0;
 text-align: center;
@@ -333,7 +333,7 @@ font-size: 15px;
 font-style: italic;
 font-weight: 700;
 line-height: 1.4;
-color: var(–ink);
+color: var(--ink);
 }
 
 .pull-quote cite {
@@ -341,19 +341,19 @@ font-family: ‘IM Fell English’, serif;
 font-size: 10px;
 letter-spacing: 0.1em;
 text-transform: uppercase;
-color: var(–faded);
+color: var(--faded);
 display: block;
 margin-top: 5px;
 }
 
 /* ── LIVE NOTICE BOX ── */
 .live-box {
-border: 3px solid var(–rule);
+border: 3px solid var(--rule);
 text-align: center;
 padding: 14px;
 margin: 10px 0;
-background: var(–ink);
-color: var(–paper);
+background: var(--ink);
+color: var(--paper);
 position: relative;
 }
 
@@ -361,7 +361,7 @@ position: relative;
 position: absolute;
 width: 10px;
 height: 10px;
-border: 2px solid var(–paper);
+border: 2px solid var(--paper);
 }
 .live-box-corner.tl { top: 4px; left: 4px; border-right: none; border-bottom: none; }
 .live-box-corner.tr { top: 4px; right: 4px; border-left: none; border-bottom: none; }
@@ -373,7 +373,7 @@ font-family: ‘IM Fell English’, serif;
 font-size: 10px;
 letter-spacing: 0.4em;
 text-transform: uppercase;
-color: var(–aged);
+color: var(--aged);
 margin-bottom: 4px;
 }
 
@@ -383,7 +383,7 @@ font-size: 26px;
 font-weight: 900;
 text-transform: uppercase;
 letter-spacing: 0.05em;
-color: var(–paper);
+color: var(--paper);
 line-height: 1.1;
 margin-bottom: 6px;
 }
@@ -391,7 +391,7 @@ margin-bottom: 6px;
 .live-detail {
 font-family: ‘IM Fell English’, serif;
 font-size: 13px;
-color: var(–paper-dark);
+color: var(--paper-dark);
 margin: 3px 0;
 }
 
@@ -399,14 +399,14 @@ margin: 3px 0;
 font-family: ‘Playfair Display’, serif;
 font-size: 12px;
 font-style: italic;
-color: var(–aged);
+color: var(--aged);
 margin-top: 8px;
 }
 
 /* ── BOTTOM BANNER ── */
 .bottom-banner {
-background: var(–ink);
-color: var(–paper);
+background: var(--ink);
+color: var(--paper);
 text-align: center;
 padding: 12px 20px;
 margin-top: 10px;
@@ -417,7 +417,7 @@ font-family: ‘Playfair Display’, serif;
 font-size: 13px;
 font-style: italic;
 letter-spacing: 0.05em;
-color: var(–aged);
+color: var(--aged);
 margin-bottom: 4px;
 }
 
@@ -426,21 +426,21 @@ font-family: ‘IM Fell English’, serif;
 font-size: 15px;
 letter-spacing: 0.1em;
 text-transform: uppercase;
-color: var(–paper);
+color: var(--paper);
 }
 
 /* ── ORNAMENTS ── */
 .ornament {
 text-align: center;
 font-size: 16px;
-color: var(–aged);
+color: var(--aged);
 letter-spacing: 8px;
 margin: 6px 0;
 }
 
 .star-rule {
 text-align: center;
-color: var(–aged);
+color: var(--aged);
 font-size: 12px;
 letter-spacing: 10px;
 margin: 5px 0;
@@ -453,13 +453,13 @@ font-family: ‘IM Fell English’, serif;
 font-size: 9px;
 letter-spacing: 0.2em;
 text-transform: uppercase;
-color: var(–faded);
+color: var(--faded);
 margin: 5px 0;
 }
 
 /* ── STAMP ── */
 .stamp {
-border: 3px solid var(–aged);
+border: 3px solid var(--aged);
 display: inline-block;
 padding: 4px 10px;
 font-family: ‘Playfair Display’, serif;
@@ -467,7 +467,7 @@ font-size: 11px;
 font-weight: 700;
 text-transform: uppercase;
 letter-spacing: 0.15em;
-color: var(–aged);
+color: var(--aged);
 transform: rotate(-2deg);
 margin: 4px auto;
 }

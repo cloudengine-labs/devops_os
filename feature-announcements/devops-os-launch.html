@@ -117,6 +117,7 @@
 
   <div class="badge-row">
     <img src="https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg" alt="CI" />
+    <img src="https://img.shields.io/badge/version-0.1.0-blue" alt="Version 0.1.0" />
     <img src="https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white" alt="Python 3.10+" />
     <img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT" />
     <img src="https://img.shields.io/badge/open%20source-%E2%9D%A4-red" alt="Open Source" />
@@ -177,21 +178,26 @@
     </ul>
 
     <h2>🚦 Getting Started</h2>
-    <p>Install the CLI and scaffold your first pipeline in under a minute:</p>
+    <p>Clone the repository and scaffold your first pipeline in under a minute:</p>
     <pre style="background:#1a1a2e;color:#a0c4ff;padding:16px;border-radius:6px;overflow-x:auto;">
-pip install devops-os
-devops-os scaffold github-actions --app my-app --language python
+git clone https://github.com/cloudengine-labs/devops_os.git
+cd devops_os
+pip install -r cli/requirements.txt
+
+# Scaffold a complete GitHub Actions workflow
+python -m cli.scaffold_gha --name my-app --languages python --type complete
     </pre>
 
     <div class="cta">
       <a href="https://github.com/cloudengine-labs/devops_os">View on GitHub</a>
+      <a href="https://cloudengine-labs.github.io/devops_os/">Documentation</a>
       <a href="https://github.com/cloudengine-labs/devops_os/blob/main/README.md">Read the Docs</a>
     </div>
 
   </div>
 
   <footer>
-    <p>© 2024 DevOps-OS · Open Source · MIT License · Built with ❤️ by the CloudEngine Labs community</p>
+    <p>© 2026 DevOps-OS · Open Source · MIT License · Built with ❤️ by the CloudEngine Labs community</p>
   </footer>
 
 </body>
