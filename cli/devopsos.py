@@ -15,6 +15,7 @@ import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
 import cli.process_first as process_first
+from cli import __version__
 
 class ProcessFirstSection(str, enum.Enum):
     """Valid sections for the process-first command."""
@@ -25,7 +26,25 @@ class ProcessFirstSection(str, enum.Enum):
     all = "all"
 
 
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"devopsos version {__version__}")
+        raise typer.Exit()
+
+
 app = typer.Typer(help="Unified DevOps-OS CLI tool")
+
+
+@app.callback()
+def main(
+    version: bool = typer.Option(
+        False, "--version", "-V",
+        callback=_version_callback,
+        is_eager=True,
+        help="Show the current version and exit.",
+    ),
+) -> None:
+    """DevOps-OS: automate your entire DevOps lifecycle."""
 
 @app.command()
 def init(

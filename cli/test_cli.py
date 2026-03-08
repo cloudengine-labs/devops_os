@@ -570,3 +570,26 @@ def test_process_first_specific_section_no_usage_footer():
             f"--section {section} should not show the usage footer"
         )
 
+
+
+# -- versioning ------------------------------------------------------------
+
+def test_version_flag_short():
+    """-V prints 'devopsos version X.Y.Z' and exits 0."""
+    result = _run(["-m", "cli.devopsos", "-V"])
+    assert result.returncode == 0
+    assert "devopsos version" in result.stdout
+
+
+def test_version_flag_long():
+    """--version prints 'devopsos version X.Y.Z' and exits 0."""
+    result = _run(["-m", "cli.devopsos", "--version"])
+    assert result.returncode == 0
+    assert "devopsos version" in result.stdout
+
+
+def test_version_matches_package():
+    """Version reported by --version matches cli.__version__."""
+    from cli import __version__
+    result = _run(["-m", "cli.devopsos", "--version"])
+    assert __version__ in result.stdout
