@@ -14,22 +14,22 @@ Complete reference for every DevOps-OS CLI command: options, default values, env
 
 | Command | Invocation | Default output |
 |---------|-----------|----------------|
-| GitHub Actions | `python -m cli.scaffold_gha` | `.github/workflows/<name>-<type>.yml` |
-| GitLab CI | `python -m cli.scaffold_gitlab` | `.gitlab-ci.yml` |
-| Jenkins | `python -m cli.scaffold_jenkins` | `Jenkinsfile` |
-| ArgoCD | `python -m cli.scaffold_argocd` | `argocd/` directory |
-| Flux CD | `python -m cli.scaffold_argocd --method flux` | `flux/` directory |
-| SRE configs | `python -m cli.scaffold_sre` | `sre/` directory |
-| Dev Container | `python -m cli.scaffold_devcontainer` | `.devcontainer/` directory |
+| GitHub Actions | `python -m cli.devopsos scaffold gha` | `.github/workflows/<name>-<type>.yml` |
+| GitLab CI | `python -m cli.devopsos scaffold gitlab` | `.gitlab-ci.yml` |
+| Jenkins | `python -m cli.devopsos scaffold jenkins` | `Jenkinsfile` |
+| ArgoCD | `python -m cli.devopsos scaffold argocd` | `argocd/` directory |
+| Flux CD | `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
+| SRE configs | `python -m cli.devopsos scaffold sre` | `sre/` directory |
+| Dev Container | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
 | Interactive wizard | `python -m cli.devopsos init` | varies |
 | Process-First guide | `python -m cli.devopsos process-first` | stdout (educational content) |
 
 ---
 
-## scaffold_gha — GitHub Actions
+## scaffold gha — GitHub Actions
 
 ```bash
-python -m cli.scaffold_gha [options]
+python -m cli.devopsos scaffold gha [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -52,10 +52,10 @@ python -m cli.scaffold_gha [options]
 
 ---
 
-## scaffold_gitlab — GitLab CI
+## scaffold gitlab — GitLab CI
 
 ```bash
-python -m cli.scaffold_gitlab [options]
+python -m cli.devopsos scaffold gitlab [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -74,10 +74,10 @@ python -m cli.scaffold_gitlab [options]
 
 ---
 
-## scaffold_jenkins — Jenkins
+## scaffold jenkins — Jenkins
 
 ```bash
-python -m cli.scaffold_jenkins [options]
+python -m cli.devopsos scaffold jenkins [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -99,10 +99,10 @@ python -m cli.scaffold_jenkins [options]
 
 ---
 
-## scaffold_argocd — ArgoCD / Flux CD
+## scaffold argocd — ArgoCD / Flux CD
 
 ```bash
-python -m cli.scaffold_argocd [options]
+python -m cli.devopsos scaffold argocd [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -126,10 +126,10 @@ python -m cli.scaffold_argocd [options]
 
 ---
 
-## scaffold_sre — SRE Configuration
+## scaffold sre — SRE Configuration
 
 ```bash
-python -m cli.scaffold_sre [options]
+python -m cli.devopsos scaffold sre [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -148,10 +148,10 @@ python -m cli.scaffold_sre [options]
 
 ---
 
-## scaffold_devcontainer — Dev Container
+## scaffold devcontainer — Dev Container
 
 ```bash
-python -m cli.scaffold_devcontainer [options]
+python -m cli.devopsos scaffold devcontainer [options]
 ```
 
 | Option | Env var | Default | Description |
@@ -181,7 +181,7 @@ python -m cli.devopsos COMMAND [options]
 | Command | Description |
 |---------|-------------|
 | `init` | Interactive wizard (select languages, tools, generate dev container) |
-| `scaffold TARGET` | Non-interactive generator (delegates to `scaffold_*` modules) |
+| `scaffold <target>` | Non-interactive generator — all targets with native options (see below) |
 | `process-first` | Learn the Process-First SDLC philosophy and how it maps to DevOps-OS tooling |
 
 ### Scaffold targets

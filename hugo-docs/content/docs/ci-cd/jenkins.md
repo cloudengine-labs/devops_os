@@ -12,7 +12,7 @@ Generate `Jenkinsfile` scripts using the declarative pipeline syntax. Pipelines 
 ## Basic Usage
 
 ```bash
-python -m cli.scaffold_jenkins --name "my-app" --type complete
+python -m cli.devopsos scaffold jenkins --name "my-app" --type complete
 ```
 
 **Output:** `Jenkinsfile` (default)  
@@ -58,14 +58,14 @@ All options can be set via environment variables prefixed `DEVOPS_OS_JENKINS_`.
 ### Complete Java pipeline
 
 ```bash
-python -m cli.scaffold_jenkins --name my-app --languages java --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
 # Output: Jenkinsfile
 ```
 
 ### Parameterized deployment pipeline
 
 ```bash
-python -m cli.scaffold_jenkins \
+python -m cli.devopsos scaffold jenkins \
   --name "Deployment" \
   --languages go \
   --kubernetes --k8s-method argocd \
@@ -76,7 +76,7 @@ python -m cli.scaffold_jenkins \
 ### Custom output location
 
 ```bash
-python -m cli.scaffold_jenkins \
+python -m cli.devopsos scaffold jenkins \
   --name my-app \
   --languages python \
   --output pipelines/Jenkinsfile
@@ -170,7 +170,7 @@ export DEVOPS_OS_JENKINS_KUBERNETES="true"
 export DEVOPS_OS_JENKINS_K8S_METHOD="kustomize"
 export DEVOPS_OS_JENKINS_PARAMETERS="true"
 
-python -m cli.scaffold_jenkins
+python -m cli.devopsos scaffold jenkins
 # Output: Jenkinsfile
 ```
 
@@ -198,7 +198,7 @@ python -m cli.scaffold_jenkins
 ```
 
 ```bash
-python -m cli.scaffold_jenkins --custom-values advanced-config.json
+python -m cli.devopsos scaffold jenkins --custom-values advanced-config.json
 # Output: Jenkinsfile
 ```
 

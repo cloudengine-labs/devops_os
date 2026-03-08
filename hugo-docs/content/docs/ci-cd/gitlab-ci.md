@@ -12,7 +12,7 @@ Generate a complete `.gitlab-ci.yml` for your project in a single command. The g
 ## Basic Usage
 
 ```bash
-python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 ```
 
 **Output:** `.gitlab-ci.yml` (default)  
@@ -74,7 +74,7 @@ Each test job uploads JUnit / coverage artifacts automatically.
 ### Python + Docker + kubectl deploy
 
 ```bash
-python -m cli.scaffold_gitlab \
+python -m cli.devopsos scaffold gitlab \
   --name flask-api \
   --languages python \
   --type complete \
@@ -123,14 +123,14 @@ deploy:kubernetes:
 ### Java build + test (no deploy)
 
 ```bash
-python -m cli.scaffold_gitlab --name java-api --languages java --type test
+python -m cli.devopsos scaffold gitlab --name java-api --languages java --type test
 # Output: .gitlab-ci.yml
 ```
 
 ### Multi-language with ArgoCD deploy
 
 ```bash
-python -m cli.scaffold_gitlab \
+python -m cli.devopsos scaffold gitlab \
   --name my-app \
   --languages python,go \
   --kubernetes --k8s-method argocd
@@ -148,7 +148,7 @@ export DEVOPS_OS_GITLAB_LANGUAGES=python,javascript
 export DEVOPS_OS_GITLAB_KUBERNETES=true
 export DEVOPS_OS_GITLAB_K8S_METHOD=kustomize
 
-python -m cli.scaffold_gitlab
+python -m cli.devopsos scaffold gitlab
 # Output: .gitlab-ci.yml
 ```
 

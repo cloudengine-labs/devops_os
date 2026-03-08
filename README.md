@@ -123,52 +123,56 @@ python -m cli.devopsos process-first --section tips
 
 ```bash
 # Complete CI/CD for a Python + JavaScript project
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 
 # With Kubernetes deployment via Kustomize
-python -m cli.scaffold_gha --name my-app --languages python --kubernetes --k8s-method kustomize
+python -m cli.devopsos scaffold gha --name my-app --languages python --kubernetes --k8s-method kustomize
 ```
 
 ---
 
 ### 4 — Generate other pipelines & configs
 
+All generators are available as subcommands of the **unified CLI** — `python -m cli.devopsos scaffold <target>`:
+
 ```bash
 # Jenkins pipeline → Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --languages java --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
 
 # GitLab CI pipeline → .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python,go --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python,go --type complete
 
 # ArgoCD GitOps configs → argocd/application.yaml + argocd/appproject.yaml
-python -m cli.scaffold_argocd --name my-app --repo https://github.com/myorg/my-app.git
+python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/myorg/my-app.git
 
 # Flux GitOps configs → flux/git-repository.yaml + flux/kustomization.yaml + flux/image-update-automation.yaml
-python -m cli.scaffold_argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
+python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
 
 # SRE configs (Prometheus, Grafana, SLO) → sre/ directory
-python -m cli.scaffold_sre --name my-app --team platform --slo-target 99.9
+python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
 
 # Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
+python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
 
 # Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
 
+Use `python -m cli.devopsos scaffold --help` to list all available targets and `python -m cli.devopsos scaffold <target> --help` to see every option for a specific target.
+
 > See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
 
 ---
 
-### 5 — Interactive wizard (all-in-one) - **WIP**
+### 5 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
 python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
 python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
 python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
-python -m cli.devopsos scaffold argocd       # scaffold ArgoCD / Flux
-python -m cli.devopsos scaffold sre          # scaffold SRE configs
+python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
+python -m cli.devopsos scaffold sre      # scaffold SRE configs
 python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
 
@@ -256,14 +260,11 @@ Generate a dev container configuration from the CLI instead of editing JSON by h
 
 ```bash
 # Generate devcontainer.json and devcontainer.env.json for a Python + Go project
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,terraform,kubectl \
   --kubernetes-tools k9s,flux \
   --devops-tools prometheus,grafana
-
-# Or use the unified CLI
-python -m cli.devopsos scaffold devcontainer
 ```
 
 You can also customize `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then reopen in VS Code.

@@ -82,10 +82,12 @@ See the [Process-First guide]({{< relref "/docs/getting-started/process-first" >
 
 ## 3 — Generate your first CI/CD pipeline
 
+All scaffold generators are subcommands of the unified `devopsos scaffold` command. Use `--help` on any subcommand to see all options.
+
 ### GitHub Actions
 
 ```bash
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 ```
 
 **Output:** `.github/workflows/my-app-complete.yml`
@@ -93,7 +95,7 @@ python -m cli.scaffold_gha --name my-app --languages python,javascript --type co
 ### GitLab CI
 
 ```bash
-python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 ```
 
 **Output:** `.gitlab-ci.yml`
@@ -101,7 +103,7 @@ python -m cli.scaffold_gitlab --name my-app --languages python --type complete
 ### Jenkins
 
 ```bash
-python -m cli.scaffold_jenkins --name my-app --languages java --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
 ```
 
 **Output:** `Jenkinsfile`
@@ -112,13 +114,13 @@ python -m cli.scaffold_jenkins --name my-app --languages java --type complete
 
 ```bash
 # ArgoCD Application CR + AppProject
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --namespace production
 # Output: argocd/application.yaml + argocd/appproject.yaml
 
 # Flux CD configs
-python -m cli.scaffold_argocd --name my-app --method flux \
+python -m cli.devopsos scaffold argocd --name my-app --method flux \
        --repo https://github.com/myorg/my-app.git
 # Output: flux/ directory
 ```
@@ -128,7 +130,7 @@ python -m cli.scaffold_argocd --name my-app --method flux \
 ## 5 — Generate SRE configs
 
 ```bash
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 ```
 
 **Output:** `sre/` directory containing:

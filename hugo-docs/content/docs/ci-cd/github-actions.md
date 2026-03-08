@@ -12,7 +12,7 @@ The GitHub Actions generator creates YAML workflow files that orchestrate CI/CD 
 ## Basic Usage
 
 ```bash
-python -m cli.scaffold_gha --name "my-app" --type complete
+python -m cli.devopsos scaffold gha --name "my-app" --type complete
 ```
 
 **Output:** `.github/workflows/my-app-complete.yml`
@@ -59,21 +59,21 @@ Change the output directory with `--output <dir>` (default: `.github/workflows/`
 ### Python application — complete pipeline
 
 ```bash
-python -m cli.scaffold_gha --name "Python App" --languages python --type complete
+python -m cli.devopsos scaffold gha --name "Python App" --languages python --type complete
 # Output: .github/workflows/python-app-complete.yml
 ```
 
 ### Java with Maven
 
 ```bash
-python -m cli.scaffold_gha --name "Java Service" --languages java --custom-values maven-config.json
+python -m cli.devopsos scaffold gha --name "Java Service" --languages java --custom-values maven-config.json
 # Output: .github/workflows/java-service-complete.yml
 ```
 
 ### Multi-language microservices with Kubernetes
 
 ```bash
-python -m cli.scaffold_gha \
+python -m cli.devopsos scaffold gha \
   --name "Microservices" \
   --languages python,javascript,go \
   --kubernetes --k8s-method kustomize
@@ -83,14 +83,14 @@ python -m cli.scaffold_gha \
 ### Matrix build (cross-platform)
 
 ```bash
-python -m cli.scaffold_gha --name "Node.js App" --languages javascript --matrix
+python -m cli.devopsos scaffold gha --name "Node.js App" --languages javascript --matrix
 # Output: .github/workflows/node-js-app-complete.yml
 ```
 
 ### Reusable workflow
 
 ```bash
-python -m cli.scaffold_gha --name "shared" --type reusable
+python -m cli.devopsos scaffold gha --name "shared" --type reusable
 # Output: .github/workflows/shared-reusable.yml
 ```
 
@@ -108,7 +108,7 @@ export DEVOPS_OS_GHA_KUBERNETES="true"
 export DEVOPS_OS_GHA_K8S_METHOD="kustomize"
 export DEVOPS_OS_GHA_MATRIX="true"
 
-python -m cli.scaffold_gha
+python -m cli.devopsos scaffold gha
 # Output: .github/workflows/api-service-complete.yml
 ```
 
@@ -167,7 +167,7 @@ jobs:
 ```
 
 ```bash
-python -m cli.scaffold_gha --custom-values advanced-config.json
+python -m cli.devopsos scaffold gha --custom-values advanced-config.json
 ```
 
 ---

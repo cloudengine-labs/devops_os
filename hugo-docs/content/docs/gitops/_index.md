@@ -13,14 +13,14 @@ DevOps-OS generates production-ready GitOps configuration files for both **ArgoC
 
 ```bash
 # ArgoCD Application + AppProject
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app \
   --repo https://github.com/myorg/my-app.git \
   --namespace production
 # Output: argocd/application.yaml + argocd/appproject.yaml
 
 # Flux CD (GitRepository + Kustomization + Image Automation)
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app --method flux \
   --repo https://github.com/myorg/my-app.git \
   --image ghcr.io/myorg/my-app
@@ -113,7 +113,7 @@ The image update automation configures Flux to watch the container registry and 
 ### ArgoCD with automated sync and canary rollout
 
 ```bash
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app \
   --repo https://github.com/myorg/my-app.git \
   --auto-sync --rollouts
@@ -125,7 +125,7 @@ python -m cli.scaffold_argocd \
 ### ArgoCD in a custom output directory
 
 ```bash
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app \
   --repo https://github.com/myorg/my-app.git \
   --namespace production \
@@ -137,7 +137,7 @@ python -m cli.scaffold_argocd \
 ### Flux CD with image automation
 
 ```bash
-python -m cli.scaffold_argocd \
+python -m cli.devopsos scaffold argocd \
   --name my-app --method flux \
   --repo https://github.com/myorg/my-app.git \
   --image ghcr.io/myorg/my-app \

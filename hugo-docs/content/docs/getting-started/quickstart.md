@@ -50,22 +50,22 @@ See the [Process-First guide]({{< relref "/docs/getting-started/process-first" >
 ```bash
 # Complete CI/CD pipeline
 # Output: .github/workflows/my-app-complete.yml
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 
 # Build-only workflow
 # Output: .github/workflows/my-app-build.yml
-python -m cli.scaffold_gha --name my-app --type build
+python -m cli.devopsos scaffold gha --name my-app --type build
 
 # With Kubernetes deployment via ArgoCD
 # Output: .github/workflows/my-app-complete.yml
-python -m cli.scaffold_gha --name my-app --kubernetes --k8s-method argocd
+python -m cli.devopsos scaffold gha --name my-app --kubernetes --k8s-method argocd
 
 # Reusable workflow
 # Output: .github/workflows/shared-reusable.yml
-python -m cli.scaffold_gha --name shared --type reusable
+python -m cli.devopsos scaffold gha --name shared --type reusable
 
 # Matrix build
-python -m cli.scaffold_gha --name my-app --matrix
+python -m cli.devopsos scaffold gha --name my-app --matrix
 ```
 
 ### Environment Variables
@@ -76,7 +76,7 @@ export DEVOPS_OS_GHA_TYPE=complete
 export DEVOPS_OS_GHA_LANGUAGES=python,javascript
 export DEVOPS_OS_GHA_KUBERNETES=true
 export DEVOPS_OS_GHA_K8S_METHOD=kustomize
-python -m cli.scaffold_gha
+python -m cli.devopsos scaffold gha
 # Output: .github/workflows/my-app-complete.yml
 ```
 
@@ -87,16 +87,16 @@ python -m cli.scaffold_gha
 ```bash
 # Complete pipeline
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 
 # With Kubernetes deployment via ArgoCD
 # Output: .gitlab-ci.yml
-python -m cli.scaffold_gitlab --name my-app --languages python,go \
+python -m cli.devopsos scaffold gitlab --name my-app --languages python,go \
        --kubernetes --k8s-method argocd
 
 # Custom output path
 # Output: ci/my-pipeline.yml
-python -m cli.scaffold_gitlab --name my-app --output ci/my-pipeline.yml
+python -m cli.devopsos scaffold gitlab --name my-app --output ci/my-pipeline.yml
 ```
 
 ---
@@ -106,15 +106,15 @@ python -m cli.scaffold_gitlab --name my-app --output ci/my-pipeline.yml
 ```bash
 # Complete pipeline
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --languages java --type complete
+python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
 
 # Parameterized pipeline
 # Output: Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --languages python --type parameterized
+python -m cli.devopsos scaffold jenkins --name my-app --languages python --type parameterized
 
 # Custom output path
 # Output: pipelines/Jenkinsfile
-python -m cli.scaffold_jenkins --name my-app --output pipelines/Jenkinsfile
+python -m cli.devopsos scaffold jenkins --name my-app --output pipelines/Jenkinsfile
 ```
 
 ---
@@ -124,19 +124,19 @@ python -m cli.scaffold_jenkins --name my-app --output pipelines/Jenkinsfile
 ```bash
 # ArgoCD Application + AppProject
 # Output: argocd/application.yaml + argocd/appproject.yaml
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --namespace production
 
 # ArgoCD with automated sync + canary rollout
 # Output: argocd/application.yaml + argocd/appproject.yaml + argocd/rollout.yaml
-python -m cli.scaffold_argocd --name my-app \
+python -m cli.devopsos scaffold argocd --name my-app \
        --repo https://github.com/myorg/my-app.git \
        --auto-sync --rollouts
 
 # Flux CD (GitRepository + Kustomization + Image Automation)
 # Output: flux/git-repository.yaml + flux/kustomization.yaml + flux/image-update-automation.yaml
-python -m cli.scaffold_argocd --name my-app --method flux \
+python -m cli.devopsos scaffold argocd --name my-app --method flux \
        --repo https://github.com/myorg/my-app.git \
        --image ghcr.io/myorg/my-app
 ```
@@ -148,20 +148,20 @@ python -m cli.scaffold_argocd --name my-app --method flux \
 ```bash
 # All SRE configs
 # Output: sre/alert-rules.yaml + sre/grafana-dashboard.json + sre/slo.yaml + sre/alertmanager-config.yaml
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 
 # Availability-only SLO
-python -m cli.scaffold_sre --name my-app --slo-type availability --slo-target 99.9
+python -m cli.devopsos scaffold sre --name my-app --slo-type availability --slo-target 99.9
 
 # Latency SLO with 200ms threshold + PagerDuty alerting
-python -m cli.scaffold_sre --name my-app --slo-type latency \
+python -m cli.devopsos scaffold sre --name my-app --slo-type latency \
        --latency-threshold 0.2 \
        --pagerduty-key YOUR_PD_KEY \
        --slack-channel "#platform-alerts"
 
 # Custom output directory
 # Output: monitoring/alert-rules.yaml  (etc.)
-python -m cli.scaffold_sre --name my-app --output-dir monitoring
+python -m cli.devopsos scaffold sre --name my-app --output-dir monitoring
 ```
 
 ---
@@ -171,12 +171,12 @@ python -m cli.scaffold_sre --name my-app --output-dir monitoring
 ```bash
 # Python + Go dev container
 # Output: .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,go \
   --cicd-tools docker,kubectl,helm
 
 # Full-stack with Kubernetes tools
-python -m cli.scaffold_devcontainer \
+python -m cli.devopsos scaffold devcontainer \
   --languages python,java,javascript \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,kustomize,argocd_cli,flux \
@@ -188,7 +188,7 @@ python -m cli.scaffold_devcontainer \
 
 ## Common Options Quick Reference
 
-| Option | `scaffold_gha` | `scaffold_gitlab` | `scaffold_jenkins` | `scaffold_argocd` | `scaffold_sre` |
+| Option | `scaffold gha` | `scaffold gitlab` | `scaffold jenkins` | `scaffold argocd` | `scaffold sre` |
 |--------|:-:|:-:|:-:|:-:|:-:|
 | `--name` | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `--type` | ✓ | ✓ | ✓ | — | — |
@@ -205,12 +205,12 @@ python -m cli.scaffold_devcontainer \
 
 ```bash
 # Show help for each generator
-python -m cli.scaffold_gha --help
-python -m cli.scaffold_gitlab --help
-python -m cli.scaffold_jenkins --help
-python -m cli.scaffold_argocd --help
-python -m cli.scaffold_sre --help
-python -m cli.scaffold_devcontainer --help
+python -m cli.devopsos scaffold gha --help
+python -m cli.devopsos scaffold gitlab --help
+python -m cli.devopsos scaffold jenkins --help
+python -m cli.devopsos scaffold argocd --help
+python -m cli.devopsos scaffold sre --help
+python -m cli.devopsos scaffold devcontainer --help
 python -m cli.devopsos process-first --help
 
 # Verify generated output

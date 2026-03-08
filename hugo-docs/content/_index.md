@@ -43,15 +43,15 @@ pip install -r cli/requirements.txt
 python -m cli.devopsos process-first
 
 # 3. Generate a GitHub Actions workflow
-python -m cli.scaffold_gha --name my-app --languages python,javascript --type complete
+python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
 # Output: .github/workflows/my-app-complete.yml
 
 # 4. Generate a GitLab CI pipeline
-python -m cli.scaffold_gitlab --name my-app --languages python --type complete
+python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 # Output: .gitlab-ci.yml
 
 # 5. Generate SRE configs (Prometheus + Grafana + SLO)
-python -m cli.scaffold_sre --name my-app --team platform
+python -m cli.devopsos scaffold sre --name my-app --team platform
 # Output: sre/ directory
 ```
 
