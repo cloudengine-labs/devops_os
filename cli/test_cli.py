@@ -29,18 +29,6 @@ def test_help():
     assert "Unified DevOps-OS CLI tool" in result.stdout
 
 
-def test_version_flag():
-    """`devopsos --version` and `devopsos -V` print the current version and exit 0."""
-    from cli.__version__ import __version__
-    for flag in ("--version", "-V"):
-        result = _run(["-m", "cli.devopsos", flag])
-        assert result.returncode == 0, f"{flag} exited non-zero: {result.stderr}"
-        text = _strip_ansi(result.stdout).strip()
-        assert __version__ in text, (
-            f"{flag} output '{text}' should contain version '{__version__}'"
-        )
-        assert "devopsos" in text, f"{flag} output '{text}' should contain 'devopsos'"
-
 def test_init_help_shows_dir_option():
     """--dir option must appear in `devopsos init --help`."""
     result = subprocess.run(
@@ -777,3 +765,29 @@ def test_scaffold_no_opts_shows_help():
             f"scaffold {target} with no opts should show Examples section, got:\n{text}"
         )
 
+
+
+# -- versioning ------------------------------------------------------------
+
+
+# -- versioning ------------------------------------------------------------
+
+def test_version_flag_short():
+    """-V prints 'devopsos version X.Y.Z' and exits 0."""
+    result = _run(["-m", "cli.devopsos", "-V"])
+    assert result.returncode == 0
+    assert "devopsos version" in result.stdout
+
+
+def test_version_flag_long():
+    """--version prints 'devopsos version X.Y.Z' and exits 0."""
+    result = _run(["-m", "cli.devopsos", "--version"])
+    assert result.returncode == 0
+    assert "devopsos version" in result.stdout
+
+
+def test_version_matches_package():
+    """Version reported by --version matches cli.__version__."""
+    from cli import __version__
+    result = _run(["-m", "cli.devopsos", "--version"])
+    assert __version__ in result.stdout
