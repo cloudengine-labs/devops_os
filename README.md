@@ -183,15 +183,9 @@ Use `python -m cli.devopsos scaffold --help` to list all available targets and `
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
-python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
-python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
-python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
-python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
-python -m cli.devopsos scaffold sre      # scaffold SRE configs
-python -m cli.devopsos scaffold devcontainer # scaffold dev container config
 ```
 
-Single Click Platform Engineering Capabilities
+Single Cli Command for Platform Engineering Capabilities - Dev Container and CICD Environment Setup
 
 ---
 
