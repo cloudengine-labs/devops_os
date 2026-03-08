@@ -29,6 +29,9 @@ jobs:
 
       # ── CLI scaffold scenarios ─────────────────────────────────────────────
 
+      - name: "Scenario: CLI init wizard"
+        run: pytest cli/test_cli.py -k init -v
+
       - name: "Scenario: GitHub Actions scaffold"
         run: pytest tests/test_comprehensive.py::TestScaffoldGHA -v
 
