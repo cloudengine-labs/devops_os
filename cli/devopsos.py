@@ -33,7 +33,7 @@ def _version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
-app = typer.Typer(help="Unified DevOps-OS CLI tool")
+app = typer.Typer(no_args_is_help=True)
 
 
 @app.callback()
@@ -47,7 +47,22 @@ def main(
         is_eager=True,
     ),
 ) -> None:
-    """DevOps-OS: automate your entire DevOps lifecycle."""
+    """DevOps-OS: automate your entire DevOps lifecycle.
+
+    \b
+    Examples:
+
+      python -m cli.devopsos init                                    # interactive project setup wizard
+      python -m cli.devopsos scaffold gha --help                     # GitHub Actions scaffold options
+      python -m cli.devopsos scaffold gitlab --type build            # GitLab CI build pipeline
+      python -m cli.devopsos scaffold argocd --app-name my-app       # Argo CD application manifest
+      python -m cli.devopsos scaffold jenkins --help                 # Jenkins pipeline options
+      python -m cli.devopsos scaffold sre --help                     # SRE resources (SLOs, alerts, dashboards)
+      python -m cli.devopsos scaffold devcontainer --help            # dev container configuration
+      python -m cli.devopsos scaffold cicd --help                    # combined CI/CD scaffold
+      python -m cli.devopsos process-first                           # Process-First SDLC overview
+      python -m cli.devopsos --version                               # show installed version
+    """
 
 # ---------------------------------------------------------------------------
 # scaffold sub-app — each scaffold target is a proper Typer subcommand so

@@ -26,7 +26,23 @@ def _strip_ansi(s):
 
 def test_help():
     result = _run(["-m", "cli.devopsos", "--help"])
-    assert "Unified DevOps-OS CLI tool" in result.stdout
+    assert result.returncode == 0
+    out = _strip_ansi(result.stdout)
+    assert "DevOps-OS" in out
+    assert "scaffold" in out
+    assert "init" in out
+    assert "Examples:" in out
+
+
+def test_no_args_shows_help():
+    """Running without arguments should display help output (not an error)."""
+    result = _run(["-m", "cli.devopsos"])
+    assert result.returncode == 0
+    out = _strip_ansi(result.stdout)
+    assert "DevOps-OS" in out
+    assert "scaffold" in out
+    assert "Examples:" in out
+    assert "python -m cli.devopsos init" in out
 
 
 def test_init_help_shows_dir_option():
