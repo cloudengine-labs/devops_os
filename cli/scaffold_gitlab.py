@@ -93,7 +93,7 @@ def _global_section(args):
         stages.append("build")
     if args.type in ("test", "complete"):
         stages.append("test")
-    if args.type in ("deploy", "complete") and args.kubernetes:
+    if args.type == "deploy" or (args.type == "complete" and args.kubernetes):
         stages.append("deploy")
 
     return {
@@ -225,9 +225,22 @@ def _test_job(lang_config):
 
 
 def _deploy_job(args):
-    """Kubernetes deploy job."""
+    """Kubernetes deploy job, or a generic deploy stub when kubernetes is disabled."""
     if not args.kubernetes:
-        return {}
+        protected_branches = [b.strip() for b in args.branches.split(",")]
+        rules = [
+            {"if": f"$CI_COMMIT_BRANCH == \"{b}\"", "when": "manual" if b != protected_branches[0] else "on_success"}
+            for b in protected_branches
+        ]
+        return {
+            "deploy": {
+                "stage": "deploy",
+                "script": [
+                    "echo \"Deploy stage — configure your deployment scripts here\"",
+                ],
+                "rules": rules,
+            }
+        }
 
     protected_branches = [b.strip() for b in args.branches.split(",")]
 
@@ -298,7 +311,7 @@ def generate_pipeline(args, custom_values):
     if args.type in ("test", "complete"):
         pipeline.update(_test_job(lang_config))
 
-    if args.type in ("deploy", "complete") and args.kubernetes:
+    if args.type == "deploy" or (args.type == "complete" and args.kubernetes):
         pipeline.update(_deploy_job(args))
 
     pipeline.update(custom_values)
