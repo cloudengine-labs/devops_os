@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-03-10
+
+### Fixed
+- **`scaffold gitlab` empty stages when `--type deploy` without `--kubernetes`** — `scaffold_gitlab.py`
+  `_global_section()` previously excluded the `deploy` stage from the stages list whenever the
+  `--kubernetes` flag was absent, producing an invalid pipeline. The condition is now corrected so
+  that `--type deploy` always adds the `deploy` stage regardless of the Kubernetes flag.
+- **Missing deploy job when `--type deploy` without `--kubernetes`** — `_deploy_job()` previously
+  returned an empty dict when `kubernetes=False`, leaving the pipeline with a declared `deploy` stage
+  but no corresponding job. A generic deploy stub (with branch-based rules) is now returned instead,
+  giving users a ready-to-customise deployment step out of the box.
+
+### Added
+- **GitHub star count badge in README** — the project README now displays a live GitHub Stars badge
+  alongside the existing license and version badges.
+
+---
+
 ## [0.2.0] - 2026-03-08
 
 ### Fixed
@@ -68,5 +86,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.github/workflows/sanity.yml` – lightweight sanity-check workflow for PRs.
 - `.github/workflows/pages.yml` – GitHub Pages deployment workflow for the Hugo docs site.
 
+[0.3.0]: https://github.com/cloudengine-labs/devops_os/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/cloudengine-labs/devops_os/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/cloudengine-labs/devops_os/releases/tag/v0.1.0
