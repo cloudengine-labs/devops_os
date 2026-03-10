@@ -614,17 +614,7 @@ class TestScaffoldGitlabExtended:
             # Build job uses docker-in-docker services
             assert "services" in data["build"]
 
-    # BUG-1: deploy pipeline with no kubernetes produces empty stages list
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG-1: When type='deploy' and kubernetes=False, _global_section() "
-            "produces an empty stages list because the 'deploy' stage is only "
-            "appended when args.kubernetes is True. A deploy-only pipeline "
-            "without Kubernetes has no valid stages, making it an invalid "
-            "GitLab CI pipeline."
-        ),
-    )
+    # BUG-1 regression: deploy pipeline with no kubernetes must still have stages
     def test_deploy_pipeline_no_kubernetes_empty_stages(self):
         """
         BUG-1: When type='deploy' and kubernetes=False, the generated

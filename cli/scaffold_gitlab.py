@@ -93,7 +93,7 @@ def _global_section(args):
         stages.append("build")
     if args.type in ("test", "complete"):
         stages.append("test")
-    if args.type in ("deploy", "complete") and args.kubernetes:
+    if args.type == "deploy" or (args.type == "complete" and args.kubernetes):
         stages.append("deploy")
 
     return {
