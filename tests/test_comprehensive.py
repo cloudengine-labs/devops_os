@@ -619,7 +619,8 @@ class TestScaffoldGitlabExtended:
         """
         BUG-1: When type='deploy' and kubernetes=False, the generated
         pipeline has an empty stages list, which is invalid for GitLab CI.
-        Expected: at least one stage should be present even for non-k8s deploy.
+        Expected: at least one stage should be present even for non-k8s deploy,
+        and a deploy job stub must be present in the pipeline.
         """
         with tempfile.TemporaryDirectory() as tmp:
             out = os.path.join(tmp, ".gitlab-ci.yml")
@@ -635,6 +636,10 @@ class TestScaffoldGitlabExtended:
             # Correct expected behavior: there should be at least one stage
             assert len(stages) > 0, (
                 "Expected at least one stage in a deploy pipeline, got: {!r}".format(stages)
+            )
+            # A deploy job stub must be present so the pipeline is valid
+            assert "deploy" in data, (
+                "Expected a deploy job in the pipeline, got keys: {!r}".format(list(data.keys()))
             )
 
 
