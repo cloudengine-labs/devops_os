@@ -10,6 +10,7 @@
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/cloudengine-labs/devops_os)
+[![GitHub Stars](https://img.shields.io/github/stars/cloudengine-labs/devops_os?style=social)](https://github.com/cloudengine-labs/devops_os/stargazers)
 
 <br/>
 
