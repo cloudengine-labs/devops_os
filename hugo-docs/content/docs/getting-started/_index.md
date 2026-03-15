@@ -20,6 +20,7 @@ DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernet
 | GitOps / Deploy | ArgoCD, Flux CD, kubectl, Kustomize |
 | Containers | Docker, Helm |
 | SRE / Observability | Prometheus alert rules, Grafana dashboards, SLO configs |
+| Unit Testing | pytest, Jest, Vitest, Mocha, Go test |
 | AI Integration | Claude (MCP Server), OpenAI (function calling) |
 
 ---
@@ -141,7 +142,27 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 
 ---
 
-## 6 — Interactive wizard (all-in-one)
+## 6 — Generate unit test configs
+
+```bash
+# Python — generates pytest.ini, conftest.py, and a sample test file
+python -m cli.devopsos scaffold unittest --name my-app --languages python
+
+# JavaScript with Jest
+python -m cli.devopsos scaffold unittest --name my-app --languages javascript --framework jest
+
+# TypeScript with Vitest
+python -m cli.devopsos scaffold unittest --name my-app --languages typescript --framework vitest
+
+# Multi-stack (Python + JavaScript + Go) in one command
+python -m cli.devopsos scaffold unittest --name my-platform --languages python,javascript,go
+```
+
+See [CLI Reference]({{< relref "/docs/reference" >}}) for all options and output file paths.
+
+---
+
+## 7 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
@@ -150,11 +171,13 @@ python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
 python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
 python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
 python -m cli.devopsos scaffold sre      # scaffold SRE configs
+python -m cli.devopsos scaffold cicd     # scaffold GHA + Jenkins in one step
+python -m cli.devopsos scaffold unittest # scaffold unit test configs
 ```
 
 ---
 
-## 7 — Use with an AI assistant
+## 8 — Use with an AI assistant
 
 ```bash
 pip install -r mcp_server/requirements.txt

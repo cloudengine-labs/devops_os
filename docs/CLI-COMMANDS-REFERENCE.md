@@ -18,6 +18,7 @@ All scaffold commands are available through the **unified `devopsos` CLI** — o
 - [devopsos scaffold sre — SRE Config Generator](#devopsos-scaffold-sre--sre-config-generator)
 - [devopsos scaffold devcontainer — Dev Container Generator](#devopsos-scaffold-devcontainer--dev-container-generator)
 - [devopsos scaffold cicd — Combined CI/CD Generator](#devopsos-scaffold-cicd--combined-cicd-generator)
+- [devopsos scaffold unittest — Unit Test Scaffold Generator](#devopsos-scaffold-unittest--unit-test-scaffold-generator)
 - [devopsos init — Interactive Wizard](#devopsos-init--interactive-wizard)
 - [devopsos process-first — Process-First Philosophy](#devopsos-process-first--process-first-philosophy)
 - [Environment Variable Reference](#environment-variable-reference)
@@ -56,6 +57,7 @@ python -m cli.devopsos scaffold gha --help     # GHA-specific options
 | Flux CD | `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
 | SRE configs | `python -m cli.devopsos scaffold sre` | `sre/` directory |
 | Dev Container | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
+| Unit Tests | `python -m cli.devopsos scaffold unittest` | `unittest/` directory |
 | Interactive wizard | `python -m cli.devopsos init` | varies (see below) |
 | Process-First | `python -m cli.devopsos process-first` | stdout (educational content) |
 
@@ -347,6 +349,77 @@ python -m cli.devopsos scaffold cicd --name my-app --jenkins --type build
 
 ---
 
+## devopsos scaffold unittest — Unit Test Scaffold Generator
+
+Generates unit testing configuration files and sample test stubs for Python, JavaScript/TypeScript, and Go projects.
+
+### Invocation
+
+```bash
+python -m cli.devopsos scaffold unittest [options]
+```
+
+### Supported Languages & Frameworks
+
+| Language | Default Framework | Override Options |
+|----------|-------------------|-----------------|
+| `python` | pytest + pytest-cov | _(no override)_ |
+| `javascript` | Jest | `jest` \| `mocha` \| `vitest` |
+| `typescript` | Jest | `jest` \| `mocha` \| `vitest` |
+| `go` | go test | _(no override)_ |
+
+### Options
+
+| Option | Env var | Default | Description |
+|--------|---------|---------|-------------|
+| `--name NAME` | `DEVOPS_OS_UNITTEST_NAME` | `my-app` | Project / application name |
+| `--languages LANGS` | `DEVOPS_OS_UNITTEST_LANGUAGES` | `python` | Comma-separated languages: `python`, `javascript`, `typescript`, `go` |
+| `--framework FW` | `DEVOPS_OS_UNITTEST_FRAMEWORK` | _(auto)_ | Framework override for JS/TS: `jest` \| `mocha` \| `vitest` |
+| `--coverage` / `--no-coverage` | `DEVOPS_OS_UNITTEST_COVERAGE` | `true` | Include or exclude coverage configuration |
+| `--output-dir DIR` | `DEVOPS_OS_UNITTEST_OUTPUT_DIR` | `unittest` | Root output directory |
+
+### Output files
+
+| File | Language | Description |
+|------|----------|-------------|
+| `<output-dir>/pytest.ini` | Python | pytest configuration with test discovery and coverage settings |
+| `<output-dir>/conftest.py` | Python | Shared pytest fixtures |
+| `<output-dir>/tests/__init__.py` | Python | Test-package marker |
+| `<output-dir>/tests/test_sample.py` | Python | Sample unit tests with parametrize example |
+| `<output-dir>/jest.config.js` | JS/TS (jest) | Jest configuration with optional coverage thresholds |
+| `<output-dir>/vitest.config.js` | JS/TS (vitest) | Vitest configuration with optional coverage |
+| `<output-dir>/.mocharc.js` | JS/TS (mocha) | Mocha configuration |
+| `<output-dir>/tests/sample.test.{js,ts}` | JS/TS | Sample unit tests for the chosen framework |
+| `<output-dir>/<name>_test.go` | Go | Sample unit tests (table-driven pattern) |
+| `<output-dir>/Makefile.test` | Go | Makefile targets: `test`, `test-race`, `test-cov`, `lint` |
+
+### Examples
+
+```bash
+# Python project
+python -m cli.devopsos scaffold unittest --name my-api --languages python
+
+# JavaScript with Jest
+python -m cli.devopsos scaffold unittest --name my-app --languages javascript --framework jest
+
+# TypeScript with Vitest
+python -m cli.devopsos scaffold unittest --name my-app --languages typescript --framework vitest
+
+# JavaScript with Mocha
+python -m cli.devopsos scaffold unittest --name my-app --languages javascript --framework mocha
+
+# Go project
+python -m cli.devopsos scaffold unittest --name my-service --languages go
+
+# Full-stack project (all three)
+python -m cli.devopsos scaffold unittest --name my-platform --languages python,javascript,go
+
+# Disable coverage config
+python -m cli.devopsos scaffold unittest --name my-app --languages python --no-coverage
+```
+
+---
+
 ## devopsos init — Interactive Wizard
 
 Prompts you to select languages, CI/CD tools, Kubernetes tools, build tools, code analysis tools, and DevOps tools. Then writes a dev container config.
@@ -408,6 +481,7 @@ Every flag for every command has a corresponding environment variable. The prefi
 | `scaffold argocd` | `DEVOPS_OS_ARGOCD_` | `DEVOPS_OS_ARGOCD_AUTO_SYNC=true` |
 | `scaffold sre` | `DEVOPS_OS_SRE_` | `DEVOPS_OS_SRE_SLO_TARGET=99.5` |
 | `scaffold devcontainer` | `DEVOPS_OS_DEVCONTAINER_` | `DEVOPS_OS_DEVCONTAINER_LANGUAGES=python,go` |
+| `scaffold unittest` | `DEVOPS_OS_UNITTEST_` | `DEVOPS_OS_UNITTEST_LANGUAGES=python,go` |
 
 Environment variables are looked up at startup and used as default values when the corresponding flag is not supplied. Explicit flags always take precedence over environment variables.
 

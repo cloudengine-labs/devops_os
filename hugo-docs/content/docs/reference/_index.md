@@ -21,6 +21,8 @@ Complete reference for every DevOps-OS CLI command: options, default values, env
 | Flux CD | `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
 | SRE configs | `python -m cli.devopsos scaffold sre` | `sre/` directory |
 | Dev Container | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
+| Combined CI/CD | `python -m cli.devopsos scaffold cicd` | `.github/workflows/` + `Jenkinsfile` |
+| Unit Tests | `python -m cli.devopsos scaffold unittest` | varies by language (see below) |
 | Interactive wizard | `python -m cli.devopsos init` | varies |
 | Process-First guide | `python -m cli.devopsos process-first` | stdout (educational content) |
 
@@ -172,6 +174,28 @@ python -m cli.devopsos scaffold devcontainer [options]
 
 ---
 
+## scaffold unittest — Unit Test Scaffold
+
+```bash
+python -m cli.devopsos scaffold unittest [options]
+```
+
+| Option | Env var | Default | Description |
+|--------|---------|---------|-------------|
+| `--name NAME` | `DEVOPS_OS_UNITTEST_NAME` | `my-app` | Project name |
+| `--languages LANGS` | `DEVOPS_OS_UNITTEST_LANGUAGES` | `python` | Comma-separated: `python`, `javascript`, `typescript`, `go` |
+| `--framework FW` | `DEVOPS_OS_UNITTEST_FRAMEWORK` | _(auto)_ | JS/TS framework: `jest` \| `mocha` \| `vitest` |
+| `--coverage` / `--no-coverage` | `DEVOPS_OS_UNITTEST_COVERAGE` | `true` | Include or exclude coverage config |
+| `--output-dir DIR` | `DEVOPS_OS_UNITTEST_OUTPUT_DIR` | `.` | Root output directory |
+
+**Output (Python):** `pytest.ini`, `conftest.py`, `tests/__init__.py`, `tests/test_sample.py`  
+**Output (JS/TS Jest):** `jest.config.js`, `tests/sample.test.{js,ts}`  
+**Output (JS/TS Vitest):** `vitest.config.js`, `tests/sample.test.{js,ts}`  
+**Output (JS/TS Mocha):** `.mocharc.js`, `tests/sample.test.{js,ts}`  
+**Output (Go):** `<name>_test.go`, `Makefile.test`
+
+---
+
 ## devopsos — Unified CLI
 
 ```bash
@@ -193,6 +217,8 @@ python -m cli.devopsos scaffold jenkins      # Jenkins
 python -m cli.devopsos scaffold argocd       # ArgoCD / Flux
 python -m cli.devopsos scaffold sre          # SRE configs
 python -m cli.devopsos scaffold devcontainer # Dev container
+python -m cli.devopsos scaffold cicd         # Combined GHA + Jenkins
+python -m cli.devopsos scaffold unittest     # Unit test configs
 ```
 
 ### process-first command

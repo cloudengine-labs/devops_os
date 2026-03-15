@@ -194,6 +194,7 @@ def test_scaffold_help_lists_new_targets():
     assert "gitlab" in result.stdout
     assert "argocd" in result.stdout
     assert "sre" in result.stdout
+    assert "unittest" in result.stdout
 
 def test_scaffold_gha_via_cli():
     """Regression: `python -m cli.devopsos scaffold gha` must not raise argparse error."""
@@ -596,11 +597,11 @@ def test_process_first_specific_section_no_usage_footer():
 # -- scaffold arg pass-through (cli.devopsos vs cli.scaffold_*) ------------
 
 def test_scaffold_help_shows_all_subcommands():
-    """`devopsos scaffold --help` lists all 7 scaffold subcommands."""
+    """`devopsos scaffold --help` lists all 8 scaffold subcommands."""
     result = _run(["-m", "cli.devopsos", "scaffold", "--help"])
     assert result.returncode == 0
     text = _strip_ansi(result.stdout)
-    for target in ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd"):
+    for target in ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd", "unittest"):
         assert target in text, f"scaffold --help should list the '{target}' subcommand"
 
 
@@ -759,11 +760,219 @@ def test_scaffold_cicd_jenkins_only():
         )
 
 
+# ── scaffold unittest (new in v0.4.0) ────────────────────────────────────────
+
+def test_scaffold_unittest_help_shows_native_options():
+    """`devopsos scaffold unittest --help` shows all unittest-specific options."""
+    result = _run(["-m", "cli.devopsos", "scaffold", "unittest", "--help"])
+    assert result.returncode == 0
+    text = _strip_ansi(result.stdout)
+    for option in ("--name", "--languages", "--framework", "--coverage", "--output-dir"):
+        assert option in text, f"scaffold unittest --help should show '{option}'"
+    # Supported languages / frameworks must be mentioned in the help text
+    assert "python" in text.lower()
+    assert "javascript" in text.lower()
+    assert "typescript" in text.lower()
+    assert "go" in text.lower()
+    assert "jest" in text.lower()
+
+
+def test_scaffold_unittest_via_cli_python():
+    """`devopsos scaffold unittest --languages python` generates pytest.ini and conftest.py."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "my-api",
+                "--languages", "python",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert "error: unrecognized arguments" not in result.stderr
+        assert (Path(tmp) / "pytest.ini").is_file(), "pytest.ini should be created"
+        assert (Path(tmp) / "conftest.py").is_file(), "conftest.py should be created"
+        assert (Path(tmp) / "tests" / "test_sample.py").is_file(), "test_sample.py should be created"
+        assert (Path(tmp) / "tests" / "__init__.py").is_file(), "tests/__init__.py should be created"
+        # pytest.ini must reference the project name
+        ini_content = (Path(tmp) / "pytest.ini").read_text()
+        assert "testpaths" in ini_content
+        assert "--cov=" in ini_content  # coverage enabled by default
+
+
+def test_scaffold_unittest_via_cli_javascript_jest():
+    """`devopsos scaffold unittest --languages javascript --framework jest` generates jest.config.js."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "my-lib",
+                "--languages", "javascript",
+                "--framework", "jest",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert (Path(tmp) / "jest.config.js").is_file(), "jest.config.js should be created"
+        assert (Path(tmp) / "tests" / "sample.test.js").is_file(), "sample.test.js should be created"
+        jest_content = (Path(tmp) / "jest.config.js").read_text()
+        assert "testEnvironment" in jest_content
+        assert "collectCoverage" in jest_content  # coverage enabled by default
+
+
+def test_scaffold_unittest_via_cli_typescript_vitest():
+    """`devopsos scaffold unittest --languages typescript --framework vitest` creates vitest.config.js."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "my-ui",
+                "--languages", "typescript",
+                "--framework", "vitest",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert (Path(tmp) / "vitest.config.js").is_file(), "vitest.config.js should be created"
+        assert (Path(tmp) / "tests" / "sample.test.ts").is_file(), "sample.test.ts should be created"
+        vitest_content = (Path(tmp) / "vitest.config.js").read_text()
+        assert "defineConfig" in vitest_content
+        assert "vitest/config" in vitest_content
+
+
+def test_scaffold_unittest_via_cli_javascript_mocha():
+    """`devopsos scaffold unittest --languages javascript --framework mocha` generates .mocharc.js."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "my-service",
+                "--languages", "javascript",
+                "--framework", "mocha",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert (Path(tmp) / ".mocharc.js").is_file(), ".mocharc.js should be created"
+        assert (Path(tmp) / "tests" / "sample.test.js").is_file(), "sample.test.js should be created"
+        mocha_content = (Path(tmp) / ".mocharc.js").read_text()
+        assert "spec" in mocha_content
+        assert "tests/**" in mocha_content
+
+
+def test_scaffold_unittest_via_cli_go():
+    """`devopsos scaffold unittest --languages go` generates a Go test file and Makefile."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "my-server",
+                "--languages", "go",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        assert (Path(tmp) / "my_server_test.go").is_file(), "my_server_test.go should be created"
+        assert (Path(tmp) / "Makefile.test").is_file(), "Makefile.test should be created"
+        go_content = (Path(tmp) / "my_server_test.go").read_text()
+        assert '"testing"' in go_content
+        assert "TestTableDriven" in go_content
+        makefile_content = (Path(tmp) / "Makefile.test").read_text()
+        assert "go test" in makefile_content
+        assert "test-cov:" in makefile_content
+
+
+def test_scaffold_unittest_via_cli_multi_language():
+    """`devopsos scaffold unittest --languages python,javascript,go` generates files for all three."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "full-stack",
+                "--languages", "python,javascript,go",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        # Python files
+        assert (Path(tmp) / "pytest.ini").is_file(), "pytest.ini should be created"
+        assert (Path(tmp) / "tests" / "test_sample.py").is_file(), "test_sample.py should be created"
+        # JavaScript files (default: jest)
+        assert (Path(tmp) / "jest.config.js").is_file(), "jest.config.js should be created"
+        # Go files
+        assert (Path(tmp) / "full_stack_test.go").is_file(), "full_stack_test.go should be created"
+        assert (Path(tmp) / "Makefile.test").is_file(), "Makefile.test should be created"
+
+
+def test_scaffold_unittest_no_coverage_flag():
+    """`--no-coverage` removes coverage configuration from generated files."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [
+                sys.executable, "-m", "cli.devopsos",
+                "scaffold", "unittest",
+                "--name", "lean-app",
+                "--languages", "python",
+                "--no-coverage",
+                "--output-dir", tmp,
+            ],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr + result.stdout
+        ini_content = (Path(tmp) / "pytest.ini").read_text()
+        assert "--cov=" not in ini_content, "pytest.ini should not contain --cov= when --no-coverage is set"
+
+
+def test_scaffold_unittest_via_cli_matches_direct_module_output():
+    """Output from `devopsos scaffold unittest` equals `python -m cli.scaffold_unittest` (same defaults)."""
+    with tempfile.TemporaryDirectory() as tmp1, tempfile.TemporaryDirectory() as tmp2:
+        common_args = ["--name", "test-app", "--languages", "python"]
+
+        result_unified = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "unittest"]
+            + common_args + ["--output-dir", tmp1],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        result_direct = subprocess.run(
+            [sys.executable, "-m", "cli.scaffold_unittest"]
+            + common_args + ["--output-dir", tmp2],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+
+        assert result_unified.returncode == 0, result_unified.stderr
+        assert result_direct.returncode == 0, result_direct.stderr
+        # Both must produce identical pytest.ini content
+        assert (Path(tmp1) / "pytest.ini").read_text() == (Path(tmp2) / "pytest.ini").read_text(), (
+            "Unified CLI and direct module should produce identical pytest.ini"
+        )
+
+
 # ── graceful exit (no opts) ──────────────────────────────────────────────────
 
 def test_scaffold_no_opts_shows_help():
     """Each scaffold subcommand shows usage help (not an error) when invoked with no options."""
-    targets = ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd")
+    targets = ("gha", "jenkins", "gitlab", "argocd", "sre", "devcontainer", "cicd", "unittest")
     for target in targets:
         result = subprocess.run(
             [sys.executable, "-m", "cli.devopsos", "scaffold", target],

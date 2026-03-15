@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-03-15
+
+### Added
+- **`scaffold unittest` subcommand** — new `devopsos scaffold unittest` command that generates
+  unit testing configuration files and sample test stubs for multiple tech stacks:
+  - **Python** → `pytest.ini` (with pytest-cov options), `conftest.py` with shared fixtures,
+    `tests/__init__.py`, and `tests/test_sample.py` with parametrized examples.
+  - **JavaScript** → Jest (`jest.config.js`), Vitest (`vitest.config.js`), or Mocha (`.mocharc.js`)
+    configuration plus a matching `tests/sample.test.js`.
+  - **TypeScript** → same as JavaScript with TypeScript-specific Jest transform (`ts-jest`)
+    and `tests/sample.test.ts`.
+  - **Go** → table-driven `<name>_test.go` sample and `Makefile.test` with `test`, `test-race`,
+    `test-cov`, and `lint` targets.
+  - Coverage configuration is included by default and can be disabled with `--no-coverage`.
+  - Supports comma-separated `--languages` to scaffold multiple stacks at once.
+- **`generate_unittest_config` MCP tool** — exposes the new unit-test scaffold as an MCP tool
+  so AI assistants can generate test configurations via conversation.
+- **`cli/scaffold_unittest.py`** — the scaffold library backing the new command.
+- **`docs/CLI-COMMANDS-REFERENCE.md`** — new section documenting all `unittest` options,
+  output files, and examples.
+
+---
+
 ## [0.3.0] - 2026-03-10
 
 ### Fixed

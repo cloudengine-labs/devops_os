@@ -24,6 +24,7 @@ from cli import (
     scaffold_gitlab,
     scaffold_argocd,
     scaffold_sre,
+    scaffold_unittest,
 )
 from mcp_server.server import (
     generate_github_actions_workflow,
@@ -33,6 +34,7 @@ from mcp_server.server import (
     generate_argocd_config,
     generate_sre_configs,
     scaffold_devcontainer,
+    generate_unittest_config,
 )
 
 
@@ -1498,3 +1500,342 @@ class TestSkillsDefinitions:
         assert "enum" in method_prop
         assert "argocd" in method_prop["enum"]
         assert "flux" in method_prop["enum"]
+
+
+# ===========================================================================
+# CLI: scaffold_unittest
+# ===========================================================================
+
+class TestScaffoldUnittest:
+    """Tests for the unit testing scaffold generator."""
+
+    # ── Python / pytest ──────────────────────────────────────────────────────
+
+    def test_pytest_ini_contains_testpaths(self):
+        content = scaffold_unittest.generate_pytest_ini("my-app", coverage=True)
+        assert "testpaths = tests" in content
+
+    def test_pytest_ini_contains_coverage_options(self):
+        content = scaffold_unittest.generate_pytest_ini("my-app", coverage=True)
+        assert "--cov=" in content
+        assert "--cov-report=xml" in content
+
+    def test_pytest_ini_no_coverage_when_disabled(self):
+        content = scaffold_unittest.generate_pytest_ini("my-app", coverage=False)
+        assert "--cov=" not in content
+
+    def test_conftest_py_contains_fixture(self):
+        content = scaffold_unittest.generate_conftest_py("my-app")
+        assert "@pytest.fixture" in content
+        assert "sample_config" in content
+
+    def test_conftest_py_uses_app_name(self):
+        content = scaffold_unittest.generate_conftest_py("my-svc")
+        assert "my-svc" in content
+
+    def test_python_test_sample_has_test_class(self):
+        content = scaffold_unittest.generate_python_test_sample("my-app")
+        assert "class Test" in content
+        assert "def test_" in content
+
+    def test_python_test_sample_has_parametrize(self):
+        content = scaffold_unittest.generate_python_test_sample("my-app")
+        assert "parametrize" in content
+
+    # ── JavaScript / Jest ────────────────────────────────────────────────────
+
+    def test_jest_config_has_test_environment(self):
+        content = scaffold_unittest.generate_jest_config("my-app", is_typescript=False, coverage=True)
+        assert "testEnvironment" in content
+        assert "node" in content
+
+    def test_jest_config_with_coverage(self):
+        content = scaffold_unittest.generate_jest_config("my-app", is_typescript=False, coverage=True)
+        assert "collectCoverage" in content
+        assert "coverageThreshold" in content
+
+    def test_jest_config_without_coverage(self):
+        content = scaffold_unittest.generate_jest_config("my-app", is_typescript=False, coverage=False)
+        assert "collectCoverage" not in content
+
+    def test_jest_config_typescript_transform(self):
+        content = scaffold_unittest.generate_jest_config("my-app", is_typescript=True, coverage=False)
+        assert "ts-jest" in content
+        assert "moduleFileExtensions" in content
+
+    def test_js_test_sample_jest_uses_expect(self):
+        content = scaffold_unittest.generate_js_test_sample("my-app", "jest", is_typescript=False)
+        assert "expect(" in content
+        assert "toBe(" in content
+        assert "describe(" in content
+
+    def test_js_test_sample_mocha_uses_chai(self):
+        content = scaffold_unittest.generate_js_test_sample("my-app", "mocha", is_typescript=False)
+        assert "require('chai')" in content
+        assert ".to.equal" in content
+
+    def test_js_test_sample_vitest_import(self):
+        content = scaffold_unittest.generate_js_test_sample("my-app", "vitest", is_typescript=False)
+        assert "from 'vitest'" in content
+
+    # ── JavaScript / Vitest ──────────────────────────────────────────────────
+
+    def test_vitest_config_has_defineconfig(self):
+        content = scaffold_unittest.generate_vitest_config("my-app", coverage=True)
+        assert "defineConfig" in content
+        assert "vitest/config" in content
+
+    def test_vitest_config_coverage_block(self):
+        content = scaffold_unittest.generate_vitest_config("my-app", coverage=True)
+        assert "coverage" in content
+        assert "thresholds" in content
+
+    def test_vitest_config_no_coverage(self):
+        content = scaffold_unittest.generate_vitest_config("my-app", coverage=False)
+        assert "thresholds" not in content
+
+    # ── JavaScript / Mocha ───────────────────────────────────────────────────
+
+    def test_mocha_rc_has_spec_glob(self):
+        content = scaffold_unittest.generate_mocha_rc("my-app", coverage=True)
+        assert "spec" in content
+        assert "tests/**" in content
+
+    def test_mocha_rc_mentions_nyc_when_coverage(self):
+        content = scaffold_unittest.generate_mocha_rc("my-app", coverage=True)
+        assert "nyc" in content
+
+    # ── Go / go test ─────────────────────────────────────────────────────────
+
+    def test_go_test_sample_has_testing_import(self):
+        content = scaffold_unittest.generate_go_test_sample("my-service")
+        assert '"testing"' in content
+
+    def test_go_test_sample_has_table_driven_test(self):
+        content = scaffold_unittest.generate_go_test_sample("my-service")
+        assert "TestTableDriven" in content
+
+    def test_go_test_sample_uses_package_name(self):
+        content = scaffold_unittest.generate_go_test_sample("my-service")
+        assert "my_service_test" in content
+
+    def test_go_makefile_has_test_target(self):
+        content = scaffold_unittest.generate_go_makefile("my-service", coverage=True)
+        assert "test:" in content
+        assert "go test" in content
+
+    def test_go_makefile_has_coverage_target(self):
+        content = scaffold_unittest.generate_go_makefile("my-service", coverage=True)
+        assert "test-cov:" in content
+        assert "coverprofile" in content
+
+    def test_go_makefile_no_coverage_when_disabled(self):
+        content = scaffold_unittest.generate_go_makefile("my-service", coverage=False)
+        assert "coverprofile" not in content
+
+    # ── generate_unittest_scaffold (file-system) ─────────────────────────────
+
+    def test_generate_scaffold_python_writes_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-app",
+                languages="python",
+                framework="",
+                coverage=True,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            assert any("pytest.ini" in p for p in paths)
+            assert any("conftest.py" in p for p in paths)
+            assert any("test_sample.py" in p for p in paths)
+
+    def test_generate_scaffold_javascript_jest_writes_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-app",
+                languages="javascript",
+                framework="jest",
+                coverage=True,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            assert any("jest.config.js" in p for p in paths)
+            assert any("sample.test.js" in p for p in paths)
+
+    def test_generate_scaffold_typescript_vitest_writes_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-app",
+                languages="typescript",
+                framework="vitest",
+                coverage=False,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            assert any("vitest.config.js" in p for p in paths)
+            assert any("sample.test.ts" in p for p in paths)
+
+    def test_generate_scaffold_go_writes_files(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-service",
+                languages="go",
+                framework="",
+                coverage=True,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            assert any("_test.go" in p for p in paths)
+            assert any("Makefile.test" in p for p in paths)
+
+    def test_generate_scaffold_multi_language(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="full-stack",
+                languages="python,javascript,go",
+                framework="",
+                coverage=True,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            # Python
+            assert any("pytest.ini" in p for p in paths)
+            # JavaScript
+            assert any("jest.config.js" in p for p in paths)
+            # Go
+            assert any("_test.go" in p for p in paths)
+
+    def test_generate_scaffold_unsupported_language_skips(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-app",
+                languages="rust",
+                framework="",
+                coverage=True,
+                output_dir=tmp,
+            )
+            assert written == []
+
+    def test_generate_scaffold_mocha_framework(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            written = scaffold_unittest.generate_unittest_scaffold(
+                name="my-app",
+                languages="javascript",
+                framework="mocha",
+                coverage=True,
+                output_dir=tmp,
+            )
+            paths = [str(p) for p, _ in written]
+            assert any(".mocharc.js" in p for p in paths)
+            assert not any("jest.config.js" in p for p in paths)
+
+    # ── CLI module invocation ─────────────────────────────────────────────────
+
+    def test_cli_python_scaffold(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_module(
+                "cli.scaffold_unittest",
+                ["--name", "my-app", "--languages", "python", "--output-dir", tmp],
+            )
+            assert result.returncode == 0
+            assert "pytest.ini" in result.stdout
+            assert os.path.exists(os.path.join(tmp, "pytest.ini"))
+
+    def test_cli_javascript_jest_scaffold(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_module(
+                "cli.scaffold_unittest",
+                ["--name", "my-lib", "--languages", "javascript",
+                 "--framework", "jest", "--output-dir", tmp],
+            )
+            assert result.returncode == 0
+            assert os.path.exists(os.path.join(tmp, "jest.config.js"))
+
+    def test_cli_go_scaffold(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_module(
+                "cli.scaffold_unittest",
+                ["--name", "my-api", "--languages", "go", "--output-dir", tmp],
+            )
+            assert result.returncode == 0
+            assert os.path.exists(os.path.join(tmp, "my_api_test.go"))
+
+    def test_cli_no_coverage_flag(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_module(
+                "cli.scaffold_unittest",
+                ["--name", "my-app", "--languages", "python",
+                 "--no-coverage", "--output-dir", tmp],
+            )
+            assert result.returncode == 0
+            content = open(os.path.join(tmp, "pytest.ini")).read()
+            assert "--cov=" not in content
+
+
+# ===========================================================================
+# MCP Server: generate_unittest_config
+# ===========================================================================
+
+class TestMCPServerUnittest:
+    """Tests for the MCP server generate_unittest_config tool."""
+
+    def test_python_returns_pytest_ini(self):
+        result = json.loads(generate_unittest_config(name="my-api", languages="python"))
+        assert "pytest.ini" in result
+        assert "conftest.py" in result
+        assert "tests/test_sample.py" in result
+
+    def test_javascript_jest_returns_jest_config(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="javascript", framework="jest"))
+        assert "jest.config.js" in result
+        assert "tests/sample.test.js" in result
+
+    def test_javascript_mocha_returns_mocharc(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="javascript", framework="mocha"))
+        assert ".mocharc.js" in result
+
+    def test_javascript_vitest_returns_vitest_config(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="javascript", framework="vitest"))
+        assert "vitest.config.js" in result
+
+    def test_typescript_jest_returns_ts_test_file(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="typescript", framework="jest"))
+        assert "tests/sample.test.ts" in result
+        assert "jest.config.js" in result
+
+    def test_go_returns_test_file_and_makefile(self):
+        result = json.loads(generate_unittest_config(
+            name="my-service", languages="go"))
+        assert "my_service_test.go" in result
+        assert "Makefile.test" in result
+
+    def test_multi_language_returns_all_files(self):
+        result = json.loads(generate_unittest_config(
+            name="full-stack", languages="python,javascript,go"))
+        assert "pytest.ini" in result
+        assert "jest.config.js" in result
+        assert "full_stack_test.go" in result
+
+    def test_coverage_true_includes_coverage_config(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="python", coverage=True))
+        assert "--cov=" in result["pytest.ini"]
+
+    def test_coverage_false_excludes_coverage_config(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="python", coverage=False))
+        assert "--cov=" not in result["pytest.ini"]
+
+    def test_go_test_file_content_has_testing_import(self):
+        result = json.loads(generate_unittest_config(
+            name="my-svc", languages="go"))
+        assert '"testing"' in result["my_svc_test.go"]
+
+    def test_unsupported_language_returns_empty(self):
+        result = json.loads(generate_unittest_config(
+            name="my-app", languages="rust"))
+        assert result == {}

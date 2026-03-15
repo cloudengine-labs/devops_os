@@ -13,6 +13,7 @@ This guide provides the essential CLI commands for using all functionalities of 
 - [GitOps / ArgoCD & Flux CD](#gitops--argocd--flux-cd)
 - [SRE Configuration](#sre-configuration)
 - [Container Configuration](#container-configuration)
+- [Unit Test Scaffold](#unit-test-scaffold)
 - [Common Options for All Generators](#common-options-for-all-generators)
 - [Troubleshooting](#troubleshooting)
 
@@ -365,19 +366,84 @@ cat > .devcontainer/devcontainer.env.json << EOF
 EOF
 ```
 
+## Unit Test Scaffold
+
+Generate ready-to-use unit test configuration files and sample test stubs for Python, JavaScript/TypeScript, and Go.
+
+### Python (pytest)
+
+```bash
+# Generate pytest.ini, conftest.py, and a sample test file
+python -m cli.devopsos scaffold unittest --name my-api --languages python
+
+# Without coverage configuration
+python -m cli.devopsos scaffold unittest --name my-api --languages python --no-coverage
+```
+
+**Output:** `pytest.ini`, `conftest.py`, `tests/__init__.py`, `tests/test_sample.py`
+
+### JavaScript / TypeScript
+
+```bash
+# JavaScript with Jest (default)
+python -m cli.devopsos scaffold unittest --name my-app --languages javascript --framework jest
+
+# JavaScript with Mocha
+python -m cli.devopsos scaffold unittest --name my-app --languages javascript --framework mocha
+
+# TypeScript with Vitest
+python -m cli.devopsos scaffold unittest --name my-app --languages typescript --framework vitest
+```
+
+**Output (Jest):** `jest.config.js`, `tests/sample.test.js`  
+**Output (Vitest):** `vitest.config.js`, `tests/sample.test.ts`  
+**Output (Mocha):** `.mocharc.js`, `tests/sample.test.js`
+
+### Go
+
+```bash
+# Generate a table-driven Go test file + Makefile
+python -m cli.devopsos scaffold unittest --name my-service --languages go
+```
+
+**Output:** `my_service_test.go`, `Makefile.test`
+
+### Multi-stack (all three in one command)
+
+```bash
+python -m cli.devopsos scaffold unittest --name my-platform --languages python,javascript,go
+```
+
+### All options
+
+```bash
+# Show all available options
+python -m cli.devopsos scaffold unittest --help
+```
+
+| Option | Env var | Default | Description |
+|--------|---------|---------|-------------|
+| `--name NAME` | `DEVOPS_OS_UNITTEST_NAME` | `my-app` | Project name |
+| `--languages LANGS` | `DEVOPS_OS_UNITTEST_LANGUAGES` | `python` | Comma-separated: `python`, `javascript`, `typescript`, `go` |
+| `--framework FW` | `DEVOPS_OS_UNITTEST_FRAMEWORK` | _(auto)_ | JS/TS override: `jest` \| `mocha` \| `vitest` |
+| `--coverage` / `--no-coverage` | `DEVOPS_OS_UNITTEST_COVERAGE` | `true` | Include or exclude coverage config |
+| `--output-dir DIR` | `DEVOPS_OS_UNITTEST_OUTPUT_DIR` | `.` | Root output directory |
+
+---
+
 ## Common Options for All Generators
 
-| Option | `scaffold gha` | `scaffold gitlab` | `scaffold jenkins` | `scaffold argocd` | `scaffold sre` | `scaffold devcontainer` | Description |
-|--------|:-:|:-:|:-:|:-:|:-:|:-:|-------------|
-| `--name` | ✓ | ✓ | ✓ | ✓ | ✓ | — | Name of the workflow/pipeline/app |
-| `--type` | ✓ | ✓ | ✓ | — | — | — | Type of workflow/pipeline |
-| `--languages` | ✓ | ✓ | ✓ | — | — | ✓ | Languages to enable |
-| `--kubernetes` | ✓ | ✓ | ✓ | — | — | — | Include K8s deployment steps |
-| `--k8s-method` | ✓ | ✓ | ✓ | — | — | — | K8s deployment method |
-| `--output` | ✓ | ✓ | ✓ | — | — | — | Output file path |
-| `--output-dir` | — | — | — | ✓ | ✓ | ✓ | Output directory |
-| `--custom-values` | ✓ | ✓ | ✓ | — | — | — | Custom configuration JSON file |
-| `--image` | ✓ | ✓ | ✓ | ✓ | — | — | Container image to use |
+| Option | `scaffold gha` | `scaffold gitlab` | `scaffold jenkins` | `scaffold argocd` | `scaffold sre` | `scaffold devcontainer` | `scaffold unittest` | Description |
+|--------|:-:|:-:|:-:|:-:|:-:|:-:|:-:|-------------|
+| `--name` | ✓ | ✓ | ✓ | ✓ | ✓ | — | ✓ | Name of the workflow/pipeline/app |
+| `--type` | ✓ | ✓ | ✓ | — | — | — | — | Type of workflow/pipeline |
+| `--languages` | ✓ | ✓ | ✓ | — | — | ✓ | ✓ | Languages to enable |
+| `--kubernetes` | ✓ | ✓ | ✓ | — | — | — | — | Include K8s deployment steps |
+| `--k8s-method` | ✓ | ✓ | ✓ | — | — | — | — | K8s deployment method |
+| `--output` | ✓ | ✓ | ✓ | — | — | — | — | Output file path |
+| `--output-dir` | — | — | — | ✓ | ✓ | ✓ | ✓ | Output directory |
+| `--custom-values` | ✓ | ✓ | ✓ | — | — | — | — | Custom configuration JSON file |
+| `--image` | ✓ | ✓ | ✓ | ✓ | — | — | — | Container image to use |
 
 ## Troubleshooting
 
@@ -389,6 +455,7 @@ python -m cli.devopsos scaffold jenkins --help
 python -m cli.devopsos scaffold argocd --help
 python -m cli.devopsos scaffold sre --help
 python -m cli.devopsos scaffold devcontainer --help
+python -m cli.devopsos scaffold unittest --help
 
 # Verify generated output locations
 ls -la .github/workflows/      # GitHub Actions
