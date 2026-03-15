@@ -15,6 +15,7 @@ import cli.scaffold_gitlab as scaffold_gitlab
 import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
+import cli.scaffold_unittest as scaffold_unittest
 import cli.process_first as process_first
 from cli import __version__
 
@@ -558,6 +559,74 @@ def scaffold_cicd_cmd(
     if custom_values:
         flags += ["--custom-values", custom_values]
     _run_scaffold(scaffold_cicd.main, flags)
+
+
+# ── scaffold unittest ────────────────────────────────────────────────────────
+
+@scaffold_app.command("unittest")
+def scaffold_unittest_cmd(
+    ctx: typer.Context,
+    name: str = typer.Option("my-app", envvar="DEVOPS_OS_UNITTEST_NAME",
+                              help="Project / application name"),
+    languages: str = typer.Option("python", envvar="DEVOPS_OS_UNITTEST_LANGUAGES",
+                                   help=(
+                                       "Comma-separated languages to generate tests for: "
+                                       "python, javascript, typescript, go"
+                                   )),
+    framework: str = typer.Option("", envvar="DEVOPS_OS_UNITTEST_FRAMEWORK",
+                                   help=(
+                                       "Testing framework override (auto-selected by default). "
+                                       "JS/TS: jest | mocha | vitest. Python: pytest. Go: go-test."
+                                   )),
+    coverage: bool = typer.Option(True, envvar="DEVOPS_OS_UNITTEST_COVERAGE",
+                                   help="Include coverage configuration (default: true)"),
+    output_dir: str = typer.Option("unittest", "--output-dir",
+                                    envvar="DEVOPS_OS_UNITTEST_OUTPUT_DIR",
+                                    help="Root output directory for generated files"),
+):
+    """Generate unit testing configuration and sample test files.
+
+    \b
+    Supported languages and their default frameworks:
+      python       → pytest + pytest-cov
+      javascript   → Jest (override with --framework mocha | vitest)
+      typescript   → Jest (override with --framework mocha | vitest)
+      go           → go test
+
+    \b
+    Output files (default: unittest/ directory):
+      unittest/pytest.ini              Python pytest configuration
+      unittest/conftest.py             Python shared fixtures
+      unittest/tests/__init__.py       Python test-package marker
+      unittest/tests/test_sample.py    Python sample unit tests
+      unittest/jest.config.js          JavaScript/TypeScript Jest config
+      unittest/vitest.config.js        JavaScript/TypeScript Vitest config
+      unittest/.mocharc.js             JavaScript/TypeScript Mocha config
+      unittest/tests/sample.test.js    JavaScript/TypeScript sample tests
+      unittest/<name>_test.go          Go sample unit test file
+      unittest/Makefile.test           Go Makefile test targets
+
+    \b
+    Examples:
+      devopsos scaffold unittest --name my-app --languages python
+      devopsos scaffold unittest --name my-app --languages javascript --framework jest
+      devopsos scaffold unittest --name my-app --languages typescript --framework vitest
+      devopsos scaffold unittest --name my-api --languages go
+      devopsos scaffold unittest --name my-app --languages python,javascript,go
+    """
+    _show_help_if_no_opts(ctx)
+    flags = [
+        "--name", name,
+        "--languages", languages,
+        "--output-dir", output_dir,
+    ]
+    if framework:
+        flags += ["--framework", framework]
+    if not coverage:
+        # coverage defaults to True; only pass flag when False
+        flags.append("--no-coverage")
+    _run_scaffold(scaffold_unittest.main, flags)
+
 
 @app.command()
 def init(

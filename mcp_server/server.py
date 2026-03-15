@@ -583,6 +583,78 @@ def generate_sre_configs(
     )
 
 
+
+# ---------------------------------------------------------------------------
+# Tool: generate_unittest_config
+# ---------------------------------------------------------------------------
+
+@mcp.tool()
+def generate_unittest_config(
+    name: str = "my-app",
+    languages: str = "python",
+    framework: str = "",
+    coverage: bool = True,
+) -> str:
+    """
+    Generate unit testing configuration and sample test files for the given tech stack.
+
+    Supported languages and their default frameworks:
+      - python       → pytest + pytest-cov
+      - javascript   → Jest  (override: jest | mocha | vitest)
+      - typescript   → Jest  (override: jest | mocha | vitest)
+      - go           → go test
+
+    Args:
+        name: Project / application name.
+        languages: Comma-separated languages (python, javascript, typescript, go).
+        framework: Testing framework override (empty = auto-select per language).
+        coverage: Include coverage configuration.
+
+    Returns:
+        JSON string with file names as keys and generated file contents as values.
+    """
+    from cli import scaffold_unittest
+
+    result = {}
+
+    lang_list = [l.strip().lower() for l in languages.split(",") if l.strip()]
+    fw = framework.strip().lower() if framework else ""
+
+    for lang in lang_list:
+        if lang not in scaffold_unittest.SUPPORTED_LANGUAGES:
+            continue
+
+        resolved_fw = fw if fw else scaffold_unittest.FRAMEWORK_DEFAULTS.get(lang, "")
+        is_ts = lang == "typescript"
+
+        if lang == "python":
+            result["pytest.ini"] = scaffold_unittest.generate_pytest_ini(name, coverage)
+            result["conftest.py"] = scaffold_unittest.generate_conftest_py(name)
+            result["tests/__init__.py"] = scaffold_unittest.generate_python_tests_init()
+            result["tests/test_sample.py"] = scaffold_unittest.generate_python_test_sample(name)
+
+        elif lang in ("javascript", "typescript"):
+            if resolved_fw not in scaffold_unittest.JS_FRAMEWORKS:
+                resolved_fw = "jest"
+            if resolved_fw == "jest":
+                result["jest.config.js"] = scaffold_unittest.generate_jest_config(name, is_ts, coverage)
+            elif resolved_fw == "vitest":
+                result["vitest.config.js"] = scaffold_unittest.generate_vitest_config(name, coverage)
+            elif resolved_fw == "mocha":
+                result[".mocharc.js"] = scaffold_unittest.generate_mocha_rc(name, coverage)
+            ext = "ts" if is_ts else "js"
+            result[f"tests/sample.test.{ext}"] = scaffold_unittest.generate_js_test_sample(
+                name, resolved_fw, is_ts
+            )
+
+        elif lang == "go":
+            pkg = name.replace("-", "_").lower()
+            result[f"{pkg}_test.go"] = scaffold_unittest.generate_go_test_sample(name)
+            result["Makefile.test"] = scaffold_unittest.generate_go_makefile(name, coverage)
+
+    return json.dumps(result, indent=2)
+
+
 # ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
