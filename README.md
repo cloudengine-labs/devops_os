@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
-[![Version](https://img.shields.io/badge/version-0.2.0-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.0-blue)](CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/cloudengine-labs/devops_os)
@@ -29,6 +29,7 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 | 🚀 **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines |
 | ☸️ **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations |
 | 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
+| 🧪 **Unit Test Scaffold** | Generate pytest, Jest, Vitest, Mocha, or Go test configs with one command |
 | 🤖 **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills |
 | 🛠️ **Dev Container** | Pre-configured multi-language environment (Python · Java · Go · JavaScript) |
 | 🔄 **Process-First** | Built-in education on the Process-First SDLC philosophy and how it maps to every DevOps-OS tool |
@@ -174,6 +175,13 @@ python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 9
 # Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
 python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
 
+# Unit test configs + sample stubs (Python, JS, Go, TypeScript)
+python -m cli.devopsos scaffold unittest --name my-app --languages python
+python -m cli.devopsos scaffold unittest --name my-app --languages python,javascript,go
+
+# Combined GitHub Actions + Jenkins in one step
+python -m cli.devopsos scaffold cicd --name my-app --type build --languages python --github --jenkins
+
 # Kubernetes manifests
 python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
 ```
@@ -218,7 +226,7 @@ git clone https://github.com/cloudengine-labs/devops_os.git && cd devops_os
 pip install -r cli/requirements.txt
 
 # ── Check version ──────────────────────────────────────────────────────────
-python -m cli.devopsos --version           # → devopsos version 0.2.0
+python -m cli.devopsos --version           # → devopsos version 0.4.0
 
 # ── Interactive project wizard ─────────────────────────────────────────────
 python -m cli.devopsos init                # guided setup for any project
@@ -247,6 +255,10 @@ python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools 
 # ── Combined CI/CD (GHA + Jenkins in one step) ────────────────────────────
 python -m cli.devopsos scaffold cicd --name my-app --type build --languages python --github --jenkins
 
+# ── Unit Tests ─────────────────────────────────────────────────────────────
+python -m cli.devopsos scaffold unittest --name my-app --languages python
+python -m cli.devopsos scaffold unittest --name my-app --languages python,javascript,go
+
 # ── Process-First philosophy ───────────────────────────────────────────────
 python -m cli.devopsos process-first                      # full overview
 python -m cli.devopsos process-first --section mapping    # which tool for which goal
@@ -268,7 +280,7 @@ python -m cli.devopsos scaffold gha --help
 devops_os/
 ├── .devcontainer/      # Dev container config (Dockerfile, devcontainer.json, setup scripts)
 ├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
-├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, devopsos)
+├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, unittest, devopsos)
 ├── kubernetes/         # Kubernetes manifest generator
 ├── mcp_server/         # MCP server for AI assistant integration (Claude, ChatGPT)
 ├── skills/             # Claude & OpenAI tool/function definitions
@@ -291,7 +303,7 @@ pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest
 python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py -v
 ```
 
-**Latest results:** ✅ 162 passed · ⚠️ 3 xfailed (known tracked bugs) · ❌ 0 failed
+**Latest results:** ✅ 260 passed · ⚠️ 2 xfailed (known tracked bugs) · ❌ 0 failed
 
 | Report | Description |
 |--------|-------------|
@@ -346,7 +358,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 |-------|-------------|
 | [🚀 Getting Started](docs/GETTING-STARTED.md) | Easy step-by-step guide — **start here** |
 | [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
-| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | v0.2.0 CLI revamp test results — 52 tests, all passing |
+| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | v0.4.0 CLI test results — 62 tests, all passing |
 | [🔄 Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
@@ -355,6 +367,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 | [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
 | [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
 | [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
+| [🧪 Unit Test Scaffold](docs/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
 | [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
 | [🤖 MCP Server](mcp_server/README.md) | Connect DevOps-OS tools to Claude or ChatGPT |
 | [🧠 AI Skills](skills/README.md) | Use DevOps-OS with the Anthropic API or OpenAI function calling |
