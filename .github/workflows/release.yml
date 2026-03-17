@@ -119,8 +119,8 @@ jobs:
         env:
           NEW_VERSION: ${{ steps.bump.outputs.new_version }}
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name  "Saravanan Gnanaguru"
+          git config user.email "g.gsaravanan@gmail.com"
 
           git add cli/__version__.py CHANGELOG.md hugo-docs/content/_index.md
           git commit -m "chore: bump version to v${NEW_VERSION} [skip ci]"
