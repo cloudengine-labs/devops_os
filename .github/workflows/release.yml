@@ -7,18 +7,24 @@ on:
     branches: [main]
 
 permissions:
-  contents: write   # needed to commit the bump and push tags
+  contents: write        # needed to push the release branch and create tags
+  pull-requests: write   # needed to open the version-bump PR
 
 jobs:
   version-bump:
-    name: Bump patch version, update docs, tag & push
+    name: Bump patch version, update docs, open PR & tag
     runs-on: ubuntu-latest
 
     # Skip commits that were already made by this workflow (or any bot) to
     # avoid triggering an infinite bump loop.
+    # Also skip merges of the automated release/vX.Y.Z PRs: a regular merge
+    # produces a commit message starting with "Merge pull request" that also
+    # references the release/vX.Y.Z branch name.
     if: >-
       github.actor != 'github-actions[bot]' &&
-      !contains(github.event.head_commit.message, '[skip ci]')
+      !contains(github.event.head_commit.message, '[skip ci]') &&
+      !(startsWith(github.event.head_commit.message, 'Merge pull request') &&
+        contains(github.event.head_commit.message, 'release/v'))
 
     steps:
       - name: Checkout repository (full history for tagging)
@@ -114,16 +120,42 @@ jobs:
             "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
             hugo-docs/content/_index.md
 
-      # ── 4. Commit, tag, and push ──────────────────────────────────────────
-      - name: Commit version bump and create git tag
+      # ── 4. Open a PR with the version-bump changes ────────────────────────
+      # peter-evans/create-pull-request creates commits via the GitHub API so
+      # they are automatically verified (signed), satisfying the branch
+      # protection rule that requires signed commits.  It also opens a PR
+      # instead of pushing directly to main, satisfying the rule that all
+      # changes must go through a pull request.
+      - name: Create pull request for version bump
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: release/v${{ steps.bump.outputs.new_version }}
+          commit-message: "chore: bump version to v${{ steps.bump.outputs.new_version }} [skip ci]"
+          title: "chore: bump version to v${{ steps.bump.outputs.new_version }}"
+          body: |
+            Automated patch version bump to `v${{ steps.bump.outputs.new_version }}`.
+
+            - Updates `cli/__version__.py`
+            - Prepends entry to `CHANGELOG.md`
+            - Updates version badge in `hugo-docs/content/_index.md`
+          labels: |
+            release
+            automated
+          add-paths: |
+            cli/__version__.py
+            CHANGELOG.md
+            hugo-docs/content/_index.md
+
+      # ── 5. Tag the PR branch's head commit ──────────────────────────────────
+      # Tag the commit on the release branch (not the local main checkout) so
+      # the tag always points to the exact commit that carries the version bump.
+      - name: Create and push git tag
+        if: steps.cpr.outputs.pull-request-number != ''
         env:
           NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+          TAG_SHA: ${{ steps.cpr.outputs.pull-request-head-sha }}
         run: |
-          git config user.name  "Saravanan Gnanaguru"
-          git config user.email "g.gsaravanan@gmail.com"
-
-          git add cli/__version__.py CHANGELOG.md hugo-docs/content/_index.md
-          git commit -m "chore: bump version to v${NEW_VERSION} [skip ci]"
-          git tag "v${NEW_VERSION}"
-          git push origin main
+          git tag "v${NEW_VERSION}" "${TAG_SHA}"
           git push origin "v${NEW_VERSION}"
