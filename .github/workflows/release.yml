@@ -1,0 +1,129 @@
+name: Release — Version Bump & Publish
+
+# Runs on every direct push to main (human or PR merge).
+# Bot-authored commits are skipped to prevent infinite loops.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write   # needed to commit the bump and push tags
+
+jobs:
+  version-bump:
+    name: Bump patch version, update docs, tag & push
+    runs-on: ubuntu-latest
+
+    # Skip commits that were already made by this workflow (or any bot) to
+    # avoid triggering an infinite bump loop.
+    if: >-
+      github.actor != 'github-actions[bot]' &&
+      !contains(github.event.head_commit.message, '[skip ci]')
+
+    steps:
+      - name: Checkout repository (full history for tagging)
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── 1. Compute new patch version ─────────────────────────────────────
+      - name: Compute and apply patch version bump
+        id: bump
+        run: |
+          python - <<'PYEOF'
+          import re, sys
+
+          path = "cli/__version__.py"
+          with open(path) as fh:
+              content = fh.read()
+
+          m = re.search(r'__version__\s*=\s*"(\d+)\.(\d+)\.(\d+)"', content)
+          if not m:
+              print("ERROR: could not find __version__ in cli/__version__.py", file=sys.stderr)
+              sys.exit(1)
+
+          major, minor, patch = int(m.group(1)), int(m.group(2)), int(m.group(3))
+          new_version = f"{major}.{minor}.{patch + 1}"
+
+          new_content = re.sub(
+              r'(__version__\s*=\s*)"[^"]+"',
+              f'\\1"{new_version}"',
+              content,
+          )
+          with open(path, "w") as fh:
+              fh.write(new_content)
+
+          print(f"Bumped {major}.{minor}.{patch} → {new_version}")
+
+          # Expose new version to subsequent steps via GITHUB_OUTPUT
+          import os
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              out.write(f"new_version={new_version}\n")
+          PYEOF
+
+      # ── 2. Update CHANGELOG.md ────────────────────────────────────────────
+      - name: Prepend CHANGELOG entry for new version
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          python - <<'PYEOF'
+          import os
+          from datetime import date
+
+          new_version = os.environ["NEW_VERSION"]
+          today = date.today().isoformat()
+
+          entry = (
+              f"\n## [{new_version}] - {today}\n\n"
+              f"### Changed\n"
+              f"- Automated patch release — version bump to {new_version}.\n\n"
+              f"---\n"
+          )
+
+          with open("CHANGELOG.md") as fh:
+              content = fh.read()
+
+          # Insert the new entry before the first existing release section
+          marker = "\n## ["
+          if marker not in content:
+              print("WARNING: no existing release section found in CHANGELOG.md; appending entry")
+              new_content = content + entry
+          else:
+              insert_at = content.index(marker)
+              new_content = content[:insert_at] + entry + content[insert_at:]
+
+          with open("CHANGELOG.md", "w") as fh:
+              fh.write(new_content)
+
+          print(f"CHANGELOG updated with {new_version} entry")
+          PYEOF
+
+      # ── 3. Update version badge in Hugo docs index ────────────────────────
+      - name: Update version badge in Hugo docs
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          # Replace any existing version-X.Y.Z-blue badge with the new version
+          sed -i -E \
+            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
+            hugo-docs/content/_index.md
+
+      # ── 4. Commit, tag, and push ──────────────────────────────────────────
+      - name: Commit version bump and create git tag
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add cli/__version__.py CHANGELOG.md hugo-docs/content/_index.md
+          git commit -m "chore: bump version to v${NEW_VERSION} [skip ci]"
+          git tag "v${NEW_VERSION}"
+          git push origin main
+          git push origin "v${NEW_VERSION}"
