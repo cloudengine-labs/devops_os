@@ -854,16 +854,6 @@ class TestScaffoldSREExtended:
         slo_names = [s["name"] for s in manifest["slos"]]
         assert "latency" in slo_names
 
-    # BUG-2: error_rate SLO type produces empty slos list in manifest
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG-2: generate_slo_manifest() only checks for 'availability' and "
-            "'latency' slo_type values. When slo_type='error_rate', neither "
-            "condition matches so the slos list is empty. An error_rate SLO "
-            "entry should be generated for slo_type='error_rate'."
-        ),
-    )
     def test_slo_manifest_error_rate_bug(self):
         """
         BUG-2: When slo_type='error_rate', generate_slo_manifest() should
