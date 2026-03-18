@@ -159,6 +159,12 @@ def test_generate_argocd_config_flux():
     assert "Kustomization" in data["flux/kustomization.yaml"]
 
 
+def test_generate_argocd_config_allow_any_source_repo():
+    result = generate_argocd_config(allow_any_source_repo=True)
+    data = json.loads(result)
+    assert "*" in data["argocd/appproject.yaml"]
+
+
 # ---------------------------------------------------------------------------
 # SRE configs
 # ---------------------------------------------------------------------------
