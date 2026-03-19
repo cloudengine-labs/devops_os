@@ -347,7 +347,7 @@ def generate_slo_manifest(args):
             },
         })
 
-    if args.slo_type in ("error_rate",):
+    if args.slo_type in ("error_rate", "all"):
         slos.append({
             "name": "error_rate",
             "description": f"{name} error rate SLO — error rate stays below {round(100 - args.slo_target, 4)}%",
