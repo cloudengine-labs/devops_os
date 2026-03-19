@@ -858,7 +858,7 @@ class TestScaffoldSREExtended:
         """
         BUG-2: When slo_type='error_rate', generate_slo_manifest() should
         return at least one SLO entry capturing the error rate objective,
-        but currently returns an empty slos list.
+        and that entry should have name == 'error_rate'.
         """
         args = _sre_args(slo_type="error_rate")
         manifest = scaffold_sre.generate_slo_manifest(args)
@@ -867,6 +867,8 @@ class TestScaffoldSREExtended:
             "Expected at least one SLO entry for error_rate type, "
             "got empty list."
         )
+        slo_names = [s["name"] for s in manifest["slos"]]
+        assert "error_rate" in slo_names
 
     def test_slo_manifest_all_type_has_both_slos(self):
         args = _sre_args(slo_type="all")
