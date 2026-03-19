@@ -347,6 +347,28 @@ def generate_slo_manifest(args):
             },
         })
 
+    if args.slo_type in ("error_rate", "all"):
+        slos.append({
+            "name": "error_rate",
+            "description": f"{name} error rate SLO — error rate stays below {round(100 - args.slo_target, 4)}%",
+            "objective": args.slo_target,
+            "sli": {
+                "events": {
+                    "error_query": f"rate(http_requests_total{{job=\"{name}\",status=~\"(5..)\"}}[{{{{.window}}}}])",
+                    "total_query": f"rate(http_requests_total{{job=\"{name}\"}}[{{{{.window}}}}])",
+                }
+            },
+            "alerting": {
+                "name": f"{name.title()}ErrorRateSLO",
+                "labels": {"team": args.team},
+                "annotations": {
+                    "runbook": f"https://wiki.example.com/runbooks/{name}/error-rate",
+                },
+                "page_alert": {"labels": {"severity": "critical"}},
+                "ticket_alert": {"labels": {"severity": "warning"}},
+            },
+        })
+
     if args.slo_type in ("latency", "all"):
         slos.append({
             "name": "latency",

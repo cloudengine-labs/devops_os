@@ -854,21 +854,11 @@ class TestScaffoldSREExtended:
         slo_names = [s["name"] for s in manifest["slos"]]
         assert "latency" in slo_names
 
-    # BUG-2: error_rate SLO type produces empty slos list in manifest
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG-2: generate_slo_manifest() only checks for 'availability' and "
-            "'latency' slo_type values. When slo_type='error_rate', neither "
-            "condition matches so the slos list is empty. An error_rate SLO "
-            "entry should be generated for slo_type='error_rate'."
-        ),
-    )
     def test_slo_manifest_error_rate_bug(self):
         """
         BUG-2: When slo_type='error_rate', generate_slo_manifest() should
         return at least one SLO entry capturing the error rate objective,
-        but currently returns an empty slos list.
+        and that entry should have name == 'error_rate'.
         """
         args = _sre_args(slo_type="error_rate")
         manifest = scaffold_sre.generate_slo_manifest(args)
@@ -877,6 +867,8 @@ class TestScaffoldSREExtended:
             "Expected at least one SLO entry for error_rate type, "
             "got empty list."
         )
+        slo_names = [s["name"] for s in manifest["slos"]]
+        assert "error_rate" in slo_names
 
     def test_slo_manifest_all_type_has_both_slos(self):
         args = _sre_args(slo_type="all")
@@ -884,6 +876,7 @@ class TestScaffoldSREExtended:
         slo_names = [s["name"] for s in manifest["slos"]]
         assert "availability" in slo_names
         assert "latency" in slo_names
+        assert "error_rate" in slo_names
 
     def test_alertmanager_config_slack_receiver(self):
         args = _sre_args(slack_channel="#platform-alerts")

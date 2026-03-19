@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.2] - 2026-03-18
+
+### Fixed
+- **`scaffold sre` empty `slos: []` when `--slo-type error_rate`** — `generate_slo_manifest()` in
+  `cli/scaffold_sre.py` had no branch for the `error_rate` SLO type, leaving `slo.yaml` with an
+  empty `slos: []` list. Sloth/OpenSLO tooling therefore received no SLO objectives. A dedicated
+  `error_rate` SLO entry (with matching SLI queries and alerting config) is now generated when
+  `--slo-type error_rate` is specified.
+
+---
+
 ## [0.4.1] - 2026-03-17
 
 ### Changed
