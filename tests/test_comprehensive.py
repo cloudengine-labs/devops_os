@@ -876,6 +876,7 @@ class TestScaffoldSREExtended:
         slo_names = [s["name"] for s in manifest["slos"]]
         assert "availability" in slo_names
         assert "latency" in slo_names
+        assert "error_rate" in slo_names
 
     def test_alertmanager_config_slack_receiver(self):
         args = _sre_args(slack_channel="#platform-alerts")
