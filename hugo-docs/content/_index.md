@@ -9,7 +9,7 @@ type: "docs"
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
-[![Version](https://img.shields.io/badge/version-0.4.3-blue)](https://github.com/cloudengine-labs/devops_os/blob/main/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-0.4.4-blue)](https://github.com/cloudengine-labs/devops_os/blob/main/CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/cloudengine-labs/devops_os/blob/main/LICENSE)
 
