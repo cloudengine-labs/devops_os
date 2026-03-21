@@ -120,7 +120,17 @@ jobs:
             "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
             hugo-docs/content/_index.md
 
-      # ── 4. Open a PR with the version-bump changes ────────────────────────
+      # ── 4. Update version badge in root README ────────────────────────────
+      - name: Update version badge in root README
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          # Replace any existing version-X.Y.Z-blue badge with the new version
+          sed -i -E \
+            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
+            README.md
+
+      # ── 5. Open a PR with the version-bump changes ────────────────────────
       # peter-evans/create-pull-request creates commits via the GitHub API so
       # they are automatically verified (signed), satisfying the branch
       # protection rule that requires signed commits.  It also opens a PR
@@ -139,6 +149,7 @@ jobs:
 
             - Updates `cli/__version__.py`
             - Prepends entry to `CHANGELOG.md`
+            - Updates version badge in `README.md`
             - Updates version badge in `hugo-docs/content/_index.md`
           labels: |
             release
@@ -146,9 +157,10 @@ jobs:
           add-paths: |
             cli/__version__.py
             CHANGELOG.md
+            README.md
             hugo-docs/content/_index.md
 
-      # ── 5. Tag the PR branch's head commit ──────────────────────────────────
+      # ── 6. Tag the PR branch's head commit ──────────────────────────────────
       # Tag the commit on the release branch (not the local main checkout) so
       # the tag always points to the exact commit that carries the version bump.
       - name: Create and push git tag
