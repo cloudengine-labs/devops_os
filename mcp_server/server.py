@@ -478,6 +478,7 @@ def generate_argocd_config(
     project: str = "default",
     auto_sync: bool = False,
     rollouts: bool = False,
+    allow_any_source_repo: bool = False,
     image: str = "ghcr.io/myorg/my-app",
 ) -> str:
     """
@@ -493,6 +494,7 @@ def generate_argocd_config(
         project: ArgoCD project name.
         auto_sync: Enable ArgoCD automated sync (prune + self-heal).
         rollouts: Add an Argo Rollouts canary Rollout resource.
+        allow_any_source_repo: Allow AppProject sourceRepos wildcard ('*').
         image: Container image for Flux image automation.
 
     Returns:
@@ -504,7 +506,8 @@ def generate_argocd_config(
     args = argparse.Namespace(
         name=name, method=method, repo=repo, revision=revision, path=path,
         namespace=namespace, project=project, auto_sync=auto_sync,
-        rollouts=rollouts, image=image, output_dir=".", custom_values=None,
+        rollouts=rollouts, allow_any_source_repo=allow_any_source_repo,
+        image=image, output_dir=".", custom_values=None,
         server="https://kubernetes.default.svc",
     )
 

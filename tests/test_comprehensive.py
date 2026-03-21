@@ -1306,21 +1306,8 @@ class TestMCPServerArgoCD:
         # Wildcard should NOT be in default appproject
         assert "- '*'" not in proj_yaml
 
-    # BUG-3: allow_any_source_repo is not exposed in MCP server generate_argocd_config
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG-3: generate_argocd_config() in the MCP server does not expose "
-            "the allow_any_source_repo parameter. Users cannot opt-in to wildcard "
-            "source repos via the MCP interface. The parameter exists in "
-            "scaffold_argocd but is not wired through the MCP tool."
-        ),
-    )
-    def test_allow_any_source_repo_not_available_in_mcp(self):
-        """
-        BUG-3: generate_argocd_config should expose allow_any_source_repo
-        so users can opt-in to wildcard source repos via the MCP interface.
-        """
+    def test_allow_any_source_repo_is_available_in_mcp(self):
+        """MCP generate_argocd_config should expose allow_any_source_repo."""
         import inspect
         sig = inspect.signature(generate_argocd_config)
         # Correct expected behavior: the parameter should be present
