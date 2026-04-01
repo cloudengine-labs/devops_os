@@ -11,7 +11,7 @@ The DevOps-OS **Model Context Protocol (MCP) server** turns any MCP-compatible A
 | `generate_gitlab_ci_pipeline` | GitLab CI/CD pipeline (`.gitlab-ci.yml`) |
 | `generate_k8s_config` | Kubernetes Deployment + Service manifests |
 | `generate_argocd_config` | Argo CD Application / AppProject or Flux CRs |
-| `generate_sre_configs` | Prometheus alert rules, Grafana dashboards, SLO manifests |
+| `generate_sre_configs` | Prometheus alert rules, Grafana dashboards, SLO manifests, Alertmanager routing/config YAML |
 | `scaffold_devcontainer` | `devcontainer.json` + `devcontainer.env.json` |
 | `generate_unittest_config` | Unit test configs for pytest, Jest, Vitest, Mocha, Go |
 
