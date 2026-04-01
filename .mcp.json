@@ -3,6 +3,7 @@
     "devops-os": {
       "command": ".venv/bin/python",
       "args": ["-m", "mcp_server.server"],
+      "cwd": ".",
       "env": {
         "PYTHONPATH": "."
       }
