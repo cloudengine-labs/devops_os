@@ -86,8 +86,12 @@ jobs:
       - name: Verify MCP server dependencies installed in venv
         run: |
           echo "Checking that 'mcp' package is importable from .venv..."
-          .venv/bin/python -c "import mcp; print('✓ mcp version:', mcp.__version__)" \
-            || { echo "ERROR: mcp package not installed in .venv"; exit 1; }
+          .venv/bin/python -c "
+import importlib.metadata
+v = importlib.metadata.version('mcp')
+from mcp.server.fastmcp import FastMCP
+print('✓ mcp version:', v, '— FastMCP importable')
+" || { echo "ERROR: mcp package not installed in .venv"; exit 1; }
 
           echo "Checking that 'yaml' package is importable from .venv..."
           .venv/bin/python -c "import yaml; print('✓ pyyaml imported')" \
