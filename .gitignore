@@ -62,9 +62,14 @@ pytestdebug.log
 *.iws
 .idea_modules/
 
-# VS Code
-.vscode/
+# VS Code (ignore personal settings, track shared MCP config)
+.vscode/*
+!.vscode/mcp.json
 *.code-workspace
+
+# Cursor (ignore personal settings, track shared MCP config)
+.cursor/*
+!.cursor/mcp.json
 
 # Spyder
 .spyderproject
