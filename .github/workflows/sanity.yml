@@ -70,6 +70,11 @@ jobs:
       - name: "Scenario: MCP server — Dev container tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerDevcontainer -v
 
+      # ── MCP wire-protocol tests ───────────────────────────────────────────
+
+      - name: "Scenario: MCP wire protocol — handshake, tool discovery, invocation"
+        run: pytest tests/test_mcp_protocol.py -v
+
       # ── AI skills definitions ──────────────────────────────────────────────
 
       - name: "Scenario: AI skills definitions (OpenAI & Claude)"
@@ -88,7 +93,7 @@ jobs:
       - name: Generate combined HTML report
         if: always()
         run: |
-          pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py \
+          pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py tests/test_mcp_protocol.py \
             --html=sanity-report.html --self-contained-html -q
 
       - name: Upload sanity test report
