@@ -3,8 +3,12 @@ name: Release — Version Bump & Publish
 # Runs on every direct push to main (human or PR merge).
 # Bot-authored commits are skipped to prevent infinite loops.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Default Branch Name'
+        required: true
+        default: 'main'
 
 permissions:
   contents: write        # needed to push the release branch and create tags
