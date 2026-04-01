@@ -26,7 +26,28 @@ for arg in "$@"; do
   case "$arg" in
     --local) LOCAL_MODE=true ;;
     --help|-h)
-      sed -n '2,15p' "$0" | sed 's/^# //'
+      cat <<'EOF'
+Usage:
+ # Install from GitHub (default) — clones into ~/devops_os
+ bash setup_devops_os_mcp.sh
+
+ # Use a custom install directory
+ INSTALL_DIR=~/my/path bash setup_devops_os_mcp.sh
+
+ # Already inside a clone? Register without re-cloning
+ bash mcp_server/setup_devops_os_mcp.sh --local
+
+ # Combine: specify directory and skip clone
+ INSTALL_DIR=/opt/devops_os bash setup_devops_os_mcp.sh --local
+
+Options:
+ --local       Use the existing devops_os clone that contains this script.
+ -h, --help    Show this help and exit.
+
+Environment variables:
+ INSTALL_DIR   Target directory for cloning devops_os (default: $HOME/devops_os)
+ PYTHON        Python interpreter to use (default: python3 or python)
+EOF
       exit 0
       ;;
   esac
