@@ -62,15 +62,40 @@ else
   INSTALL_DIR="${INSTALL_DIR:-$HOME/devops_os}"
 fi
 
-# --- Check Python ---
-PYTHON="${PYTHON:-$(which python3 2>/dev/null || which python 2>/dev/null)}"
+# --- Check Python (require 3.10+) ---
+if [ -n "${PYTHON:-}" ]; then
+  CANDIDATES=("$PYTHON")
+else
+  CANDIDATES=()
+  if command -v python3 >/dev/null 2>&1; then
+    CANDIDATES+=("$(command -v python3)")
+  fi
+  if command -v python >/dev/null 2>&1; then
+    CANDIDATES+=("$(command -v python)")
+  fi
+fi
+
+PYTHON=""
+PYTHON_VERSION=""
+for cmd in "${CANDIDATES[@]}"; do
+  ver="$("$cmd" -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || true)"
+  if [ -z "$ver" ]; then
+    continue
+  fi
+  major="${ver%%.*}"
+  minor="${ver#*.}"
+  if [ "$major" -gt 3 ] || { [ "$major" -eq 3 ] && [ "$minor" -ge 10 ]; }; then
+    PYTHON="$cmd"
+    PYTHON_VERSION="$ver"
+    break
+  fi
+done
+
 if [ -z "$PYTHON" ]; then
   echo "Error: Python 3.10+ is required but was not found in PATH." >&2
   echo "Install it from https://www.python.org/downloads/ and re-run this script." >&2
   exit 1
 fi
-
-PYTHON_VERSION=$("$PYTHON" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 echo "==> Using Python $PYTHON_VERSION at $PYTHON"
 
 # --- Clone or update repo (skipped in local mode) ---
