@@ -1,10 +1,14 @@
 name: Release — Version Bump & Publish
 
-# Runs on every direct push to main (human or PR merge).
-# Bot-authored commits are skipped to prevent infinite loops.
+# Manually triggered release workflow (via "Run workflow" in GitHub Actions).
+# Use the `branch` input to select the source branch for the release (defaults to `main`).
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Default Branch Name'
+        required: true
+        default: 'main'
 
 permissions:
   contents: write        # needed to push the release branch and create tags
@@ -22,9 +26,9 @@ jobs:
     # references the release/vX.Y.Z branch name.
     if: >-
       github.actor != 'github-actions[bot]' &&
-      !contains(github.event.head_commit.message, '[skip ci]') &&
-      !(startsWith(github.event.head_commit.message, 'Merge pull request') &&
-        contains(github.event.head_commit.message, 'release/v'))
+      !contains(github.event.head_commit.message || '', '[skip ci]') &&
+      !(startsWith(github.event.head_commit.message || '', 'Merge pull request') &&
+        contains(github.event.head_commit.message || '', 'release/v'))
 
     steps:
       - name: Checkout repository (full history for tagging)
@@ -32,6 +36,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: ${{ inputs.branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
