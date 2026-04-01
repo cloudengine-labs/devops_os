@@ -31,10 +31,7 @@ import json
 import os
 import subprocess
 import sys
-from typing import Any, Dict, Generator, Optional
-
-import pytest
-
+from typing import Any, Dict, Optional
 # ---------------------------------------------------------------------------
 # Expected tool names (all 8 DevOps-OS tools exposed by the MCP server)
 # ---------------------------------------------------------------------------
