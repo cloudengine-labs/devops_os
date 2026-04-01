@@ -216,7 +216,14 @@ Connect DevOps-OS tools to any MCP-compatible AI assistant: **Claude Code, Claud
 **Fastest setup (Claude Code CLI):**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh | bash
+# Download the setup script
+curl -fsSLo setup_devops_os_mcp.sh https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh
+
+# (Optional but recommended) Inspect the script before running it
+less setup_devops_os_mcp.sh
+
+# Run the setup script
+bash setup_devops_os_mcp.sh
 ```
 
 Already cloned the repo? Run locally instead:
