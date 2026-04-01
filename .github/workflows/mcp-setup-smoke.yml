@@ -146,7 +146,7 @@ print('✓ mcp version:', v, '— FastMCP importable')
               msg = {"jsonrpc": "2.0", "method": method}
               if req_id is not None:
                   msg["id"] = req_id
-              if params:
+              if params is not None:
                   msg["params"] = params
               proc.stdin.write(json.dumps(msg) + "\n")
               proc.stdin.flush()
