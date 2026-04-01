@@ -83,7 +83,6 @@ class _MCPSession:
             cwd=_REPO_ROOT,
         )
         self._next_id = 1
-        self._handshake_done = False
 
     # ------------------------------------------------------------------
     # Low-level transport helpers
