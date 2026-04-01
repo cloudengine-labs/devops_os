@@ -1,0 +1,219 @@
+name: MCP Setup Smoke Test
+
+# What this workflow proves
+# ─────────────────────────
+# The setup_devops_os_mcp.sh script is the primary on-boarding path for users
+# who want to connect DevOps-OS to Claude Code.  This workflow proves the
+# full installation flow works end-to-end on a clean Ubuntu machine:
+#
+#   1. setup_devops_os_mcp.sh --local creates a Python venv at .venv/
+#   2. All MCP server dependencies are installed (importable from the venv)
+#   3. The MCP server process starts successfully under the venv interpreter
+#   4. The server completes the MCP initialize handshake
+#   5. tools/list returns all 8 expected DevOps-OS tools
+#   6. The claude mcp add / claude mcp list commands are exercised via a
+#      stub so the registration code path is validated even without a real
+#      Claude CLI binary or API key
+
+on:
+  push:
+    branches: [main, "copilot/**"]
+    paths:
+      - "mcp_server/**"
+      - ".github/workflows/mcp-setup-smoke.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "mcp_server/**"
+      - ".github/workflows/mcp-setup-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  mcp-setup-smoke:
+    name: MCP Setup Smoke Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── Step 1: stub the 'claude' binary ────────────────────────────────────
+      # The setup script calls `claude mcp list` and `claude mcp add`.
+      # We provide a minimal stub that:
+      #   • Returns a non-zero exit code for `mcp list` (so the script skips
+      #     the "remove existing entry" path) — mirrors a fresh install.
+      #   • Exits 0 for `mcp add` and logs the invocation so we can assert
+      #     the correct arguments were passed.
+      # This validates the registration code path without a real Claude binary.
+      - name: Install claude CLI stub
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          cat > "$HOME/.local/bin/claude" << 'EOF'
+          #!/usr/bin/env bash
+          # Claude CLI stub for CI smoke testing.
+          # Logs every invocation to $HOME/claude-stub.log.
+          echo "claude stub called: $*" >> "$HOME/claude-stub.log"
+          if [[ "$1 $2" == "mcp list" ]]; then
+            # Return 1 so the 'grep -q "^devops-os"' check fails ─ simulates
+            # a clean install with no prior registration.
+            exit 1
+          fi
+          # All other sub-commands (mcp add, mcp remove) succeed silently.
+          exit 0
+          EOF
+          chmod +x "$HOME/.local/bin/claude"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # ── Step 2: run the setup script in local mode ──────────────────────────
+      - name: Run setup_devops_os_mcp.sh --local
+        run: bash mcp_server/setup_devops_os_mcp.sh --local
+
+      # ── Step 3: verify .venv was created ────────────────────────────────────
+      - name: Verify .venv was created
+        run: |
+          echo "Checking for .venv directory..."
+          test -d .venv || { echo "ERROR: .venv was not created by setup script"; exit 1; }
+          test -f .venv/bin/python || { echo "ERROR: .venv/bin/python not found"; exit 1; }
+          echo "✓ .venv exists: $(.venv/bin/python --version)"
+
+      # ── Step 4: verify MCP server dependencies are installed ────────────────
+      - name: Verify MCP server dependencies installed in venv
+        run: |
+          echo "Checking that 'mcp' package is importable from .venv..."
+          .venv/bin/python -c "import mcp; print('✓ mcp version:', mcp.__version__)" \
+            || { echo "ERROR: mcp package not installed in .venv"; exit 1; }
+
+          echo "Checking that 'yaml' package is importable from .venv..."
+          .venv/bin/python -c "import yaml; print('✓ pyyaml imported')" \
+            || { echo "ERROR: pyyaml not installed in .venv"; exit 1; }
+
+      # ── Step 5: verify claude stub was called with the right arguments ───────
+      - name: Verify claude mcp add was invoked with correct arguments
+        run: |
+          echo "Contents of claude-stub.log:"
+          cat "$HOME/claude-stub.log"
+
+          # Assert 'claude mcp add' was called
+          grep -q "mcp add" "$HOME/claude-stub.log" \
+            || { echo "ERROR: 'claude mcp add' was never called by the setup script"; exit 1; }
+
+          # Assert --transport stdio was passed
+          grep -q "stdio" "$HOME/claude-stub.log" \
+            || { echo "ERROR: '--transport stdio' was not passed to 'claude mcp add'"; exit 1; }
+
+          # Assert the server name 'devops-os' was registered
+          grep -q "devops-os" "$HOME/claude-stub.log" \
+            || { echo "ERROR: 'devops-os' server name was not passed to 'claude mcp add'"; exit 1; }
+
+          # Assert mcp_server.server module was referenced
+          grep -q "mcp_server.server" "$HOME/claude-stub.log" \
+            || { echo "ERROR: 'mcp_server.server' module not referenced in 'claude mcp add' call"; exit 1; }
+
+          echo "✓ claude mcp add was called with all expected arguments"
+
+      # ── Step 6: verify the MCP server starts and responds via JSON-RPC ───────
+      - name: Verify MCP server starts and responds to tools/list
+        run: |
+          .venv/bin/python - << 'PYEOF'
+          import json, os, subprocess, sys
+
+          repo_root = os.getcwd()
+          env = {**os.environ, "PYTHONPATH": repo_root}
+          venv_python = os.path.join(repo_root, ".venv", "bin", "python")
+
+          print("Starting MCP server via venv python:", venv_python)
+          proc = subprocess.Popen(
+              [venv_python, "-m", "mcp_server.server"],
+              stdin=subprocess.PIPE,
+              stdout=subprocess.PIPE,
+              stderr=subprocess.PIPE,
+              text=True,
+              env=env,
+              cwd=repo_root,
+          )
+
+          def send(method, params=None, req_id=None):
+              msg = {"jsonrpc": "2.0", "method": method}
+              if req_id is not None:
+                  msg["id"] = req_id
+              if params:
+                  msg["params"] = params
+              proc.stdin.write(json.dumps(msg) + "\n")
+              proc.stdin.flush()
+              if req_id is not None:
+                  return json.loads(proc.stdout.readline())
+
+          # MCP initialize handshake
+          init_resp = send("initialize", {
+              "protocolVersion": "2024-11-05",
+              "capabilities": {},
+              "clientInfo": {"name": "smoke-test", "version": "1.0"},
+          }, req_id=1)
+
+          if "error" in init_resp:
+              proc.terminate()
+              print("ERROR: initialize failed:", init_resp["error"])
+              sys.exit(1)
+
+          proto_ver = init_resp["result"]["protocolVersion"]
+          server_name = init_resp["result"]["serverInfo"]["name"]
+          print(f"✓ Initialize handshake OK — server: {server_name!r}, protocol: {proto_ver}")
+
+          # Send notifications/initialized (required before tool calls)
+          send("notifications/initialized")
+
+          # tools/list
+          list_resp = send("tools/list", {}, req_id=2)
+          if "error" in list_resp:
+              proc.terminate()
+              print("ERROR: tools/list failed:", list_resp["error"])
+              sys.exit(1)
+
+          tools = list_resp["result"]["tools"]
+          names = {t["name"] for t in tools}
+          expected = {
+              "generate_github_actions_workflow",
+              "generate_gitlab_ci_pipeline",
+              "generate_jenkins_pipeline",
+              "generate_k8s_config",
+              "generate_argocd_config",
+              "generate_sre_configs",
+              "scaffold_devcontainer",
+              "generate_unittest_config",
+          }
+          missing = expected - names
+          if missing:
+              proc.terminate()
+              print("ERROR: missing tools:", missing)
+              sys.exit(1)
+
+          print(f"✓ tools/list returned {len(tools)} tools, all 8 DevOps-OS tools present")
+          for t in sorted(tools, key=lambda x: x["name"]):
+              print(f"   • {t['name']}")
+
+          # Quick tools/call sanity check: generate a GHA workflow
+          call_resp = send("tools/call", {
+              "name": "generate_github_actions_workflow",
+              "arguments": {"name": "smoke-test-app", "languages": "python"},
+          }, req_id=3)
+
+          if "error" in call_resp:
+              proc.terminate()
+              print("ERROR: tools/call failed:", call_resp["error"])
+              sys.exit(1)
+
+          content_text = call_resp["result"]["content"][0]["text"]
+          assert "smoke-test-app" in content_text, "app name not in GHA output"
+          assert "runs-on:" in content_text, "not a valid GHA YAML"
+          print("✓ tools/call generate_github_actions_workflow returned valid GHA YAML")
+
+          proc.terminate()
+          proc.wait(timeout=5)
+          print("\nAll smoke checks passed ✓")
+          PYEOF
