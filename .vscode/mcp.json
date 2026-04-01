@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "devops-os": {
+      "type": "stdio",
+      "command": ".venv/bin/python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": ".",
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}

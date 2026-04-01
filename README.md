@@ -209,17 +209,28 @@ Single Cli Command for Platform Engineering Capabilities - Dev Container and CIC
 
 ---
 
-### 6 — Use with AI (MCP Server) - **WIP**
+### 6 — Use with AI (MCP Server)
+
+Connect DevOps-OS tools to any MCP-compatible AI assistant: **Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, and Zed**.
+
+**Fastest setup (Claude Code CLI):**
 
 ```bash
-pip install -r mcp_server/requirements.txt
-python mcp_server/server.py
+curl -fsSL https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh | bash
 ```
 
-Add to your `claude_desktop_config.json` and ask Claude:
-> *"Generate a complete CI/CD GitHub Actions workflow for my Python API with Kubernetes deployment using ArgoCD."*
+Already cloned the repo? Run locally instead:
 
-See **[mcp_server/README.md](mcp_server/README.md)** for full setup and **[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
+```bash
+bash mcp_server/setup_devops_os_mcp.sh --local
+```
+
+Then ask your AI assistant:
+> *"Generate a complete GitHub Actions CI/CD workflow for my Python API with Kubernetes deployment using ArgoCD."*
+
+**[Full setup guide →](mcp_server/README.md)** — covers Claude Desktop, Cursor, VS Code, Windsurf, Zed, and troubleshooting.
+
+See **[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
 
 ---
 
