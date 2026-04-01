@@ -48,8 +48,14 @@ You do **not** need Docker, Kubernetes, or any cloud accounts.
 The fastest path. One command clones the repo, installs dependencies, and registers the server.
 
 ```bash
-# Download and run the setup script
-curl -fsSL https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh | bash
+# Download the setup script
+curl -fsSLo setup_devops_os_mcp.sh https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh
+
+# (Optional but recommended) Inspect the script before running it
+less setup_devops_os_mcp.sh
+
+# Run the setup script
+bash setup_devops_os_mcp.sh
 ```
 
 **Already cloned the repo?** Run the script in local mode instead of downloading it:
