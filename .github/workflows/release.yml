@@ -1,7 +1,7 @@
 name: Release — Version Bump & Publish
 
-# Runs on every direct push to main (human or PR merge).
-# Bot-authored commits are skipped to prevent infinite loops.
+# Manually triggered release workflow (via "Run workflow" in GitHub Actions).
+# Use the `branch` input to select the source branch for the release (defaults to `main`).
 on:
   workflow_dispatch:
     inputs:
