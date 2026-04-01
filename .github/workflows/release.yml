@@ -26,9 +26,9 @@ jobs:
     # references the release/vX.Y.Z branch name.
     if: >-
       github.actor != 'github-actions[bot]' &&
-      !contains(github.event.head_commit.message, '[skip ci]') &&
-      !(startsWith(github.event.head_commit.message, 'Merge pull request') &&
-        contains(github.event.head_commit.message, 'release/v'))
+      !contains(github.event.head_commit.message || '', '[skip ci]') &&
+      !(startsWith(github.event.head_commit.message || '', 'Merge pull request') &&
+        contains(github.event.head_commit.message || '', 'release/v'))
 
     steps:
       - name: Checkout repository (full history for tagging)
@@ -36,6 +36,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          ref: ${{ inputs.branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
