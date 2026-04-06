@@ -13,6 +13,12 @@ Outputs (relative to --output-dir):
   └── devcontainer.env.json    Tool / language selection & versions
 """
 
+TEMPLATE_INFO = {
+    "name": "devcontainer",
+    "category": "Development",
+    "description": "VS Code dev containers",
+}
+
 import os
 import argparse
 import json

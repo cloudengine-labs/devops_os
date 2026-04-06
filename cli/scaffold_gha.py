@@ -15,6 +15,12 @@ Features:
 - Matrix build support for multiple OS/architectures
 """
 
+TEMPLATE_INFO = {
+    "name": "gha",
+    "category": "CI/CD",
+    "description": "GitHub Actions workflows",
+}
+
 import os
 import sys
 import argparse

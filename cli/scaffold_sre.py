@@ -16,6 +16,12 @@ Outputs (default: sre/ directory):
   └── alertmanager-config.yaml Alertmanager receiver config stub
 """
 
+TEMPLATE_INFO = {
+    "name": "sre",
+    "category": "SRE",
+    "description": "Prometheus alerts, Grafana dashboards, SLOs",
+}
+
 import os
 import argparse
 import json

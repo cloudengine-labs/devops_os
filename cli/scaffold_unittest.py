@@ -26,6 +26,12 @@ Output layout (default: <output-dir>/ in the current directory):
   └── sample_test.go          # Go — sample unit test file
 """
 
+TEMPLATE_INFO = {
+    "name": "unittest",
+    "category": "Testing",
+    "description": "Unit test configs (pytest, Jest, Go)",
+}
+
 import os
 import sys
 import argparse

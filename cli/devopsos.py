@@ -877,5 +877,44 @@ def process_first_cmd(
     process_first.display(section.value)
 
 
+# List of scaffold modules for dynamic template discovery
+_SCAFFOLD_MODULES = [
+    scaffold_gha,
+    scaffold_gitlab,
+    scaffold_jenkins,
+    scaffold_cicd,
+    scaffold_argocd,
+    scaffold_sre,
+    scaffold_unittest,
+    scaffold_devcontainer,
+]
+
+
+def _collect_templates():
+    """Collect TEMPLATE_INFO from all scaffold modules, grouped by category."""
+    by_category = {}
+    for mod in _SCAFFOLD_MODULES:
+        info = getattr(mod, "TEMPLATE_INFO", None)
+        if info:
+            cat = info.get("category", "Other")
+            by_category.setdefault(cat, []).append(info)
+    return by_category
+
+
+@app.command("list")
+def list_templates():
+    """List all available scaffold templates organized by category."""
+    templates = _collect_templates()
+    typer.echo("\nAvailable Templates:\n")
+    for category, items in templates.items():
+        typer.echo(typer.style(category, bold=True))
+        for t in items:
+            name = t["name"].ljust(14)
+            desc = t["description"]
+            typer.echo(f"  {name} {desc}")
+        typer.echo()
+    typer.echo("Run 'python -m cli.devopsos scaffold --help' for usage details.\n")
+
+
 if __name__ == "__main__":
     app()
