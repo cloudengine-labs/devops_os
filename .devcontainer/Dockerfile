@@ -104,9 +104,11 @@ RUN if [ "$INSTALL_JS" = "true" ]; then \
 RUN if [ "$INSTALL_GO" = "true" ]; then \
     GO_DOWNLOAD_VERSION="${GO_VERSION}" \
     && case "${GO_DOWNLOAD_VERSION}" in *.*.*) ;; *.*) GO_DOWNLOAD_VERSION="${GO_DOWNLOAD_VERSION}.0" ;; esac \
-    && curl -fsSLO "https://go.dev/dl/go${GO_DOWNLOAD_VERSION}.linux-amd64.tar.gz" \
-    && tar -C /usr/local -xzf "go${GO_DOWNLOAD_VERSION}.linux-amd64.tar.gz" \
-    && rm "go${GO_DOWNLOAD_VERSION}.linux-amd64.tar.gz" \
+    && GO_TARBALL="go${GO_DOWNLOAD_VERSION}.linux-amd64.tar.gz" \
+    && curl -fsSLO "https://go.dev/dl/${GO_TARBALL}" \
+    && test -s "${GO_TARBALL}" \
+    && tar -C /usr/local -xzf "${GO_TARBALL}" \
+    && rm "${GO_TARBALL}" \
     && echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/bash.bashrc \
     && echo "export PATH=$PATH:/root/go/bin" >> /etc/bash.bashrc \
     && /usr/local/go/bin/go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest; \
