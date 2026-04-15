@@ -67,14 +67,14 @@ Run `python -m cli.scaffold_devcontainer --help` to see all available options in
     "openshift_cli": false
   },
   "versions": {
-    "python": "3.11",
-    "java": "17",
-    "node": "20",
-    "go": "1.21",
-    "k9s": "0.29.1",
-    "argocd": "2.8.4", 
-    "flux": "2.1.2",
-    "kustomize": "5.2.1"
+    "python": "3.12",
+    "java": "21",
+    "node": "22",
+    "go": "1.25.0",
+    "k9s": "0.50.16",
+    "argocd": "3.3.6",
+    "flux": "2.8.5",
+    "kustomize": "5.8.0"
   }
 }
 ```

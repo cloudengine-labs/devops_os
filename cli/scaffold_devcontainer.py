@@ -43,7 +43,7 @@ LANG_ARG_MAP = {
     "csharp": "INSTALL_CSHARP", "php": "INSTALL_PHP",
     "rust": "INSTALL_RUST", "typescript": "INSTALL_TYPESCRIPT",
     "kotlin": "INSTALL_KOTLIN", "c": "INSTALL_C",
-    "cpp": "INSTALL_CPP", "javascript": "INSTALL_JAVASCRIPT",
+    "cpp": "INSTALL_CPP", "javascript": "INSTALL_JS",
     "go": "INSTALL_GO",
 }
 CICD_ARG_MAP = {
@@ -115,38 +115,38 @@ def parse_arguments():
     )
     # Version overrides
     parser.add_argument("--python-version",
-                        default=os.environ.get(f"{ENV_PREFIX}PYTHON_VERSION", "3.11"),
-                        help="Python version (default: 3.11)")
+                        default=os.environ.get(f"{ENV_PREFIX}PYTHON_VERSION", "3.12"),
+                        help="Python version (default: 3.12)")
     parser.add_argument("--java-version",
-                        default=os.environ.get(f"{ENV_PREFIX}JAVA_VERSION", "17"),
-                        help="Java JDK version (default: 17)")
+                        default=os.environ.get(f"{ENV_PREFIX}JAVA_VERSION", "21"),
+                        help="Java JDK version (default: 21)")
     parser.add_argument("--node-version",
-                        default=os.environ.get(f"{ENV_PREFIX}NODE_VERSION", "20"),
-                        help="Node.js version (default: 20)")
+                        default=os.environ.get(f"{ENV_PREFIX}NODE_VERSION", "22"),
+                        help="Node.js version (default: 22)")
     parser.add_argument("--go-version",
-                        default=os.environ.get(f"{ENV_PREFIX}GO_VERSION", "1.21"),
-                        help="Go version (default: 1.21)")
+                        default=os.environ.get(f"{ENV_PREFIX}GO_VERSION", "1.25.0"),
+                        help="Go version (default: 1.25.0)")
     parser.add_argument("--k9s-version",
-                        default=os.environ.get(f"{ENV_PREFIX}K9S_VERSION", "0.29.1"),
-                        help="K9s version (default: 0.29.1)")
+                        default=os.environ.get(f"{ENV_PREFIX}K9S_VERSION", "0.50.16"),
+                        help="K9s version (default: 0.50.16)")
     parser.add_argument("--argocd-version",
-                        default=os.environ.get(f"{ENV_PREFIX}ARGOCD_VERSION", "2.8.4"),
-                        help="ArgoCD version (default: 2.8.4)")
+                        default=os.environ.get(f"{ENV_PREFIX}ARGOCD_VERSION", "3.3.6"),
+                        help="ArgoCD version (default: 3.3.6)")
     parser.add_argument("--flux-version",
-                        default=os.environ.get(f"{ENV_PREFIX}FLUX_VERSION", "2.1.2"),
-                        help="Flux version (default: 2.1.2)")
+                        default=os.environ.get(f"{ENV_PREFIX}FLUX_VERSION", "2.8.5"),
+                        help="Flux version (default: 2.8.5)")
     parser.add_argument("--kustomize-version",
-                        default=os.environ.get(f"{ENV_PREFIX}KUSTOMIZE_VERSION", "5.2.1"),
-                        help="Kustomize version (default: 5.2.1)")
+                        default=os.environ.get(f"{ENV_PREFIX}KUSTOMIZE_VERSION", "5.8.0"),
+                        help="Kustomize version (default: 5.8.0)")
     parser.add_argument("--nexus-version",
-                        default=os.environ.get(f"{ENV_PREFIX}NEXUS_VERSION", "3.50.0"),
-                        help="Nexus version (default: 3.50.0)")
+                        default=os.environ.get(f"{ENV_PREFIX}NEXUS_VERSION", "3.91.0"),
+                        help="Nexus version (default: 3.91.0)")
     parser.add_argument("--prometheus-version",
-                        default=os.environ.get(f"{ENV_PREFIX}PROMETHEUS_VERSION", "2.45.0"),
-                        help="Prometheus version (default: 2.45.0)")
+                        default=os.environ.get(f"{ENV_PREFIX}PROMETHEUS_VERSION", "3.5.1"),
+                        help="Prometheus version (default: 3.5.1)")
     parser.add_argument("--grafana-version",
-                        default=os.environ.get(f"{ENV_PREFIX}GRAFANA_VERSION", "10.0.0"),
-                        help="Grafana version (default: 10.0.0)")
+                        default=os.environ.get(f"{ENV_PREFIX}GRAFANA_VERSION", "12.4.2"),
+                        help="Grafana version (default: 12.4.2)")
     parser.add_argument(
         "--output-dir",
         default=os.environ.get(f"{ENV_PREFIX}OUTPUT_DIR", "."),
@@ -241,27 +241,27 @@ def generate_devcontainer_json(env_config):
 
     # Version build args
     if langs.get("python"):
-        build_args["PYTHON_VERSION"] = versions.get("python", "3.11")
+        build_args["PYTHON_VERSION"] = versions.get("python", "3.12")
     if langs.get("java"):
-        build_args["JAVA_VERSION"] = versions.get("java", "17")
+        build_args["JAVA_VERSION"] = versions.get("java", "21")
     if langs.get("node"):
-        build_args["NODE_VERSION"] = versions.get("node", "20")
+        build_args["NODE_VERSION"] = versions.get("node", "22")
     if langs.get("go"):
-        build_args["GO_VERSION"] = versions.get("go", "1.21")
+        build_args["GO_VERSION"] = versions.get("go", "1.25.0")
     if k8s.get("k9s"):
-        build_args["K9S_VERSION"] = versions.get("k9s", "0.29.1")
+        build_args["K9S_VERSION"] = versions.get("k9s", "0.50.16")
     if k8s.get("argocd_cli"):
-        build_args["ARGOCD_VERSION"] = versions.get("argocd", "2.8.4")
+        build_args["ARGOCD_VERSION"] = versions.get("argocd", "3.3.6")
     if k8s.get("flux"):
-        build_args["FLUX_VERSION"] = versions.get("flux", "2.1.2")
+        build_args["FLUX_VERSION"] = versions.get("flux", "2.8.5")
     if k8s.get("kustomize"):
-        build_args["KUSTOMIZE_VERSION"] = versions.get("kustomize", "5.2.1")
+        build_args["KUSTOMIZE_VERSION"] = versions.get("kustomize", "5.8.0")
     if devops.get("nexus"):
-        build_args["NEXUS_VERSION"] = versions.get("nexus", "3.50.0")
+        build_args["NEXUS_VERSION"] = versions.get("nexus", "3.91.0")
     if devops.get("prometheus"):
-        build_args["PROMETHEUS_VERSION"] = versions.get("prometheus", "2.45.0")
+        build_args["PROMETHEUS_VERSION"] = versions.get("prometheus", "3.5.1")
     if devops.get("grafana"):
-        build_args["GRAFANA_VERSION"] = versions.get("grafana", "10.0.0")
+        build_args["GRAFANA_VERSION"] = versions.get("grafana", "12.4.2")
 
     # -- extensions --------------------------------------------------------
     extensions = []

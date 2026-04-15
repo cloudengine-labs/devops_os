@@ -426,38 +426,38 @@ def scaffold_devcontainer_cmd(
                                        help="Comma-separated code analysis tools (default: none)"),
     devops_tools: str = typer.Option("", "--devops-tools", envvar="DEVOPS_OS_DEVCONTAINER_DEVOPS_TOOLS",
                                       help="Comma-separated DevOps tools (default: none)"),
-    python_version: str = typer.Option("3.11", "--python-version",
+    python_version: str = typer.Option("3.12", "--python-version",
                                         envvar="DEVOPS_OS_DEVCONTAINER_PYTHON_VERSION",
-                                        help="Python version (default: 3.11)"),
-    java_version: str = typer.Option("17", "--java-version",
+                                        help="Python version (default: 3.12)"),
+    java_version: str = typer.Option("21", "--java-version",
                                       envvar="DEVOPS_OS_DEVCONTAINER_JAVA_VERSION",
-                                      help="Java JDK version (default: 17)"),
-    node_version: str = typer.Option("20", "--node-version",
+                                      help="Java JDK version (default: 21)"),
+    node_version: str = typer.Option("22", "--node-version",
                                       envvar="DEVOPS_OS_DEVCONTAINER_NODE_VERSION",
-                                      help="Node.js version (default: 20)"),
-    go_version: str = typer.Option("1.21", "--go-version", envvar="DEVOPS_OS_DEVCONTAINER_GO_VERSION",
-                                    help="Go version (default: 1.21)"),
-    k9s_version: str = typer.Option("0.29.1", "--k9s-version",
+                                      help="Node.js version (default: 22)"),
+    go_version: str = typer.Option("1.25.0", "--go-version", envvar="DEVOPS_OS_DEVCONTAINER_GO_VERSION",
+                                    help="Go version (default: 1.25.0)"),
+    k9s_version: str = typer.Option("0.50.16", "--k9s-version",
                                      envvar="DEVOPS_OS_DEVCONTAINER_K9S_VERSION",
-                                     help="K9s version (default: 0.29.1)"),
-    argocd_version: str = typer.Option("2.8.4", "--argocd-version",
+                                     help="K9s version (default: 0.50.16)"),
+    argocd_version: str = typer.Option("3.3.6", "--argocd-version",
                                         envvar="DEVOPS_OS_DEVCONTAINER_ARGOCD_VERSION",
-                                        help="ArgoCD version (default: 2.8.4)"),
-    flux_version: str = typer.Option("2.1.2", "--flux-version",
+                                        help="ArgoCD version (default: 3.3.6)"),
+    flux_version: str = typer.Option("2.8.5", "--flux-version",
                                       envvar="DEVOPS_OS_DEVCONTAINER_FLUX_VERSION",
-                                      help="Flux version (default: 2.1.2)"),
-    kustomize_version: str = typer.Option("5.2.1", "--kustomize-version",
+                                      help="Flux version (default: 2.8.5)"),
+    kustomize_version: str = typer.Option("5.8.0", "--kustomize-version",
                                            envvar="DEVOPS_OS_DEVCONTAINER_KUSTOMIZE_VERSION",
-                                           help="Kustomize version (default: 5.2.1)"),
-    nexus_version: str = typer.Option("3.50.0", "--nexus-version",
+                                           help="Kustomize version (default: 5.8.0)"),
+    nexus_version: str = typer.Option("3.91.0", "--nexus-version",
                                        envvar="DEVOPS_OS_DEVCONTAINER_NEXUS_VERSION",
-                                       help="Nexus version (default: 3.50.0)"),
-    prometheus_version: str = typer.Option("2.45.0", "--prometheus-version",
+                                       help="Nexus version (default: 3.91.0)"),
+    prometheus_version: str = typer.Option("3.5.1", "--prometheus-version",
                                             envvar="DEVOPS_OS_DEVCONTAINER_PROMETHEUS_VERSION",
-                                            help="Prometheus version (default: 2.45.0)"),
-    grafana_version: str = typer.Option("10.0.0", "--grafana-version",
+                                            help="Prometheus version (default: 3.5.1)"),
+    grafana_version: str = typer.Option("12.4.2", "--grafana-version",
                                          envvar="DEVOPS_OS_DEVCONTAINER_GRAFANA_VERSION",
-                                         help="Grafana version (default: 10.0.0)"),
+                                         help="Grafana version (default: 12.4.2)"),
     output_dir: str = typer.Option(".", "--output-dir", envvar="DEVOPS_OS_DEVCONTAINER_OUTPUT_DIR",
                                     help="Root output directory (files written to <output-dir>/.devcontainer/)"),
 ):
@@ -472,7 +472,7 @@ def scaffold_devcontainer_cmd(
     Examples:
       devopsos scaffold devcontainer --languages python,java --cicd-tools docker,github_actions
       devopsos scaffold devcontainer --kubernetes-tools kubectl,helm,argocd_cli
-      devopsos scaffold devcontainer --languages go --go-version 1.22 --output-dir myproject
+      devopsos scaffold devcontainer --languages go --go-version 1.25.0 --output-dir myproject
     """
     _show_help_if_no_opts(ctx)
     flags = [
@@ -647,9 +647,9 @@ def init(
     ALL_DEVOPS_TOOLS  = ["nexus", "prometheus", "grafana", "elk", "jenkins"]
 
     versions_defaults = {
-        "python": "3.11", "java": "17", "node": "20", "go": "1.21", "nexus": "3.50.0",
-        "prometheus": "2.45.0", "grafana": "10.0.0", "k9s": "0.29.1", "argocd": "2.8.4",
-        "flux": "2.1.2", "kustomize": "5.2.1", "jenkins": "2.440.1"
+        "python": "3.12", "java": "21", "node": "22", "go": "1.25.0", "nexus": "3.91.0",
+        "prometheus": "3.5.1", "grafana": "12.4.2", "k9s": "0.50.16", "argocd": "3.3.6",
+        "flux": "2.8.5", "kustomize": "5.8.0", "jenkins": "2.440.1"
     }
 
     # ── Wizard groups aligned with Process-First DevOps principles ────────
@@ -780,7 +780,7 @@ def init(
             "ruby": "INSTALL_RUBY", "csharp": "INSTALL_CSHARP", "php": "INSTALL_PHP",
             "rust": "INSTALL_RUST", "typescript": "INSTALL_TYPESCRIPT",
             "kotlin": "INSTALL_KOTLIN", "c": "INSTALL_C", "cpp": "INSTALL_CPP",
-            "javascript": "INSTALL_JAVASCRIPT", "go": "INSTALL_GO"
+            "javascript": "INSTALL_JS", "go": "INSTALL_GO"
         }
         for lang, arg in lang_map.items():
             build_args[arg] = str(config["languages"].get(lang, False)).lower()

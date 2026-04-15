@@ -54,17 +54,17 @@ default_config = {
         "jenkins": False
     },
     "versions": {
-        "python": "3.11",
-        "java": "17",
-        "node": "20",
-        "go": "1.21",
-        "nexus": "3.50.0",
-        "prometheus": "2.45.0",
-        "grafana": "10.0.0",
-        "k9s": "0.29.1",
-        "argocd": "2.8.4",
-        "flux": "2.1.2",
-        "kustomize": "5.2.1"
+        "python": "3.12",
+        "java": "21",
+        "node": "22",
+        "go": "1.25.0",
+        "nexus": "3.91.0",
+        "prometheus": "3.5.1",
+        "grafana": "12.4.2",
+        "k9s": "0.50.16",
+        "argocd": "3.3.6",
+        "flux": "2.8.5",
+        "kustomize": "5.8.0"
     }
 }
 
@@ -105,15 +105,15 @@ devcontainer = {
             
             # Kubernetes tools
             "INSTALL_K9S": str(config["kubernetes"]["k9s"]).lower(),
-            "K9S_VERSION": config["versions"].get("k9s", "0.29.1"),
+            "K9S_VERSION": config["versions"].get("k9s", "0.50.16"),
             "INSTALL_KUSTOMIZE": str(config["kubernetes"]["kustomize"]).lower(),
-            "KUSTOMIZE_VERSION": config["versions"].get("kustomize", "5.2.1"),
+            "KUSTOMIZE_VERSION": config["versions"].get("kustomize", "5.8.0"),
             "INSTALL_ARGOCD_CLI": str(config["kubernetes"]["argocd_cli"]).lower(),
-            "ARGOCD_VERSION": config["versions"].get("argocd", "2.8.4"),
+            "ARGOCD_VERSION": config["versions"].get("argocd", "3.3.6"),
             "INSTALL_LENS": str(config["kubernetes"]["lens"]).lower(),
             "INSTALL_KUBESEAL": str(config["kubernetes"]["kubeseal"]).lower(),
             "INSTALL_FLUX": str(config["kubernetes"]["flux"]).lower(),
-            "FLUX_VERSION": config["versions"].get("flux", "2.1.2"),
+            "FLUX_VERSION": config["versions"].get("flux", "2.8.5"),
             "INSTALL_KIND": str(config["kubernetes"]["kind"]).lower(),
             "INSTALL_MINIKUBE": str(config["kubernetes"]["minikube"]).lower(),
             "INSTALL_OPENSHIFT_CLI": str(config["kubernetes"]["openshift_cli"]).lower(),
@@ -134,11 +134,11 @@ devcontainer = {
             
             # DevOps tools
             "INSTALL_NEXUS": str(config["devops_tools"]["nexus"]).lower(),
-            "NEXUS_VERSION": config["versions"].get("nexus", "3.50.0"),
+            "NEXUS_VERSION": config["versions"].get("nexus", "3.91.0"),
             "INSTALL_PROMETHEUS": str(config["devops_tools"]["prometheus"]).lower(),
-            "PROMETHEUS_VERSION": config["versions"].get("prometheus", "2.45.0"),
+            "PROMETHEUS_VERSION": config["versions"].get("prometheus", "3.5.1"),
             "INSTALL_GRAFANA": str(config["devops_tools"]["grafana"]).lower(),
-            "GRAFANA_VERSION": config["versions"].get("grafana", "10.0.0"),
+            "GRAFANA_VERSION": config["versions"].get("grafana", "12.4.2"),
             "INSTALL_ELK": str(config["devops_tools"]["elk"]).lower(),
             "INSTALL_JENKINS": str(config["devops_tools"]["jenkins"]).lower()
         }
