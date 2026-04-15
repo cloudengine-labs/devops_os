@@ -26,3 +26,4 @@ Welcome to the DevOps-OS documentation. Use the sidebar to navigate between sect
 | [Dev Container]({{< relref "/docs/dev-container" >}}) | Multi-language dev environment setup |
 | [AI Integration]({{< relref "/docs/ai-integration" >}}) | MCP server for Claude / ChatGPT |
 | [CLI Reference]({{< relref "/docs/reference" >}}) | Complete command options and output paths |
+| [Talks & Presentations]({{< relref "/docs/talks" >}}) | GitHub Pages access to conference-ready DevOps-OS decks |

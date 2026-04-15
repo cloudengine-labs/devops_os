@@ -91,3 +91,4 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 | [Dev Container]({{< relref "/docs/dev-container" >}}) | Configure the dev container |
 | [AI Integration]({{< relref "/docs/ai-integration" >}}) | MCP server & AI skills |
 | [CLI Reference]({{< relref "/docs/reference" >}}) | Full CLI options and output paths |
+| [Chennai FOSS 2026 Presentation]({{< relref "/docs/talks/chennai-foss-2026" >}}) | GitHub Pages-friendly conference deck with embedded playback |
