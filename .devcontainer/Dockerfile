@@ -249,7 +249,7 @@ RUN if [ "$INSTALL_ANT" = "true" ]; then \
 # SonarQube Scanner
 RUN if [ "$INSTALL_SONARQUBE" = "true" ]; then \
     curl -fsSLo /tmp/sonar-scanner-cli.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip" \
-    && rm -rf /opt/sonar-scanner /tmp/sonar-scanner \
+    && rm -rf /opt/sonar-scanner \
     && mkdir -p /tmp/sonar-scanner \
     && unzip /tmp/sonar-scanner-cli.zip -d /tmp/sonar-scanner \
     && mv "/tmp/sonar-scanner/sonar-scanner-${SONAR_SCANNER_VERSION}-linux" /opt/sonar-scanner \
@@ -270,7 +270,7 @@ RUN if [ "$INSTALL_PMD" = "true" ]; then \
     mkdir -p /opt/pmd \
     && curl -fsSLo /opt/pmd.zip "https://github.com/pmd/pmd/releases/download/pmd_releases/${PMD_VERSION}/pmd-dist-${PMD_VERSION}-bin.zip" \
     && unzip /opt/pmd.zip -d /opt \
-    && mv /opt/pmd-* /opt/pmd \
+    && mv "/opt/pmd-bin-${PMD_VERSION}" /opt/pmd \
     && rm /opt/pmd.zip \
     && echo 'export PATH=$PATH:/opt/pmd/bin' >> /etc/bash.bashrc; \
     fi
