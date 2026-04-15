@@ -125,12 +125,12 @@ RUN if [ "$INSTALL_TERRAFORM" = "true" ]; then \
 
 # Install kubectl if requested
 RUN if [ "$INSTALL_KUBECTL" = "true" ]; then \
-    KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" || (echo "failed to resolve the latest kubectl version" >&2 && exit 1) \
+    KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" || (echo "failed to resolve the latest kubectl version from https://dl.k8s.io/release/stable.txt" >&2 && exit 1) \
     && curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl" \
     && curl -fsSLo /tmp/kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl.sha256" \
     && KUBECTL_SHA256="$(cat /tmp/kubectl.sha256)" \
     && DOWNLOADED_KUBECTL_SHA256="$(sha256sum /tmp/kubectl | cut -d' ' -f1)" \
-    && (test "${KUBECTL_SHA256}" = "${DOWNLOADED_KUBECTL_SHA256}" || (echo "kubectl checksum verification failed" >&2 && exit 1)) \
+    && (test "${KUBECTL_SHA256}" = "${DOWNLOADED_KUBECTL_SHA256}" || (echo "kubectl checksum verification failed: expected ${KUBECTL_SHA256}, got ${DOWNLOADED_KUBECTL_SHA256}" >&2 && exit 1)) \
     && install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl \
     && rm -f /tmp/kubectl /tmp/kubectl.sha256; \
     fi
