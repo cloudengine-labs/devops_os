@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps-OS — Chennai FOSS 2026</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --bg-soft: #0d1b2e;
+      --panel: rgba(11, 24, 43, 0.84);
+      --panel-strong: rgba(16, 34, 58, 0.94);
+      --text: #ecf3ff;
+      --muted: #aebfd8;
+      --line: rgba(165, 192, 225, 0.18);
+      --blue: #63b3ff;
+      --cyan: #6af0d2;
+      --green: #8ef0ad;
+      --gold: #ffd66b;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: Inter, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(99, 179, 255, 0.18), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(106, 240, 210, 0.16), transparent 32%),
+        linear-gradient(145deg, #040b16 0%, var(--bg) 45%, #091b31 100%);
+      overflow: hidden;
+    }
+
+    .progress {
+      position: fixed;
+      inset: 0 auto auto 0;
+      height: 4px;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--cyan), var(--green));
+      box-shadow: 0 0 28px rgba(106, 240, 210, 0.45);
+      transition: width 0.3s ease;
+      z-index: 50;
+    }
+
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      padding: 42px;
+    }
+
+    .glow {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.32;
+      pointer-events: none;
+    }
+
+    .glow.one {
+      width: 320px;
+      height: 320px;
+      top: -70px;
+      right: 8%;
+      background: rgba(99, 179, 255, 0.45);
+    }
+
+    .glow.two {
+      width: 300px;
+      height: 300px;
+      bottom: -90px;
+      left: 6%;
+      background: rgba(106, 240, 210, 0.3);
+    }
+
+    .deck {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(6, 16, 29, 0.7), rgba(7, 17, 31, 0.88));
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 18px;
+      padding: 56px 64px 92px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(24px);
+      transition: opacity 0.35s ease, transform 0.35s ease, visibility 0.35s ease;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      width: fit-content;
+      padding: 8px 14px;
+      border: 1px solid rgba(99, 179, 255, 0.24);
+      border-radius: 999px;
+      background: rgba(99, 179, 255, 0.1);
+      color: var(--blue);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1, h2 {
+      font-family: "Aptos Display", "Segoe UI", Inter, sans-serif;
+      font-weight: 800;
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      max-width: 880px;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 5vw, 5.3rem);
+    }
+
+    h2 {
+      font-size: clamp(2.4rem, 4vw, 4.2rem);
+    }
+
+    p.lead {
+      max-width: 760px;
+      color: var(--muted);
+      font-size: clamp(1.08rem, 1.75vw, 1.45rem);
+      line-height: 1.55;
+    }
+
+    .accent { color: var(--cyan); }
+    .accent-blue { color: var(--blue); }
+    .accent-gold { color: var(--gold); }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    .meta span,
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(8px);
+    }
+
+    .content {
+      display: grid;
+      align-content: center;
+      gap: 24px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card,
+    .quote,
+    .flow-step {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 22px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+    }
+
+    .card h3,
+    .flow-step h3 {
+      font-size: 1.02rem;
+      margin-bottom: 10px;
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .card p,
+    .flow-step p,
+    .quote p,
+    .list li {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
+    }
+
+    .list {
+      list-style: none;
+      display: grid;
+      gap: 12px;
+      max-width: 760px;
+    }
+
+    .list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(165, 192, 225, 0.12);
+      background: rgba(255, 255, 255, 0.025);
+    }
+
+    .list li::before {
+      content: "•";
+      color: var(--cyan);
+      font-size: 1.2rem;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .quote {
+      max-width: 780px;
+      background: linear-gradient(135deg, rgba(99, 179, 255, 0.1), rgba(106, 240, 210, 0.07));
+    }
+
+    .quote p {
+      font-size: clamp(1.18rem, 2vw, 1.55rem);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step {
+      min-height: 150px;
+      background: var(--panel-strong);
+    }
+
+    .flow-step .num {
+      display: inline-flex;
+      width: 34px;
+      height: 34px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      background: rgba(106, 240, 210, 0.12);
+      color: var(--cyan);
+      border: 1px solid rgba(106, 240, 210, 0.25);
+      font-weight: 700;
+    }
+
+    .footer-note {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: rgba(174, 191, 216, 0.8);
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-note a {
+      color: var(--cyan);
+      text-decoration: none;
+    }
+
+    .toolbar {
+      position: absolute;
+      right: 28px;
+      bottom: 26px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 60;
+    }
+
+    .toolbar button {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(10, 23, 41, 0.92);
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .toolbar button:hover {
+      transform: translateY(-1px);
+      background: rgba(18, 36, 61, 0.98);
+    }
+
+    .counter {
+      position: absolute;
+      left: 28px;
+      bottom: 36px;
+      z-index: 60;
+      color: rgba(174, 191, 216, 0.85);
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .presenter-tip {
+      color: rgba(174, 191, 216, 0.65);
+      font-size: 0.88rem;
+    }
+
+    @media (max-width: 1100px) {
+      .slide {
+        padding: 48px 40px 92px;
+      }
+
+      .grid.two,
+      .grid.three,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .stage {
+        padding: 16px;
+      }
+
+      .slide {
+        padding: 34px 22px 90px;
+      }
+
+      .footer-note {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .toolbar {
+        right: 16px;
+        bottom: 18px;
+      }
+
+      .counter {
+        left: 16px;
+        bottom: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progressBar"></div>
+  <div class="stage">
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+
+    <main class="deck" id="deck">
+      <section class="slide active">
+        <div class="eyebrow">Chennai FOSS 2026 · Apr 18</div>
+        <div class="content">
+          <h1>Simplifying <span class="accent">Platform Engineering</span> with DevOps-OS</h1>
+          <p class="lead">A process-first talk on building improved developer experience workflows with open source building blocks.</p>
+          <div class="meta">
+            <span>Saravanan Gnanaguru</span>
+            <span>Founder · CloudEngine Labs</span>
+            <span>gsaravanen.dev</span>
+          </div>
+        </div>
+        <div class="footer-note">
+          <span>cloudenginelabs.io</span>
+          <span>DevOps-OS open source project</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">20 minute flow</div>
+        <div class="content">
+          <h2>What we will cover</h2>
+          <div class="grid two">
+            <div class="card"><h3>01 · Mindset</h3><p>Why DevOps starts with process, not tooling.</p></div>
+            <div class="card"><h3>02 · DevOps-OS</h3><p>Why this project exists and what problem it simplifies.</p></div>
+            <div class="card"><h3>03 · Templates</h3><p>How repeatable tech stack automation becomes reusable building blocks.</p></div>
+            <div class="card"><h3>04 · Platform view</h3><p>How templates evolve into platform engineering and IDP adoption.</p></div>
+          </div>
+        </div>
+        <div class="footer-note">
+          <span>Short talk · lightweight slides · practical framing</span>
+          <span>Ends with a live demo cue</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Process-first understanding</div>
+        <div class="content">
+          <h2>DevOps is a <span class="accent-blue">workflow system</span> before it is a toolchain</h2>
+          <ul class="list">
+            <li>Start with how code moves from idea to production.</li>
+            <li>Then define approvals, quality gates, deployment flow, and feedback loops.</li>
+            <li>Only after that should tools and YAML enter the conversation.</li>
+          </ul>
+          <div class="quote"><p>When process is clear, automation becomes practical, repeatable, and easier to adopt.</p></div>
+        </div>
+        <div class="footer-note">
+          <span>Design the path first</span>
+          <span>Then automate the path</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Why DevOps-OS</div>
+        <div class="content">
+          <h2><span class="accent-gold">Process</span> &gt; tools</h2>
+          <div class="grid two">
+            <div class="card">
+              <h3>What teams usually do</h3>
+              <p>Pick CI/CD, Kubernetes, GitOps, and SRE tools first — then struggle to connect them into one usable workflow.</p>
+            </div>
+            <div class="card">
+              <h3>What DevOps-OS encourages</h3>
+              <p>Define the delivery process first — then scaffold the right starting configuration around it.</p>
+            </div>
+          </div>
+          <p class="lead">The project is not just about generating files. It is about making the first layer of platform workflow design simpler.</p>
+        </div>
+        <div class="footer-note">
+          <span>Less blank-page setup</span>
+          <span>More workflow clarity</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Map process with tools</div>
+        <div class="content">
+          <h2>Connect each stage to the <span class="accent">right building block</span></h2>
+          <div class="flow">
+            <div class="flow-step"><div class="num">1</div><h3>Plan</h3><p>Delivery intent, ownership, release expectations.</p></div>
+            <div class="flow-step"><div class="num">2</div><h3>Build & test</h3><p>GitHub Actions, GitLab CI, Jenkins scaffolds.</p></div>
+            <div class="flow-step"><div class="num">3</div><h3>Ship</h3><p>Kubernetes, deployment config, GitOps handoff.</p></div>
+            <div class="flow-step"><div class="num">4</div><h3>Operate</h3><p>Prometheus, Grafana, SLO, alerting foundations.</p></div>
+            <div class="flow-step"><div class="num">5</div><h3>Improve</h3><p>Template updates, reuse, onboarding, standardisation.</p></div>
+          </div>
+        </div>
+        <div class="footer-note">
+          <span>Process gives context</span>
+          <span>Tools implement the context</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Templatisation</div>
+        <div class="content">
+          <h2>Turn stack-specific automation into <span class="accent">reusable templates</span></h2>
+          <div class="grid three">
+            <div class="card"><h3>Opinionated defaults</h3><p>Encode a practical starting point for Python, Go, JavaScript, Java, or mixed stacks.</p></div>
+            <div class="card"><h3>Consistency at scale</h3><p>Teams stop rebuilding the same CI, GitOps, and SRE setup from scratch.</p></div>
+            <div class="card"><h3>Faster onboarding</h3><p>Developers consume a known pattern instead of reinventing delivery setup.</p></div>
+          </div>
+          <div class="quote"><p>Templates are not shortcuts. They are packaged implementation experience.</p></div>
+        </div>
+        <div class="footer-note">
+          <span>Repeatable</span>
+          <span>Adaptable</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Platform engineering</div>
+        <div class="content">
+          <h2>What is <span class="accent-blue">platform engineering</span>?</h2>
+          <ul class="list">
+            <li>Creating shared internal capabilities that reduce delivery friction for product teams.</li>
+            <li>Providing paved paths instead of one-off docs, tribal knowledge, or ticket-driven setup.</li>
+            <li>Balancing standardisation, self-service, governance, and developer experience.</li>
+          </ul>
+        </div>
+        <div class="footer-note">
+          <span>Not just infrastructure</span>
+          <span>Usable internal platforms</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">IDP</div>
+        <div class="content">
+          <h2>What is an <span class="accent-gold">Internal Developer Platform</span>?</h2>
+          <div class="grid two">
+            <div class="card">
+              <h3>Experience layer</h3>
+              <p>An IDP is how developers discover, request, and consume platform capabilities through a usable interface.</p>
+            </div>
+            <div class="card">
+              <h3>DevOps-OS angle</h3>
+              <p>Templates become the portable building blocks behind that experience layer — ready to plug into self-service workflows.</p>
+            </div>
+          </div>
+          <p class="lead">Platform engineering builds the capability. IDP makes the capability consumable.</p>
+        </div>
+        <div class="footer-note">
+          <span>Capability + interface</span>
+          <span>Self-service with guardrails</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Demo framing</div>
+        <div class="content">
+          <h2>Live demo: from <span class="accent">template creation</span> to platform consumption</h2>
+          <div class="grid two">
+            <div class="card"><h3>Show creation</h3><p>Create templates for CI/CD, deployment, or stack automation using DevOps-OS.</p></div>
+            <div class="card"><h3>Show consumption</h3><p>Explain how the same templates can power platform engineering workflows and future IDP experiences.</p></div>
+          </div>
+          <ul class="list">
+            <li>Keep focus on the workflow story, not every command.</li>
+            <li>Use the demo to show reuse, consistency, and developer experience.</li>
+          </ul>
+        </div>
+        <div class="footer-note">
+          <span>Presenter cue slide</span>
+          <span>No deep walkthrough on screen</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Wrap-up</div>
+        <div class="content">
+          <h2>Key takeaways</h2>
+          <div class="grid two">
+            <div class="card"><h3>1</h3><p>Process-first thinking makes DevOps automation more useful.</p></div>
+            <div class="card"><h3>2</h3><p>Templates help teams standardise without slowing developers down.</p></div>
+            <div class="card"><h3>3</h3><p>Platform engineering is about delivering reusable internal capabilities.</p></div>
+            <div class="card"><h3>4</h3><p>DevOps-OS can act as an open source building block behind that journey.</p></div>
+          </div>
+          <p class="lead">Thank you — Chennai FOSS 2026.</p>
+        </div>
+        <div class="footer-note">
+          <span>github.com/cloudengine-labs/devops_os</span>
+          <span class="presenter-tip">Use ← →, space, or click buttons</span>
+        </div>
+      </section>
+
+      <div class="counter" id="counter">Slide 1 / 10</div>
+      <div class="toolbar" aria-label="Slide controls">
+        <button type="button" id="prevBtn" aria-label="Previous slide">←</button>
+        <button type="button" id="nextBtn" aria-label="Next slide">→</button>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      var total = slides.length;
+      var current = 0;
+      var counter = document.getElementById('counter');
+      var progressBar = document.getElementById('progressBar');
+      var prevBtn = document.getElementById('prevBtn');
+      var nextBtn = document.getElementById('nextBtn');
+
+      function updateButtons() {
+        prevBtn.disabled = current === 0;
+        nextBtn.disabled = current === total - 1;
+        prevBtn.style.opacity = current === 0 ? '0.45' : '1';
+        nextBtn.style.opacity = current === total - 1 ? '0.45' : '1';
+      }
+
+      function render(index) {
+        if (index < 0 || index >= total) return;
+
+        slides[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        counter.textContent = 'Slide ' + (current + 1) + ' / ' + total;
+        progressBar.style.width = (((current + 1) / total) * 100) + '%';
+        updateButtons();
+      }
+
+      function next() { render(current + 1); }
+      function prev() { render(current - 1); }
+
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'ArrowRight' || event.key === ' ' || event.key === 'PageDown') {
+          event.preventDefault();
+          next();
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          prev();
+        }
+        if (event.key === 'Home') {
+          event.preventDefault();
+          render(0);
+        }
+        if (event.key === 'End') {
+          event.preventDefault();
+          render(total - 1);
+        }
+      });
+
+      render(0);
+    })();
+  </script>
+</body>
+</html>
