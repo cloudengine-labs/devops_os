@@ -126,7 +126,7 @@ RUN if [ "$INSTALL_KUBECTL" = "true" ]; then \
     KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" \
     && curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl" \
     && curl -fsSLo /tmp/kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl.sha256" \
-    && test "$(cat /tmp/kubectl.sha256)" = "$(sha256sum /tmp/kubectl | cut -d' ' -f1)" \
+    && (test "$(cat /tmp/kubectl.sha256)" = "$(sha256sum /tmp/kubectl | cut -d' ' -f1)" || (echo "kubectl checksum verification failed" && exit 1)) \
     && install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl \
     && rm -f /tmp/kubectl /tmp/kubectl.sha256; \
     fi
