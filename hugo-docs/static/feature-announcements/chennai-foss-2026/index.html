@@ -281,6 +281,63 @@
       font-weight: 700;
     }
 
+    .concept-evolution {
+      display: grid;
+      gap: 20px;
+    }
+
+    .concept-evolution-label {
+      max-width: 880px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      letter-spacing: 0.01em;
+    }
+
+    .concept-track {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .concept-step {
+      display: grid;
+      align-content: start;
+      gap: 14px;
+      min-height: 220px;
+      padding: 26px;
+      background:
+        linear-gradient(180deg, rgba(11, 24, 43, 0.92), rgba(16, 34, 58, 0.92)),
+        radial-gradient(circle at top right, rgba(99, 179, 255, 0.16), transparent 55%);
+      border-color: rgba(99, 179, 255, 0.16);
+    }
+
+    .concept-step h3 {
+      font-size: 1.28rem;
+      margin-bottom: 0;
+    }
+
+    .concept-step p {
+      font-size: 1rem;
+    }
+
+    .concept-kicker {
+      width: fit-content;
+      color: var(--cyan);
+      border-color: rgba(106, 240, 210, 0.2);
+      background: rgba(106, 240, 210, 0.08);
+    }
+
+    .concept-arrow {
+      display: grid;
+      place-items: center;
+      padding: 0 4px;
+      color: var(--cyan);
+      font-size: 2rem;
+      font-weight: 800;
+      text-shadow: 0 0 22px rgba(106, 240, 210, 0.35);
+    }
+
     .footer-note {
       display: flex;
       justify-content: space-between;
@@ -348,6 +405,16 @@
       .grid.three,
       .flow {
         grid-template-columns: 1fr;
+      }
+
+      .concept-track {
+        grid-template-columns: 1fr;
+      }
+
+      .concept-arrow {
+        min-height: 24px;
+        font-size: 1.7rem;
+        transform: rotate(90deg);
       }
     }
 
@@ -454,6 +521,39 @@
         <div class="footer-note">
           <span>Less blank-page setup</span>
           <span>More workflow clarity</span>
+        </div>
+      </section>
+
+      <section class="slide">
+        <div class="eyebrow">Concept evolution</div>
+        <div class="content">
+          <h2>How <span class="accent">DevOps automation</span> evolves</h2>
+          <div class="concept-evolution">
+            <p class="concept-evolution-label">Automation maturity: what starts as CI/CD scaffolding grows into a shared platform capability and then becomes a self-service developer experience.</p>
+            <div class="concept-track" aria-label="CI/CD template evolves into platform engineering and then IDP">
+              <div class="card concept-step">
+                <span class="pill concept-kicker">Automation maturity</span>
+                <h3>CI/CD template</h3>
+                <p>Automates stack setup with repeatable pipelines, checks, and deployment defaults.</p>
+              </div>
+              <div class="concept-arrow" aria-hidden="true">→</div>
+              <div class="card concept-step">
+                <span class="pill concept-kicker">Shared capability</span>
+                <h3>Platform Engineering</h3>
+                <p>Turns repeatable setup into an internal capability that standardises delivery without slowing teams down.</p>
+              </div>
+              <div class="concept-arrow" aria-hidden="true">→</div>
+              <div class="card concept-step">
+                <span class="pill concept-kicker">Self-service layer</span>
+                <h3>IDP</h3>
+                <p>Exposes that capability through a usable interface so developers can consume it as a self-service experience.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="footer-note">
+          <span>DevOps automation starts as templates, matures into platform capabilities, and is consumed through an IDP.</span>
+          <span>Templates → capabilities → self-service</span>
         </div>
       </section>
 
