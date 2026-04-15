@@ -123,8 +123,9 @@ RUN if [ "$INSTALL_TERRAFORM" = "true" ]; then \
 
 # Install kubectl if requested
 RUN if [ "$INSTALL_KUBECTL" = "true" ]; then \
-    curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
+    KUBECTL_CHANNEL="$(curl -fsSL https://dl.k8s.io/release/stable.txt | sed -E 's/^v([0-9]+\.[0-9]+).*/v\1/')" \
+    && curl -fsSL "https://pkgs.k8s.io/core:/stable:/${KUBECTL_CHANNEL}/deb/Release.key" | gpg --dearmor -o /usr/share/keyrings/kubernetes-apt-keyring.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${KUBECTL_CHANNEL}/deb/ /" > /etc/apt/sources.list.d/kubernetes.list \
     && apt-get update \
     && apt-get install -y kubectl; \
     fi
