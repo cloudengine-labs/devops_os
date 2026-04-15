@@ -6,6 +6,8 @@ ARG PYTHON_VERSION=3.11
 ARG JAVA_VERSION=17
 ARG NODE_VERSION=20
 ARG GO_VERSION=1.21
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
 ARG INSTALL_PYTHON=true
 ARG INSTALL_JAVA=true 
 ARG INSTALL_JS=true
@@ -28,6 +30,7 @@ ARG INSTALL_KUBESEAL=true
 ARG INSTALL_FLUX=true
 ARG FLUX_VERSION=2.1.2
 ARG INSTALL_KIND=true
+ARG KIND_VERSION=0.20.0
 ARG INSTALL_MINIKUBE=true
 ARG INSTALL_OPENSHIFT_CLI=false
 
@@ -40,8 +43,10 @@ ARG INSTALL_CMAKE=true
 
 # Code analysis tools
 ARG INSTALL_SONARQUBE=true
+ARG SONAR_SCANNER_VERSION=4.8.0.2856
 ARG INSTALL_CHECKSTYLE=true
 ARG INSTALL_PMD=true
+ARG PMD_VERSION=7.0.0-rc3
 ARG INSTALL_ESLINT=true
 ARG INSTALL_PYLINT=true
 
@@ -123,10 +128,14 @@ RUN if [ "$INSTALL_TERRAFORM" = "true" ]; then \
 
 # Install kubectl if requested
 RUN if [ "$INSTALL_KUBECTL" = "true" ]; then \
-    curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list \
-    && apt-get update \
-    && apt-get install -y kubectl; \
+    KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" || (echo "Failed to resolve the latest kubectl version from https://dl.k8s.io/release/stable.txt" >&2 && exit 1) \
+    && curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl" \
+    && curl -fsSLo /tmp/kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl.sha256" \
+    && KUBECTL_SHA256="$(cat /tmp/kubectl.sha256)" \
+    && DOWNLOADED_KUBECTL_SHA256="$(sha256sum /tmp/kubectl | cut -d' ' -f1)" \
+    && (test "${KUBECTL_SHA256}" = "${DOWNLOADED_KUBECTL_SHA256}" || (echo "Kubectl checksum verification failed: expected ${KUBECTL_SHA256}, got ${DOWNLOADED_KUBECTL_SHA256}" >&2 && exit 1)) \
+    && install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl \
+    && rm -f /tmp/kubectl /tmp/kubectl.sha256; \
     fi
 
 # Install Helm if requested
@@ -187,7 +196,7 @@ RUN if [ "$INSTALL_FLUX" = "true" ]; then \
 
 # Install KinD if requested
 RUN if [ "$INSTALL_KIND" = "true" ]; then \
-    curl -Lo /usr/local/bin/kind "https://kind.sigs.k8s.io/dl/v0.20.0/kind-$(uname)-amd64" \
+    curl -fsSLo /usr/local/bin/kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-${TARGETOS}-${TARGETARCH}" \
     && chmod +x /usr/local/bin/kind; \
     fi
 
@@ -239,11 +248,12 @@ RUN if [ "$INSTALL_ANT" = "true" ]; then \
 
 # SonarQube Scanner
 RUN if [ "$INSTALL_SONARQUBE" = "true" ]; then \
-    mkdir -p /opt/sonar-scanner \
-    && curl -sSLo /opt/sonar-scanner-cli.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip \
-    && unzip /opt/sonar-scanner-cli.zip -d /opt \
-    && mv /opt/sonar-scanner-* /opt/sonar-scanner \
-    && rm /opt/sonar-scanner-cli.zip \
+    curl -fsSLo /tmp/sonar-scanner-cli.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip" \
+    && rm -rf /opt/sonar-scanner \
+    && mkdir -p /tmp/sonar-scanner \
+    && unzip /tmp/sonar-scanner-cli.zip -d /tmp/sonar-scanner \
+    && mv "/tmp/sonar-scanner/sonar-scanner-${SONAR_SCANNER_VERSION}-linux" /opt/sonar-scanner \
+    && rm -rf /tmp/sonar-scanner /tmp/sonar-scanner-cli.zip \
     && echo 'export PATH=$PATH:/opt/sonar-scanner/bin' >> /etc/bash.bashrc; \
     fi
 
@@ -258,9 +268,9 @@ RUN if [ "$INSTALL_CHECKSTYLE" = "true" ]; then \
 # PMD
 RUN if [ "$INSTALL_PMD" = "true" ]; then \
     mkdir -p /opt/pmd \
-    && curl -sSLo /opt/pmd.zip https://github.com/pmd/pmd/releases/download/pmd_releases%2F7.0.0-rc3/pmd-bin-7.0.0-rc3.zip \
+    && curl -fsSLo /opt/pmd.zip "https://github.com/pmd/pmd/releases/download/pmd_releases/${PMD_VERSION}/pmd-dist-${PMD_VERSION}-bin.zip" \
     && unzip /opt/pmd.zip -d /opt \
-    && mv /opt/pmd-bin-* /opt/pmd \
+    && mv "/opt/pmd-bin-${PMD_VERSION}" /opt/pmd \
     && rm /opt/pmd.zip \
     && echo 'export PATH=$PATH:/opt/pmd/bin' >> /etc/bash.bashrc; \
     fi
@@ -302,8 +312,8 @@ RUN if [ "$INSTALL_PROMETHEUS" = "true" ]; then \
 
 # Grafana
 RUN if [ "$INSTALL_GRAFANA" = "true" ]; then \
-    wget -q -O - https://packages.grafana.com/gpg.key | gpg --dearmor | tee /usr/share/keyrings/grafana.gpg > /dev/null \
-    && echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" | tee -a /etc/apt/sources.list.d/grafana.list \
+    wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | tee /usr/share/keyrings/grafana.gpg > /dev/null \
+    && echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://apt.grafana.com stable main" | tee -a /etc/apt/sources.list.d/grafana.list \
     && apt-get update \
     && apt-get install -y grafana; \
     fi
