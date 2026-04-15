@@ -1,12 +1,13 @@
 # Multi-Language Development Container
 
-This development container provides a consistent environment for Java, JavaScript, Go, and Python development, along with CI/CD tools.
+This development container provides a toolbox-style environment across the major languages supported by DevOps-OS, along with CI/CD and Kubernetes tooling.
 
 ## Features
 
-- **Multiple Languages**: Java, JavaScript/TypeScript, Go, and Python with all necessary build tools
+- **Hybrid Runtime Strategy**: official Dev Container Features install mainstream runtimes, while the repo Dockerfile keeps Ubuntu 24.04 plus unsupported language/toolbox extras
+- **Multiple Languages**: Python, Java, Node.js/JavaScript/TypeScript, Go, Ruby, PHP, Rust, C#, Kotlin, and C/C++ are available by default
 - **CI/CD Tools**: Docker, Terraform, Kubernetes (kubectl), Helm, GitHub Actions
-- **Customizable**: Configure which languages and tools to include
+- **Customizable**: `.devcontainer/devcontainer.env.json` remains the single control plane for languages and tools
 
 ## Getting Started
 
@@ -45,6 +46,15 @@ Run `python -m cli.scaffold_devcontainer --help` to see all available options in
   "languages": {
     "python": true,
     "java": true,
+    "node": true,
+    "ruby": true,
+    "csharp": true,
+    "php": true,
+    "rust": true,
+    "typescript": true,
+    "kotlin": true,
+    "c": true,
+    "cpp": true,
     "javascript": true,
     "go": true
   },
@@ -95,9 +105,11 @@ After configuring (via either option), open the project in VS Code and click "Re
 ### Languages and Tools
 
 - **Python**: Python interpreter, pip, pytest, black, flake8, mypy
-- **Java**: JDK, Maven, Gradle
+- **Java/Kotlin**: JDK, Maven, Gradle, Ant, Kotlin compiler
 - **JavaScript/TypeScript**: Node.js, npm, yarn, TypeScript, Jest, ESLint, Prettier
 - **Go**: Go compiler, golangci-lint
+- **Ruby/PHP/Rust/C#**: runtime/compiler support installed for toolbox workflows
+- **C/C++**: build-essential, clang, gdb, cmake
 
 ### CI/CD Tools
 
@@ -122,8 +134,8 @@ For detailed information on using the Kubernetes capabilities, see [kubernetes-c
 You can:
 
 1. Disable languages or tools you don't need
-2. Change versions of languages
-3. Add additional tools by editing the Dockerfile
+2. Change pinned versions for Python, Java, Node, and Go
+3. Add additional repo-local tools in `bootstrap-toolbox.sh` or the Dockerfile
 
 ## Troubleshooting
 

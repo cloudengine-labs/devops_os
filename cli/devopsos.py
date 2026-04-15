@@ -762,8 +762,22 @@ def init(
         typer.echo("Aborted by user.")
         raise typer.Exit(1)
 
-    # Write to .devcontainer/devcontainer.env.json
-    devcontainer_dir = Path(directory) / ".devcontainer"
+    target_root = Path(directory)
+    primary_devcontainer_dir = target_root / ".devcontainer"
+    preserve_existing = primary_devcontainer_dir.exists()
+    if preserve_existing:
+        devcontainer_dir = target_root / ".devcontainer.generated"
+        typer.echo(
+            f"Existing {primary_devcontainer_dir} detected. Preserving it and writing "
+            f"generated output to {devcontainer_dir}."
+        )
+        typer.echo(
+            ".devcontainer.generated/ is a review/reference copy and may be overwritten "
+            "by later init runs."
+        )
+    else:
+        devcontainer_dir = primary_devcontainer_dir
+
     devcontainer_dir.mkdir(parents=True, exist_ok=True)
     env_json_path = devcontainer_dir / "devcontainer.env.json"
     with open(env_json_path, "w") as f:

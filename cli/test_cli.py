@@ -86,6 +86,138 @@ def test_init_dir_option_creates_devcontainer_in_specified_dir():
             "Expected devcontainer.env.json inside .devcontainer"
         )
 
+def test_init_preserves_existing_devcontainer_and_writes_generated_copy():
+    """Existing .devcontainer must be preserved; generated output goes to .devcontainer.generated."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_skip = MagicMock()
+    confirm_skip.execute.return_value = False
+
+    with tempfile.TemporaryDirectory() as tmp:
+        existing_dir = Path(tmp) / ".devcontainer"
+        existing_dir.mkdir(parents=True, exist_ok=True)
+        existing_env = existing_dir / "devcontainer.env.json"
+        existing_json = existing_dir / "devcontainer.json"
+        existing_env.write_text('{"protected": true}\n')
+        existing_json.write_text('{"protected": true}\n')
+
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_skip]):
+            runner = CliRunner()
+            result = runner.invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        assert "Preserving it and writing generated output" in result.output
+        assert existing_env.read_text() == '{"protected": true}\n'
+        assert existing_json.read_text() == '{"protected": true}\n'
+
+        generated_dir = Path(tmp) / ".devcontainer.generated"
+        assert generated_dir.is_dir()
+        assert (generated_dir / "devcontainer.env.json").exists()
+        assert not (generated_dir / "devcontainer.json").exists()
+
+def test_init_preserves_existing_devcontainer_when_only_one_file_exists():
+    """Any existing .devcontainer directory is protected even if only one config file exists."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_generate = MagicMock()
+    confirm_generate.execute.return_value = True
+
+    with tempfile.TemporaryDirectory() as tmp:
+        existing_dir = Path(tmp) / ".devcontainer"
+        existing_dir.mkdir(parents=True, exist_ok=True)
+        existing_env = existing_dir / "devcontainer.env.json"
+        existing_env.write_text('{"protected": true}\n')
+
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_generate]):
+            result = CliRunner().invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        assert existing_env.read_text() == '{"protected": true}\n'
+        assert not (existing_dir / "devcontainer.json").exists()
+
+        generated_dir = Path(tmp) / ".devcontainer.generated"
+        assert (generated_dir / "devcontainer.env.json").exists()
+        assert (generated_dir / "devcontainer.json").exists()
+
+def test_init_rerun_refreshes_generated_output_without_touching_devcontainer():
+    """Rerunning init refreshes .devcontainer.generated and leaves .devcontainer unchanged."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    selections = [
+        ["python"],
+        ["docker"],
+        [],
+        [],
+        [],
+        [],
+        [],
+    ]
+    sel_iter = iter(selections)
+
+    def _checkbox_factory(**kwargs):
+        mock = MagicMock()
+        mock.execute.return_value = next(sel_iter)
+        return mock
+
+    text_mock = MagicMock()
+    text_mock.execute.return_value = "3.12"
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    confirm_generate = MagicMock()
+    confirm_generate.execute.return_value = True
+
+    with tempfile.TemporaryDirectory() as tmp:
+        existing_dir = Path(tmp) / ".devcontainer"
+        existing_dir.mkdir(parents=True, exist_ok=True)
+        existing_env = existing_dir / "devcontainer.env.json"
+        existing_env.write_text('{"protected": true}\n')
+
+        generated_dir = Path(tmp) / ".devcontainer.generated"
+        generated_dir.mkdir(parents=True, exist_ok=True)
+        stale_env = generated_dir / "devcontainer.env.json"
+        stale_json = generated_dir / "devcontainer.json"
+        stale_env.write_text('{"stale": true}\n')
+        stale_json.write_text('{"stale": true}\n')
+
+        with patch("cli.devopsos.inquirer.checkbox", side_effect=_checkbox_factory), \
+             patch("cli.devopsos.inquirer.text", return_value=text_mock), \
+             patch("cli.devopsos.inquirer.confirm",
+                   side_effect=[confirm_proceed, confirm_generate]):
+            result = CliRunner().invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        assert existing_env.read_text() == '{"protected": true}\n'
+
+        env_cfg = json.loads(stale_env.read_text())
+        dc_cfg = json.loads(stale_json.read_text())
+        assert env_cfg["languages"]["python"] is True
+        assert env_cfg["cicd"]["docker"] is True
+        assert env_cfg["languages"]["java"] is False
+        assert dc_cfg["build"]["args"]["INSTALL_PYTHON"] == "true"
+        assert dc_cfg["build"]["args"]["INSTALL_DOCKER"] == "true"
+        assert dc_cfg["build"]["args"]["INSTALL_JAVA"] == "false"
+
 def test_init_checkbox_includes_space_instruction():
     """Each checkbox prompt must include an instruction so users know to press Space."""
     from unittest.mock import MagicMock, patch, call

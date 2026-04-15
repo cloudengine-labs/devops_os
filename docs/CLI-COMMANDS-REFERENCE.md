@@ -438,7 +438,11 @@ python -m cli.devopsos init [--dir DIRECTORY]
 
 ### Output files
 
-`.devcontainer/devcontainer.env.json` and `.devcontainer/devcontainer.json`
+- Fresh target with no existing `.devcontainer/`:
+  `.devcontainer/devcontainer.env.json` and `.devcontainer/devcontainer.json`
+- Existing target with `.devcontainer/` already present:
+  `.devcontainer/` is preserved unchanged and generated output is written to
+  `.devcontainer.generated/devcontainer.env.json` and `.devcontainer.generated/devcontainer.json`
 
 ---
 

@@ -57,6 +57,7 @@ Before getting started, ensure you have the following installed:
    ```
 
    This creates `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json` with the correct build args, VS Code extensions, and forwarded ports for your selected tools.
+   If the target directory already has a `.devcontainer/`, `devopsos init` preserves it and writes a review copy to `.devcontainer.generated/` instead of overwriting the existing files.
 
    Run `python -m cli.scaffold_devcontainer --help` to see all options, including version overrides (e.g. `--python-version 3.12`).
 
