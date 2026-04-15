@@ -270,7 +270,7 @@ RUN if [ "$INSTALL_PMD" = "true" ]; then \
     mkdir -p /opt/pmd \
     && curl -fsSLo /opt/pmd.zip "https://github.com/pmd/pmd/releases/download/pmd_releases/${PMD_VERSION}/pmd-dist-${PMD_VERSION}-bin.zip" \
     && unzip /opt/pmd.zip -d /opt \
-    && mv /opt/pmd-bin-* /opt/pmd \
+    && mv /opt/pmd-* /opt/pmd \
     && rm /opt/pmd.zip \
     && echo 'export PATH=$PATH:/opt/pmd/bin' >> /etc/bash.bashrc; \
     fi
