@@ -1,0 +1,131 @@
+{
+  "demo": {
+    "title": "Chennai FOSS IDP Onboarding POC",
+    "app_name": "go-idp-service",
+    "status_model": [
+      "Connected",
+      "Analysed",
+      "Templates selected",
+      "Generated",
+      "Ready for review",
+      "Optional deploy enabled",
+      "Optional observability enabled"
+    ],
+    "todo": {
+      "jira": [
+        "Create onboarding tasks automatically",
+        "Link generated assets to epics or stories",
+        "Sync dashboard stage updates back to Jira"
+      ],
+      "cloud": [
+        "Add cloud target selection during onboarding",
+        "Generate cloud-specific deployment overlays",
+        "Show environment and rollout status in the dashboard"
+      ]
+    }
+  },
+  "repo": {
+    "repo_path": "/home/runner/work/devops_os/devops_os/feature-announcements/chennai-foss-2026/demo-source/go-idp-service",
+    "repo_url": "https://github.com/cloudengine-labs/go-idp-service-demo.git",
+    "branch": "master",
+    "commit": "c5f0654",
+    "primary_language": "go",
+    "language_counts": {
+      "go": 1
+    },
+    "recommended_templates": {
+      "ci": true,
+      "unittest": true,
+      "container": true,
+      "cd": false,
+      "sre": false
+    }
+  },
+  "selected_templates": {
+    "ci": true,
+    "unittest": true,
+    "container": true,
+    "cd": true,
+    "sre": true
+  },
+  "stages": [
+    {
+      "key": "connected",
+      "label": "Repo connected",
+      "state": "done"
+    },
+    {
+      "key": "analysed",
+      "label": "Branch / commit detected",
+      "state": "done"
+    },
+    {
+      "key": "language",
+      "label": "Language detected: go",
+      "state": "done"
+    },
+    {
+      "key": "ci",
+      "label": "CI scaffolded",
+      "state": "done"
+    },
+    {
+      "key": "unittest",
+      "label": "Unit tests scaffolded",
+      "state": "done"
+    },
+    {
+      "key": "container",
+      "label": "Containerization scaffolded",
+      "state": "done"
+    },
+    {
+      "key": "cd",
+      "label": "CD scaffolded",
+      "state": "done"
+    },
+    {
+      "key": "sre",
+      "label": "SRE scaffolded",
+      "state": "done"
+    },
+    {
+      "key": "review",
+      "label": "Ready for review",
+      "state": "done"
+    }
+  ],
+  "artifacts": [
+    {
+      "key": "ci",
+      "label": "GitHub Actions workflow",
+      "path": ".github/workflows/go-idp-service-complete.yml",
+      "preview": "name: go-idp-service CI/CD\n'on':\n  push:\n    branches:\n    - main\n  pull_request:\n    branches:\n    - main\n  workflow_dispatch:\n    inputs:\n      environment:\n        description: Environment to deploy to\n        require"
+    },
+    {
+      "key": "unittest",
+      "label": "Unit test scaffold",
+      "path": "unittest",
+      "preview": "# Makefile test targets for go-idp-service\n# Include these targets in your project Makefile\n\n.PHONY: test test-verbose test-race lint\n\n# Run all tests\ntest:\n\tgo test -v -count=1 ./...\n\n# Run tests with race-condition det"
+    },
+    {
+      "key": "container",
+      "label": "Dev container / container baseline",
+      "path": ".devcontainer/devcontainer.json",
+      "preview": "{\n  \"name\": \"DevOps OS - Multi-Language Development Environment\",\n  \"build\": {\n    \"dockerfile\": \"Dockerfile\",\n    \"args\": {\n      \"INSTALL_PYTHON\": \"false\",\n      \"INSTALL_JAVA\": \"false\",\n      \"INSTALL_JS\": \"false\","
+    },
+    {
+      "key": "cd",
+      "label": "ArgoCD deployment template",
+      "path": "argocd/application.yaml",
+      "preview": "apiVersion: argoproj.io/v1alpha1\nkind: Application\nmetadata:\n  name: go-idp-service\n  namespace: argocd\n  labels:\n    app.kubernetes.io/name: go-idp-service\nspec:\n  project: default\n  source:\n    repoURL: https://github."
+    },
+    {
+      "key": "sre",
+      "label": "SRE dashboard template",
+      "path": "sre/grafana-dashboard.json",
+      "preview": "{\n  \"__inputs\": [\n    {\n      \"name\": \"DS_PROMETHEUS\",\n      \"label\": \"Prometheus\",\n      \"type\": \"datasource\",\n      \"pluginId\": \"prometheus\"\n    }\n  ],\n  \"__requires\": [\n    {\n      \"type\": \"grafana\",\n      \"id\": \"graf"
+    }
+  ],
+  "generated_output_dir": "/home/runner/work/devops_os/devops_os/feature-announcements/chennai-foss-2026/demo-output/go-idp-service"
+}

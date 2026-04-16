@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevOps-OS IDP Onboarding Demo</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(11, 24, 43, 0.88);
+      --panel-soft: rgba(16, 34, 58, 0.74);
+      --line: rgba(165, 192, 225, 0.18);
+      --text: #ecf3ff;
+      --muted: #aebfd8;
+      --blue: #63b3ff;
+      --cyan: #6af0d2;
+      --green: #8ef0ad;
+      --gold: #ffd66b;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(99, 179, 255, 0.2), transparent 28%),
+        linear-gradient(145deg, #040b16 0%, var(--bg) 48%, #091b31 100%);
+      min-height: 100vh;
+    }
+
+    main {
+      width: min(1240px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 56px;
+    }
+
+    .hero, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(99, 179, 255, 0.12);
+      border: 1px solid rgba(99, 179, 255, 0.24);
+      color: var(--blue);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 16px 0 12px;
+      font-size: clamp(2.2rem, 4vw, 3.8rem);
+      line-height: 1.05;
+    }
+
+    p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+      gap: 24px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+    }
+
+    .meta-grid, .status-grid, .artifact-grid, .todo-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .meta-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 18px; }
+    .artifact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 18px; }
+    .todo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 18px; }
+
+    .card, .status, .artifact, .todo {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--panel-soft);
+      padding: 16px;
+    }
+
+    .card strong, .status strong, .artifact strong, .todo strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(165, 192, 225, 0.1);
+    }
+
+    .check-item input { width: 18px; height: 18px; }
+
+    button {
+      padding: 14px 18px;
+      border: 0;
+      border-radius: 14px;
+      color: #04101d;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .timeline-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pill {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pill.done { background: rgba(142, 240, 173, 0.14); color: var(--green); }
+    .pill.skipped { background: rgba(255, 214, 107, 0.12); color: var(--gold); }
+    .pill.pending { background: rgba(99, 179, 255, 0.12); color: var(--blue); }
+
+    pre {
+      margin: 10px 0 0;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(4, 10, 18, 0.78);
+      overflow: auto;
+      color: #d6e7ff;
+      font-size: 0.84rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    ul { padding-left: 18px; color: var(--muted); }
+    a { color: var(--cyan); }
+
+    @media (max-width: 960px) {
+      .layout, .meta-grid, .status-grid, .artifact-grid, .todo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="eyebrow">Chennai FOSS • IDP POC</span>
+      <h1>App onboarding as a lightweight internal developer platform</h1>
+      <p>
+        This demo turns DevOps-OS into a self-service onboarding experience: detect repo metadata,
+        infer the main language, preselect platform templates, generate delivery assets, and show
+        onboarding status in one dashboard.
+      </p>
+      <p>
+        <a href="./">Back to presentation</a>
+      </p>
+    </section>
+
+    <section class="layout">
+      <div class="panel stack">
+        <div>
+          <span class="eyebrow">Onboarding form</span>
+          <h2>Platform defaults</h2>
+        </div>
+
+        <div class="field">
+          <label class="label" for="repo-url">Git repo URL</label>
+          <input id="repo-url" type="text" readonly>
+        </div>
+        <div class="field">
+          <label class="label" for="repo-path">Local repo path</label>
+          <input id="repo-path" type="text" readonly>
+        </div>
+        <div class="meta-grid">
+          <div class="card">
+            <strong>Branch</strong>
+            <span id="branch-value">—</span>
+          </div>
+          <div class="card">
+            <strong>Commit</strong>
+            <span id="commit-value">—</span>
+          </div>
+          <div class="card">
+            <strong>Primary language</strong>
+            <span id="language-value">—</span>
+          </div>
+          <div class="card">
+            <strong>App name</strong>
+            <span id="app-value">—</span>
+          </div>
+        </div>
+
+        <div>
+          <div class="label">Template selection</div>
+          <div class="checklist">
+            <label class="check-item"><input id="toggle-ci" type="checkbox" disabled> CI workflow</label>
+            <label class="check-item"><input id="toggle-unittest" type="checkbox" disabled> Unit test scaffold</label>
+            <label class="check-item"><input id="toggle-container" type="checkbox" disabled> Container / devcontainer</label>
+            <label class="check-item"><input id="toggle-cd" type="checkbox" disabled> Optional CD / GitOps</label>
+            <label class="check-item"><input id="toggle-sre" type="checkbox" disabled> Optional SRE / monitoring</label>
+          </div>
+        </div>
+
+        <button id="generate-btn" type="button">Generate Platform Assets</button>
+        <p id="generate-note">The committed demo output below was generated by the new <code>devopsos onboard</code> command.</p>
+      </div>
+
+      <div class="stack">
+        <div class="panel">
+          <span class="eyebrow">Dashboard</span>
+          <h2>Status</h2>
+          <div id="timeline" class="timeline"></div>
+        </div>
+
+        <div class="panel">
+          <span class="eyebrow">Generated assets</span>
+          <h2>What the platform created</h2>
+          <div id="artifacts" class="artifact-grid"></div>
+        </div>
+
+        <div class="panel">
+          <span class="eyebrow">Next integrations</span>
+          <h2>TODO</h2>
+          <div class="todo-grid">
+            <div class="todo">
+              <strong>Jira / task management</strong>
+              <ul id="jira-list"></ul>
+            </div>
+            <div class="todo">
+              <strong>Cloud integration</strong>
+              <ul id="cloud-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const summaryUrl = "./demo-output/go-idp-service/onboarding-summary.json";
+    const generateBtn = document.getElementById("generate-btn");
+    const timeline = document.getElementById("timeline");
+    const artifacts = document.getElementById("artifacts");
+
+    function pillClass(state) {
+      return state === "done" ? "done" : state === "skipped" ? "skipped" : "pending";
+    }
+
+    function setValue(id, value) {
+      document.getElementById(id).value = value || "";
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value || "—";
+    }
+
+    function setToggle(id, value) {
+      document.getElementById(id).checked = Boolean(value);
+    }
+
+    function renderTimeline(stages) {
+      timeline.innerHTML = "";
+      stages.forEach((stage) => {
+        const item = document.createElement("div");
+        item.className = "timeline-item";
+        item.innerHTML = `<span>${stage.label}</span><span class="pill ${pillClass(stage.state)}">${stage.state}</span>`;
+        timeline.appendChild(item);
+      });
+    }
+
+    function renderArtifacts(items) {
+      artifacts.innerHTML = "";
+      items.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "artifact";
+        card.innerHTML = `
+          <strong>${item.label}</strong>
+          <div>${item.path}</div>
+          <pre>${item.preview || "Preview unavailable"}</pre>
+        `;
+        artifacts.appendChild(card);
+      });
+    }
+
+    function renderList(id, values) {
+      const root = document.getElementById(id);
+      root.innerHTML = "";
+      values.forEach((value) => {
+        const li = document.createElement("li");
+        li.textContent = value;
+        root.appendChild(li);
+      });
+    }
+
+    function bindSummary(summary) {
+      setValue("repo-url", summary.repo.repo_url);
+      setValue("repo-path", summary.repo.repo_path);
+      setText("branch-value", summary.repo.branch);
+      setText("commit-value", summary.repo.commit);
+      setText("language-value", summary.repo.primary_language);
+      setText("app-value", summary.demo.app_name);
+      setToggle("toggle-ci", summary.selected_templates.ci);
+      setToggle("toggle-unittest", summary.selected_templates.unittest);
+      setToggle("toggle-container", summary.selected_templates.container);
+      setToggle("toggle-cd", summary.selected_templates.cd);
+      setToggle("toggle-sre", summary.selected_templates.sre);
+      renderTimeline(summary.stages.map((stage, index) => ({...stage, state: index === 0 ? "pending" : "pending"})));
+      renderArtifacts(summary.artifacts);
+      renderList("jira-list", summary.demo.todo.jira);
+      renderList("cloud-list", summary.demo.todo.cloud);
+
+      generateBtn.addEventListener("click", () => {
+        const staged = summary.stages.map((stage) => ({...stage, state: "pending"}));
+        renderTimeline(staged);
+        staged.forEach((stage, index) => {
+          window.setTimeout(() => {
+            staged[index] = summary.stages[index];
+            renderTimeline(staged);
+          }, 320 * (index + 1));
+        });
+      }, { once: true });
+    }
+
+    fetch(summaryUrl)
+      .then((response) => response.json())
+      .then(bindSummary)
+      .catch(() => {
+        timeline.innerHTML = '<div class="timeline-item"><span>Unable to load onboarding summary</span><span class="pill skipped">error</span></div>';
+      });
+  </script>
+</body>
+</html>

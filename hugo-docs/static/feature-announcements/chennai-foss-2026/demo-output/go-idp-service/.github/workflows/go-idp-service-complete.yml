@@ -1,0 +1,99 @@
+name: go-idp-service CI/CD
+'on':
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        required: true
+        default: dev
+        type: choice
+        options:
+        - dev
+        - test
+        - staging
+        - prod
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up build environment
+      run: echo 'Setting up build environment for DevOps-OS'
+    - name: Build Go application
+      run: if [ -f go.mod ]; then go build -v ./...; fi
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: dist/
+        retention-days: 1
+  test:
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up test environment
+      run: echo 'Setting up test environment for DevOps-OS'
+    - name: Run Go tests
+      run: if [ -f go.mod ]; then go test -v ./...; fi
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: test-reports/
+        retention-days: 1
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml,./coverage/lcov.info
+        fail_ci_if_error: false
+  deploy:
+    needs:
+    - test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/yourorg/devops-os:latest
+      options: --user root
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Set up deployment environment
+      run: echo 'Setting up deployment environment for DevOps-OS'
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      run: 'echo "${{ secrets.REGISTRY_TOKEN }}" | docker login ghcr.io -u ${{ github.actor
+        }} --password-stdin
+
+        docker build -t ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name
+        }}:latest .
+
+        docker push ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name
+        }}:latest'
+    - name: Deploy with ArgoCD
+      if: github.ref == 'refs/heads/main'
+      run: 'argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD
+        --insecure
+
+        argocd app sync my-application
+
+        argocd app wait my-application --health'
+      env:
+        ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+        ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+        ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}

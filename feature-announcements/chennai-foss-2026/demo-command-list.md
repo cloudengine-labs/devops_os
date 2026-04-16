@@ -2,6 +2,11 @@
 
 This demo should show **Process-First DevOps automation for a Go service** with the fewest commands possible, while still telling the full story from **build → test → deploy → monitoring**.
 
+## IDP onboarding POC page
+
+- Open the lightweight onboarding dashboard: `feature-announcements/chennai-foss-2026/idp-onboarding-demo.html`
+- Demo output is backed by the generated sample app assets in `feature-announcements/chennai-foss-2026/demo-output/go-idp-service/`
+
 ## Demo objective
 
 Show that DevOps-OS can act as a **self-service internal developer platform (IDP) entry point** where platform teams publish reusable templates and application teams consume them with simple CLI commands.
