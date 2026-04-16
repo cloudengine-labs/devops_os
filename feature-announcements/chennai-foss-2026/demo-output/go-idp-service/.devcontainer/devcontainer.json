@@ -1,0 +1,81 @@
+{
+  "name": "DevOps OS - Multi-Language Development Environment",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {
+      "INSTALL_PYTHON": "false",
+      "INSTALL_JAVA": "false",
+      "INSTALL_JS": "false",
+      "INSTALL_RUBY": "false",
+      "INSTALL_CSHARP": "false",
+      "INSTALL_PHP": "false",
+      "INSTALL_RUST": "false",
+      "INSTALL_TYPESCRIPT": "false",
+      "INSTALL_KOTLIN": "false",
+      "INSTALL_C": "false",
+      "INSTALL_CPP": "false",
+      "INSTALL_GO": "true",
+      "INSTALL_DOCKER": "true",
+      "INSTALL_PODMAN": "false",
+      "INSTALL_TERRAFORM": "false",
+      "INSTALL_KUBECTL": "false",
+      "INSTALL_HELM": "false",
+      "INSTALL_GITHUB_ACTIONS": "true",
+      "INSTALL_JENKINS": "false",
+      "INSTALL_K9S": "false",
+      "INSTALL_KUSTOMIZE": "false",
+      "INSTALL_ARGOCD_CLI": "true",
+      "INSTALL_LENS": "false",
+      "INSTALL_KUBESEAL": "false",
+      "INSTALL_FLUX": "true",
+      "INSTALL_KIND": "false",
+      "INSTALL_MINIKUBE": "false",
+      "INSTALL_OPENSHIFT_CLI": "false",
+      "INSTALL_GRADLE": "false",
+      "INSTALL_MAVEN": "false",
+      "INSTALL_ANT": "false",
+      "INSTALL_MAKE": "false",
+      "INSTALL_CMAKE": "false",
+      "INSTALL_SONARQUBE": "false",
+      "INSTALL_CHECKSTYLE": "false",
+      "INSTALL_PMD": "false",
+      "INSTALL_ESLINT": "false",
+      "INSTALL_PYLINT": "false",
+      "INSTALL_NEXUS": "false",
+      "INSTALL_PROMETHEUS": "true",
+      "INSTALL_GRAFANA": "true",
+      "INSTALL_ELK": "false",
+      "GO_VERSION": "1.25.0",
+      "ARGOCD_VERSION": "3.3.6",
+      "FLUX_VERSION": "2.8.5",
+      "PROMETHEUS_VERSION": "3.5.1",
+      "GRAFANA_VERSION": "12.4.2"
+    }
+  },
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-azuretools.vscode-docker",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "mindaro.mindaro",
+        "argoproj.argocd-vscode-extension",
+        "weaveworks.vscode-gitops-tools",
+        "github.vscode-github-actions",
+        "github.copilot",
+        "github.copilot-chat",
+        "ms-vsliveshare.vsliveshare",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens"
+      ]
+    }
+  },
+  "forwardPorts": [
+    9090,
+    3000
+  ],
+  "postCreateCommand": "chmod +x /workspaces/.devcontainer/k8s-config-generator.py && ln -sf /workspaces/.devcontainer/k8s-config-generator.py /usr/local/bin/k8s-config-generator"
+}

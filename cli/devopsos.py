@@ -17,6 +17,7 @@ import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
 import cli.scaffold_unittest as scaffold_unittest
 import cli.process_first as process_first
+import cli.onboard as onboard
 from cli import __version__
 
 class ProcessFirstSection(str, enum.Enum):
@@ -61,6 +62,7 @@ def main(
       python -m cli.devopsos scaffold sre --help                     # SRE resources (SLOs, alerts, dashboards)
       python -m cli.devopsos scaffold devcontainer --help            # dev container configuration
       python -m cli.devopsos scaffold cicd --help                    # combined CI/CD scaffold
+      python -m cli.devopsos onboard --repo .                        # onboarding POC for a local repo
       python -m cli.devopsos process-first                           # Process-First SDLC overview
       python -m cli.devopsos --version                               # show installed version
     """
@@ -841,6 +843,48 @@ def init(
         typer.echo(f"Updated {devcontainer_json_path} with build args.")
         # Optionally, update Dockerfile (not strictly needed if it uses build args)
         typer.echo("Dockerfile uses build args; ensure it references the correct ARGs.")
+
+
+@app.command("onboard")
+def onboard_cmd(
+    repo: str = typer.Option(".", "--repo", help="Local git repository path to analyze"),
+    repo_url: str = typer.Option("", "--repo-url", help="Optional repository URL shown in the dashboard"),
+    name: str = typer.Option("demo-app", "--name", help="Application name used in generated assets"),
+    output_dir: str = typer.Option("", "--output-dir", help="Output directory for generated assets (defaults to repo path)"),
+    enable_ci: bool = typer.Option(True, "--enable-ci/--disable-ci", help="Generate GitHub Actions CI assets"),
+    enable_unittest: bool = typer.Option(True, "--enable-unittest/--disable-unittest", help="Generate unit test scaffold assets"),
+    enable_container: bool = typer.Option(True, "--enable-container/--disable-container", help="Generate container/devcontainer assets"),
+    enable_cd: bool = typer.Option(False, "--enable-cd/--disable-cd", help="Generate ArgoCD GitOps assets"),
+    enable_sre: bool = typer.Option(False, "--enable-sre/--disable-sre", help="Generate SRE/monitoring assets"),
+):
+    """Analyze a repo and scaffold a lightweight IDP onboarding POC."""
+    flags = [
+        "--repo", repo,
+        "--repo-url", repo_url,
+        "--name", name,
+        "--output-dir", output_dir,
+    ]
+    if enable_ci:
+        flags.append("--enable-ci")
+    else:
+        flags.append("--disable-ci")
+    if enable_unittest:
+        flags.append("--enable-unittest")
+    else:
+        flags.append("--disable-unittest")
+    if enable_container:
+        flags.append("--enable-container")
+    else:
+        flags.append("--disable-container")
+    if enable_cd:
+        flags.append("--enable-cd")
+    else:
+        flags.append("--disable-cd")
+    if enable_sre:
+        flags.append("--enable-sre")
+    else:
+        flags.append("--disable-sre")
+    _run_scaffold(onboard.main, flags)
 
 
 @app.command("process-first")

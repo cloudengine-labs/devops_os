@@ -31,6 +31,7 @@ def test_help():
     assert "DevOps-OS" in out
     assert "scaffold" in out
     assert "init" in out
+    assert "onboard" in out
     assert "Examples:" in out
 
 
@@ -117,6 +118,79 @@ def test_init_checkbox_includes_space_instruction():
         assert "space" in instruction.lower(), (
             f"instruction '{instruction}' should mention Space so users know how to select"
         )
+
+
+def test_onboard_help_shows_repo_option():
+    result = _run(["-m", "cli.devopsos", "onboard", "--help"])
+    assert result.returncode == 0
+    out = _strip_ansi(result.stdout)
+    assert "--repo" in out
+    assert "--enable-cd" in out
+    assert "--enable-sre" in out
+
+
+def test_onboard_generates_summary_and_assets_for_go_repo():
+    with tempfile.TemporaryDirectory() as repo_tmp, tempfile.TemporaryDirectory() as out_tmp:
+        repo = Path(repo_tmp)
+        (repo / "go.mod").write_text("module example.com/go-demo\n\ngo 1.22\n")
+        (repo / "main.go").write_text(
+            'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("hello")\n}\n'
+        )
+        subprocess.run(["git", "init"], cwd=repo, check=True, capture_output=True, text=True)
+        subprocess.run(
+            ["git", "config", "user.name", "DevOps OS"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.email", "devops-os@example.com"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        subprocess.run(["git", "add", "."], cwd=repo, check=True, capture_output=True, text=True)
+        subprocess.run(
+            ["git", "commit", "-m", "Initial commit"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        result = _run(
+            [
+                "-m",
+                "cli.devopsos",
+                "onboard",
+                "--repo",
+                repo_tmp,
+                "--repo-url",
+                "https://example.com/go-demo.git",
+                "--name",
+                "go-demo",
+                "--output-dir",
+                out_tmp,
+                "--enable-cd",
+                "--enable-sre",
+            ]
+        )
+        assert result.returncode == 0, result.stderr
+
+        summary_path = Path(out_tmp) / "onboarding-summary.json"
+        assert summary_path.exists()
+        summary = json.loads(summary_path.read_text())
+        assert summary["repo"]["primary_language"] == "go"
+        assert summary["repo"]["commit"]
+        assert summary["selected_templates"]["cd"] is True
+        assert summary["selected_templates"]["sre"] is True
+        assert (Path(out_tmp) / ".github" / "workflows" / "go-demo-complete.yml").exists()
+        assert (Path(out_tmp) / "unittest").exists()
+        assert (Path(out_tmp) / ".devcontainer" / "devcontainer.json").exists()
+        assert (Path(out_tmp) / "argocd" / "application.yaml").exists()
+        assert (Path(out_tmp) / "sre" / "grafana-dashboard.json").exists()
 
 def test_init_selections_written_to_config():
     """Selections made in the wizard must be reflected as True in devcontainer.env.json."""

@@ -1,0 +1,26 @@
+# Makefile test targets for go-idp-service
+# Include these targets in your project Makefile
+
+.PHONY: test test-verbose test-race lint
+
+# Run all tests
+test:
+	go test -v -count=1 ./...
+
+# Run tests with race-condition detector
+test-race:
+	go test -race -v ./...
+
+# Run tests with coverage
+test-cov:
+	go test -v -coverprofile=coverage_go_idp_service.out ./...
+	go tool cover -func=coverage_go_idp_service.out
+
+# Generate HTML coverage report
+test-coverage: test
+	go tool cover -html=coverage_go_idp_service.out -o coverage_go_idp_service.html
+	@echo "Coverage report: coverage_go_idp_service.html"
+
+# Run go vet and staticcheck
+lint:
+	go vet ./...

@@ -8,6 +8,7 @@ weight: 10
 Open the deck directly or use the embedded view below during the session.
 
 - [Open presentation in a new tab](../../../feature-announcements/chennai-foss-2026/)
+- [Open the IDP onboarding demo](../../../feature-announcements/chennai-foss-2026/idp-onboarding-demo.html)
 - [Open the Talks section]({{< relref "/docs/talks" >}})
 
 <div style="margin: 1rem 0 1.5rem; padding: 1rem; border: 1px solid #d0d7de; border-radius: 12px; background: rgba(175, 184, 193, 0.08);">
