@@ -285,17 +285,17 @@ python -m cli.devopsos scaffold devcontainer [options]
 | `--build-tools TOOLS` | `DEVOPS_OS_DEVCONTAINER_BUILD_TOOLS` | _(none)_ | Comma-separated build tools |
 | `--code-analysis TOOLS` | `DEVOPS_OS_DEVCONTAINER_CODE_ANALYSIS` | _(none)_ | Comma-separated analysis tools |
 | `--devops-tools TOOLS` | `DEVOPS_OS_DEVCONTAINER_DEVOPS_TOOLS` | _(none)_ | Comma-separated DevOps tools |
-| `--python-version VER` | `DEVOPS_OS_DEVCONTAINER_PYTHON_VERSION` | `3.11` | Python version |
-| `--java-version VER` | `DEVOPS_OS_DEVCONTAINER_JAVA_VERSION` | `17` | Java JDK version |
-| `--node-version VER` | `DEVOPS_OS_DEVCONTAINER_NODE_VERSION` | `20` | Node.js version |
-| `--go-version VER` | `DEVOPS_OS_DEVCONTAINER_GO_VERSION` | `1.21` | Go version |
-| `--k9s-version VER` | `DEVOPS_OS_DEVCONTAINER_K9S_VERSION` | `0.29.1` | K9s version |
-| `--argocd-version VER` | `DEVOPS_OS_DEVCONTAINER_ARGOCD_VERSION` | `2.8.4` | ArgoCD CLI version |
-| `--flux-version VER` | `DEVOPS_OS_DEVCONTAINER_FLUX_VERSION` | `2.1.2` | Flux version |
-| `--kustomize-version VER` | `DEVOPS_OS_DEVCONTAINER_KUSTOMIZE_VERSION` | `5.2.1` | Kustomize version |
-| `--nexus-version VER` | `DEVOPS_OS_DEVCONTAINER_NEXUS_VERSION` | `3.50.0` | Nexus version |
-| `--prometheus-version VER` | `DEVOPS_OS_DEVCONTAINER_PROMETHEUS_VERSION` | `2.45.0` | Prometheus version |
-| `--grafana-version VER` | `DEVOPS_OS_DEVCONTAINER_GRAFANA_VERSION` | `10.0.0` | Grafana version |
+| `--python-version VER` | `DEVOPS_OS_DEVCONTAINER_PYTHON_VERSION` | `3.12` | Python version |
+| `--java-version VER` | `DEVOPS_OS_DEVCONTAINER_JAVA_VERSION` | `21` | Java JDK version |
+| `--node-version VER` | `DEVOPS_OS_DEVCONTAINER_NODE_VERSION` | `22` | Node.js version |
+| `--go-version VER` | `DEVOPS_OS_DEVCONTAINER_GO_VERSION` | `1.25.0` | Go version |
+| `--k9s-version VER` | `DEVOPS_OS_DEVCONTAINER_K9S_VERSION` | `0.50.16` | K9s version |
+| `--argocd-version VER` | `DEVOPS_OS_DEVCONTAINER_ARGOCD_VERSION` | `3.3.6` | ArgoCD CLI version |
+| `--flux-version VER` | `DEVOPS_OS_DEVCONTAINER_FLUX_VERSION` | `2.8.5` | Flux version |
+| `--kustomize-version VER` | `DEVOPS_OS_DEVCONTAINER_KUSTOMIZE_VERSION` | `5.8.0` | Kustomize version |
+| `--nexus-version VER` | `DEVOPS_OS_DEVCONTAINER_NEXUS_VERSION` | `3.91.0` | Nexus version |
+| `--prometheus-version VER` | `DEVOPS_OS_DEVCONTAINER_PROMETHEUS_VERSION` | `3.5.1` | Prometheus version |
+| `--grafana-version VER` | `DEVOPS_OS_DEVCONTAINER_GRAFANA_VERSION` | `12.4.2` | Grafana version |
 | `--output-dir DIR` | `DEVOPS_OS_DEVCONTAINER_OUTPUT_DIR` | `.` | Root output directory |
 
 ### Output files
@@ -439,10 +439,9 @@ python -m cli.devopsos init [--dir DIRECTORY]
 ### Output files
 
 - Fresh target with no existing `.devcontainer/`:
-  `.devcontainer/devcontainer.env.json` and `.devcontainer/devcontainer.json`
+  `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.env.json`, and `.devcontainer/devcontainer.json`
 - Existing target with `.devcontainer/` already present:
-  `.devcontainer/` is preserved unchanged and generated output is written to
-  `.devcontainer.generated/devcontainer.env.json` and `.devcontainer.generated/devcontainer.json`
+  `.devcontainer/` is preserved unchanged and `init` stops without generating alternate output
 
 ---
 

@@ -7,6 +7,8 @@ weight: 60
 
 DevOps-OS provides a pre-configured VS Code Dev Container that gives you a consistent, multi-language development environment with all CI/CD tools included.
 
+The repository's old checked-in `.devcontainer` stack has been archived under `.legacy/devcontainer/`. Generate project-local `.devcontainer/` files with the CLI instead.
+
 ---
 
 ## Quick Start
@@ -81,7 +83,7 @@ This generates a dev container with:
 
 ## Manual Configuration
 
-Edit `.devcontainer/devcontainer.env.json` directly:
+Edit the generated `.devcontainer/devcontainer.env.json` directly:
 
 ```json
 {
@@ -161,4 +163,4 @@ code .
 
 1. Check the tool is `true` in `devcontainer.env.json`
 2. Rebuild the container: **"Dev Containers: Rebuild Container"**
-3. Run `python3 .devcontainer/configure.py` manually inside the container
+3. Regenerate the devcontainer files with `python -m cli.devopsos scaffold devcontainer ...` if you changed the selected tools

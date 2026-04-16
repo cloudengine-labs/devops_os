@@ -201,35 +201,13 @@ When integrating Kubernetes with your CI/CD pipelines:
 
 ## Configuring the DevOps-OS Container for Kubernetes
 
-You can customize which Kubernetes tools are included in your container by editing the `.devcontainer/devcontainer.env.json` file:
-
-```json
-{
-  "kubernetes": {
-    "k9s": true,
-    "kustomize": true,
-    "argocd_cli": true,
-    "lens": false,
-    "kubeseal": true,
-    "flux": true,
-    "kind": true,
-    "minikube": true,
-    "openshift_cli": false
-  },
-  "versions": {
-    "k9s": "0.29.1",
-    "argocd": "2.8.4",
-    "flux": "2.1.2",
-    "kustomize": "5.2.1"
-  }
-}
-```
-
-After modifying the configuration, run the configure script to update your container:
+You can customize which Kubernetes tools are included in your container by regenerating the devcontainer configuration with the desired Kubernetes tool flags:
 
 ```bash
-cd .devcontainer
-python configure.py
+python -m cli.devopsos scaffold devcontainer \
+  --languages python,go \
+  --cicd-tools docker,kubectl,helm \
+  --kubernetes-tools k9s,kustomize,argocd_cli,flux,kind,minikube
 ```
 
 Then rebuild your container to apply the changes.

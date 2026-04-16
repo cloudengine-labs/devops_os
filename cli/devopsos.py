@@ -18,6 +18,16 @@ import cli.scaffold_devcontainer as scaffold_devcontainer
 import cli.scaffold_unittest as scaffold_unittest
 import cli.process_first as process_first
 from cli import __version__
+from cli.devcontainer_templates import (
+    ALL_BUILD_TOOLS,
+    ALL_CICD,
+    ALL_CODE_ANALYSIS,
+    ALL_DEVOPS_TOOLS,
+    ALL_KUBERNETES,
+    ALL_LANGUAGES,
+    DEFAULT_VERSIONS,
+    write_generated_devcontainer,
+)
 
 class ProcessFirstSection(str, enum.Enum):
     """Valid sections for the process-first command."""
@@ -636,22 +646,6 @@ def init(
     typer.echo("Welcome to DevOps-OS Init Wizard!")
     typer.echo("Tools are grouped by Process-First DevOps principles (Systems Thinking).\n")
 
-    # ── Canonical tool lists ──────────────────────────────────────────────
-    ALL_LANGUAGES    = ["python", "java", "node", "ruby", "csharp", "php", "rust",
-                        "typescript", "kotlin", "c", "cpp", "javascript", "go"]
-    ALL_CICD         = ["docker", "podman", "terraform", "kubectl", "helm", "github_actions", "jenkins"]
-    ALL_KUBERNETES   = ["k9s", "kustomize", "argocd_cli", "lens", "kubeseal",
-                        "flux", "kind", "minikube", "openshift_cli"]
-    ALL_BUILD_TOOLS  = ["gradle", "maven", "ant", "make", "cmake"]
-    ALL_CODE_ANALYSIS = ["sonarqube", "checkstyle", "pmd", "eslint", "pylint"]
-    ALL_DEVOPS_TOOLS  = ["nexus", "prometheus", "grafana", "elk", "jenkins"]
-
-    versions_defaults = {
-        "python": "3.12", "java": "21", "node": "22", "go": "1.25.0", "nexus": "3.91.0",
-        "prometheus": "3.5.1", "grafana": "12.4.2", "k9s": "0.50.16", "argocd": "3.3.6",
-        "flux": "2.8.5", "kustomize": "5.8.0", "jenkins": "2.440.1"
-    }
-
     # ── Wizard groups aligned with Process-First DevOps principles ────────
     # Each group maps to a DevOps stage in the Systems Thinking value stream.
     wizard_groups = {
@@ -702,10 +696,10 @@ def init(
     all_selected = {tool for tools in selected_by_group.values() for tool in tools}
     for tool in all_selected:
         vkey = "argocd" if tool == "argocd_cli" else tool
-        if vkey in versions_defaults:
+        if vkey in DEFAULT_VERSIONS:
             selected_versions[vkey] = inquirer.text(
                 message=f"{tool.title()} version:",
-                default=versions_defaults[vkey],
+                default=DEFAULT_VERSIONS[vkey],
             ).execute()
 
     # ── Map wizard selections back to legacy JSON structure ───────────────
@@ -763,98 +757,18 @@ def init(
         raise typer.Exit(1)
 
     target_root = Path(directory)
-    primary_devcontainer_dir = target_root / ".devcontainer"
-    preserve_existing = primary_devcontainer_dir.exists()
-    if preserve_existing:
-        devcontainer_dir = target_root / ".devcontainer.generated"
+    devcontainer_dir = target_root / ".devcontainer"
+    if devcontainer_dir.exists():
         typer.echo(
-            f"Existing {primary_devcontainer_dir} detected. Preserving it and writing "
-            f"generated output to {devcontainer_dir}."
+            f"Existing {devcontainer_dir} detected. Preserving it and skipping devcontainer generation."
         )
-        typer.echo(
-            ".devcontainer.generated/ is a review/reference copy and may be overwritten "
-            "by later init runs."
-        )
-    else:
-        devcontainer_dir = primary_devcontainer_dir
+        typer.echo("Remove or rename the existing .devcontainer/ directory if you want init to generate a new one.")
+        raise typer.Exit(0)
 
-    devcontainer_dir.mkdir(parents=True, exist_ok=True)
-    env_json_path = devcontainer_dir / "devcontainer.env.json"
-    with open(env_json_path, "w") as f:
-        json.dump(config, f, indent=2)
-    typer.echo(f"Wrote configuration to {env_json_path}")
-
-    # Offer to generate Dockerfile/devcontainer.json
-    if inquirer.confirm(message="Generate Dockerfile and devcontainer.json now?", default=True).execute():
-        # Map config to build args for devcontainer.json
-        build_args = {}
-        # Languages
-        lang_map = {
-            "python": "INSTALL_PYTHON", "java": "INSTALL_JAVA", "node": "INSTALL_JS",
-            "ruby": "INSTALL_RUBY", "csharp": "INSTALL_CSHARP", "php": "INSTALL_PHP",
-            "rust": "INSTALL_RUST", "typescript": "INSTALL_TYPESCRIPT",
-            "kotlin": "INSTALL_KOTLIN", "c": "INSTALL_C", "cpp": "INSTALL_CPP",
-            "javascript": "INSTALL_JS", "go": "INSTALL_GO"
-        }
-        for lang, arg in lang_map.items():
-            build_args[arg] = str(config["languages"].get(lang, False)).lower()
-        # CICD (includes container runtimes docker/podman)
-        cicd_map = {
-            "docker": "INSTALL_DOCKER", "podman": "INSTALL_PODMAN",
-            "terraform": "INSTALL_TERRAFORM",
-            "kubectl": "INSTALL_KUBECTL", "helm": "INSTALL_HELM",
-            "github_actions": "INSTALL_GITHUB_ACTIONS", "jenkins": "INSTALL_JENKINS"
-        }
-        for tool, arg in cicd_map.items():
-            build_args[arg] = str(config["cicd"].get(tool, False)).lower()
-        # Kubernetes
-        k8s_map = {
-            "k9s": "INSTALL_K9S", "kustomize": "INSTALL_KUSTOMIZE",
-            "argocd_cli": "INSTALL_ARGOCD_CLI", "lens": "INSTALL_LENS",
-            "kubeseal": "INSTALL_KUBESEAL", "flux": "INSTALL_FLUX",
-            "kind": "INSTALL_KIND", "minikube": "INSTALL_MINIKUBE",
-            "openshift_cli": "INSTALL_OPENSHIFT_CLI"
-        }
-        for tool, arg in k8s_map.items():
-            build_args[arg] = str(config["kubernetes"].get(tool, False)).lower()
-        # Build tools
-        build_map = {
-            "gradle": "INSTALL_GRADLE", "maven": "INSTALL_MAVEN", "ant": "INSTALL_ANT",
-            "make": "INSTALL_MAKE", "cmake": "INSTALL_CMAKE"
-        }
-        for tool, arg in build_map.items():
-            build_args[arg] = str(config["build_tools"].get(tool, False)).lower()
-        # Code analysis
-        analysis_map = {
-            "sonarqube": "INSTALL_SONARQUBE", "checkstyle": "INSTALL_CHECKSTYLE",
-            "pmd": "INSTALL_PMD", "eslint": "INSTALL_ESLINT", "pylint": "INSTALL_PYLINT"
-        }
-        for tool, arg in analysis_map.items():
-            build_args[arg] = str(config["code_analysis"].get(tool, False)).lower()
-        # DevOps tools
-        devops_map = {
-            "nexus": "INSTALL_NEXUS", "prometheus": "INSTALL_PROMETHEUS",
-            "grafana": "INSTALL_GRAFANA", "elk": "INSTALL_ELK",
-            "jenkins": "INSTALL_JENKINS"
-        }
-        for tool, arg in devops_map.items():
-            build_args[arg] = str(config["devops_tools"].get(tool, False)).lower()
-        # Versions (only for selected)
-        for k, v in config["versions"].items():
-            build_args[k.upper() + ("_VERSION" if k not in ["k9s", "argocd", "flux", "kustomize"] else "")] = v
-        # Update devcontainer.json
-        devcontainer_json_path = devcontainer_dir / "devcontainer.json"
-        if devcontainer_json_path.exists():
-            with open(devcontainer_json_path) as f:
-                devcontainer_json = json.load(f)
-        else:
-            devcontainer_json = {"build": {"dockerfile": "Dockerfile", "args": {}}}
-        devcontainer_json.setdefault("build", {})["args"] = build_args
-        with open(devcontainer_json_path, "w") as f:
-            json.dump(devcontainer_json, f, indent=2)
-        typer.echo(f"Updated {devcontainer_json_path} with build args.")
-        # Optionally, update Dockerfile (not strictly needed if it uses build args)
-        typer.echo("Dockerfile uses build args; ensure it references the correct ARGs.")
+    written = write_generated_devcontainer(devcontainer_dir, config)
+    typer.echo(f"Wrote configuration to {written['env']}")
+    typer.echo(f"Wrote Dockerfile to {written['dockerfile']}")
+    typer.echo(f"Wrote devcontainer.json to {written['json']}")
 
 
 @app.command("process-first")

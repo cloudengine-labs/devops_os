@@ -303,7 +303,8 @@ python -m cli.devopsos scaffold gha --help
 
 ```text
 devops_os/
-├── .devcontainer/      # Dev container config (Dockerfile, devcontainer.json, setup scripts)
+├── .devcontainer/      # Redirect note; active devcontainer generation lives in cli/templates/devcontainer/
+├── .legacy/            # Archived repo-local devcontainer implementation
 ├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
 ├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, unittest, devopsos)
 ├── kubernetes/         # Kubernetes manifest generator
@@ -362,12 +363,12 @@ The pre-configured dev container gives you a consistent multi-language environme
 </details>
 
 
-The repo-local dev container now uses a hybrid model:
+Dev container generation now uses two supported paths:
 
-- Dev Container Features install the mainstream runtimes
-- The repo Dockerfile keeps Ubuntu 24.04 plus unsupported language/toolbox extras
-- `.devcontainer/devcontainer.env.json` remains the single control plane
-- Toolbox mode is the repo default, so all languages stay available unless you turn them off
+- `python -m cli.devopsos init` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
+- `python -m cli.devopsos scaffold devcontainer` generates the legacy two-file `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json`.
+
+The old checked-in repo-local `.devcontainer` stack has been archived under `.legacy/devcontainer/`.
 
 Generate a dev container configuration from the CLI instead of editing JSON by hand:
 
@@ -380,7 +381,7 @@ python -m cli.devopsos scaffold devcontainer \
   --devops-tools prometheus,grafana
 ```
 
-You can also customize `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then reopen in VS Code. For this repository, the checked-in file defaults to the full toolbox profile.
+For generated projects, you can customize the generated `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then rebuild or reopen in VS Code.
 
 ---
 
