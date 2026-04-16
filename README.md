@@ -399,6 +399,37 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 
 ---
 
+## 🌐 Hugo branch preview
+
+The production GitHub Pages site is still deployed only from `main`, but you can test the Hugo-hosted Chennai FOSS IDP UI from your current branch in two safe ways.
+
+### Local preview
+
+```bash
+cd /home/runner/work/devops_os/devops_os/hugo-docs
+hugo mod tidy
+hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/
+```
+
+Then verify:
+
+- `http://localhost:1313/docs/talks/chennai-foss-2026/`
+- `http://localhost:1313/feature-announcements/chennai-foss-2026/idp-onboarding-demo.html`
+
+### GitHub Actions preview artifact
+
+Use the **Build Hugo Preview** workflow on your branch. It builds the Hugo site without deploying to the shared GitHub Pages environment and uploads the generated `public/` directory as an artifact.
+
+After downloading the artifact, serve it locally:
+
+```bash
+python -m http.server 1313 -d public
+```
+
+For a one-off hosted verification, you can still manually run **Deploy Hugo Documentation** on your branch with `workflow_dispatch`, but that updates the shared Pages site.
+
+---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Whether it's a bug fix, a new scaffold generator, or documentation improvement — feel free to open an issue or submit a pull request.

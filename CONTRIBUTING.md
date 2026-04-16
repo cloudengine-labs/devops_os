@@ -32,6 +32,16 @@ Please be respectful and constructive in all interactions. We are committed to p
    ```bash
    python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py -v
    ```
+4. If your change touches the Hugo docs or the Chennai FOSS demo pages, preview them from your branch before opening a PR:
+   ```bash
+   cd /home/runner/work/devops_os/devops_os/hugo-docs
+   hugo mod tidy
+   hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/
+   ```
+   Verify:
+   - `http://localhost:1313/docs/talks/chennai-foss-2026/`
+   - `http://localhost:1313/feature-announcements/chennai-foss-2026/idp-onboarding-demo.html`
+   You can also run the **Build Hugo Preview** workflow to get a downloadable preview artifact without deploying to the production Pages site.
 
 ---
 

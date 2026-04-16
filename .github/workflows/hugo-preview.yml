@@ -1,0 +1,94 @@
+name: Build Hugo Preview
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/hugo-preview.yml"
+      - "hugo-docs/**"
+      - "feature-announcements/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/pages.yml"
+      - ".github/workflows/hugo-preview.yml"
+      - "hugo-docs/**"
+      - "feature-announcements/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "hugo-preview-${{ github.ref }}"
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+    env:
+      HUGO_VERSION: "0.158.0"
+      PREVIEW_BASEURL: "http://127.0.0.1:1313/"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Install Hugo CLI
+        run: |
+          wget -O "${{ runner.temp }}/hugo.deb" \
+            "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i "${{ runner.temp }}/hugo.deb"
+
+      - name: Download Hugo modules
+        working-directory: ./hugo-docs
+        run: hugo mod tidy
+
+      - name: Build Hugo preview site
+        working-directory: ./hugo-docs
+        env:
+          HUGO_ENVIRONMENT: production
+          HUGO_BASEURL: ${{ env.PREVIEW_BASEURL }}
+        run: hugo --gc --minify
+
+      - name: Upload Hugo preview artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hugo-preview-${{ github.run_number }}
+          path: ./hugo-docs/public
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publish preview instructions
+        run: |
+          {
+            echo "## Hugo branch preview"
+            echo
+            echo "Artifact: \`hugo-preview-${{ github.run_number }}\`"
+            echo
+            echo "After downloading the artifact, serve the extracted \`public/\` directory locally:"
+            echo
+            echo "\`\`\`bash"
+            echo "python -m http.server 1313 -d public"
+            echo "\`\`\`"
+            echo
+            echo "Then verify:"
+            echo
+            echo "- http://127.0.0.1:1313/docs/talks/chennai-foss-2026/"
+            echo "- http://127.0.0.1:1313/feature-announcements/chennai-foss-2026/idp-onboarding-demo.html"
+            echo
+            echo "For a one-off hosted check, you can still run the production Pages workflow manually on this branch, but that deploys to the shared GitHub Pages environment."
+          } >> "$GITHUB_STEP_SUMMARY"
