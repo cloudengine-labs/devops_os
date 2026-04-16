@@ -372,7 +372,7 @@
       setToggle("toggle-container", summary.selected_templates.container);
       setToggle("toggle-cd", summary.selected_templates.cd);
       setToggle("toggle-sre", summary.selected_templates.sre);
-      renderTimeline(summary.stages.map((stage, index) => ({...stage, state: index === 0 ? "pending" : "pending"})));
+      renderTimeline(summary.stages.map((stage) => ({...stage, state: "pending"})));
       renderArtifacts(summary.artifacts);
       renderList("jira-list", summary.demo.todo.jira);
       renderList("cloud-list", summary.demo.todo.cloud);
