@@ -1,0 +1,7 @@
+go: module example.com/go-project
+
+# indirect
+github.com/gin-gonic/gin v1.7.4 // indirect
+github.com/stretchr/testify v1.7.0 // indirect
+golang.org/x/net v0.0.0-20220316182356-1c4e7f4e8b2e // indirect
+golang.org/x/sys v0.0.0-20220316182356-1c4e7f4e8b2e // indirect
