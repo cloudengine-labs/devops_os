@@ -6,12 +6,37 @@ weight: 12
 # Process-First Philosophy
 
 > *"Tools are only as good as the processes that govern them."*  
-> — Saravanan Gnanagur, Founder, CloudEngineLabs
+> — Saravanan Gnanaguru, Founder, CloudEngine Labs
 
 [cloudenginelabs.io](https://cloudenginelabs.io) is a **Process-First SDLC automation company**.  
 DevOps-OS embeds this philosophy as a first-class CLI command so every engineer on your team can understand *why* before they run *how*.
 
 ---
+
+## Thought Leaders on Process-First & Systems Thinking
+
+> *"The First Way emphasises the performance of the entire system, as opposed to
+> the performance of a specific silo of work or department."*
+>
+> — **Gene Kim, Kevin Behr, and George Spafford** (*The Phoenix Project* / *The DevOps Handbook*)
+
+Gene Kim, Kevin Behr, and George Spafford define the **"Three Ways"** of DevOps in
+*The Phoenix Project* and *The DevOps Handbook*. The **First Way** focuses on
+**Systems Thinking** — optimising the flow from development through operations to
+the customer, rather than maximising the throughput of any single stage.
+
+> *"DevOps is about fixing the broken, inefficient processes between developers
+> and operations before introducing new tools."*
+>
+> — **Patrick Debois** (Founder of DevOpsDays)
+
+Patrick Debois, as the founder of DevOpsDays, emphasised that cultural and
+process problems — not technology gaps — are the root cause of slow, unreliable
+software delivery. He showed that bringing developers and operations together
+through shared processes is the prerequisite for any tooling to succeed.
+
+---
+
 
 ## The `process-first` command
 
