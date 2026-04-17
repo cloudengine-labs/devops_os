@@ -80,6 +80,7 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 | Guide | Description |
 |-------|-------------|
 | [Getting Started]({{< relref "/docs/getting-started" >}}) | Zero to first pipeline in 5 minutes |
+| [Platform Engineering IDP]({{< relref "/docs/platform-engineering" >}}) | Conceptual self-service IDP flow from templates to generated automation |
 | [Process-First Philosophy]({{< relref "/docs/getting-started/process-first" >}}) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [Quick Start Reference]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands at a glance |
 | [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) | Generate GHA workflows |

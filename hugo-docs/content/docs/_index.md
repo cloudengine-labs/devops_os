@@ -18,6 +18,7 @@ Welcome to the DevOps-OS documentation. Use the sidebar to navigate between sect
 | Section | What you'll find |
 |---------|-----------------|
 | [Getting Started]({{< relref "/docs/getting-started" >}}) | Prerequisites, installation, first pipeline |
+| [Platform Engineering IDP]({{< relref "/docs/platform-engineering" >}}) | Conceptual self-service flow from templates to generated automation |
 | [Quick Start]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands with output paths |
 | [CI/CD Generators]({{< relref "/docs/ci-cd" >}}) | GitHub Actions, GitLab CI, Jenkins |
 | [GitOps & ArgoCD]({{< relref "/docs/gitops" >}}) | ArgoCD and Flux CD configs |
