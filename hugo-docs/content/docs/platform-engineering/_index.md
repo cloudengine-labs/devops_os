@@ -73,7 +73,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
     <polygon points="970,215 959,217 968,226" fill="#475569"/>
 
     <rect x="40" y="335" width="1100" height="52" rx="12" fill="#111827"/>
-    <text x="590" y="366" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">Templates → IDP UI → Git code commit → Developer selects templates → Select required automation stages → Click submit → Outputs</text>
+    <text x="590" y="366" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">Templates → IDP UI → Git code commit → Select templates → Select automation stages → Submit → Outputs</text>
   </svg>
 </div>
 
