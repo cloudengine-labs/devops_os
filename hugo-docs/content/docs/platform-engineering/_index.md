@@ -14,7 +14,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
 
 <div style="overflow-x:auto; margin: 1rem 0;">
   <svg viewBox="0 0 1180 430" role="img" aria-labelledby="idp-title idp-desc" xmlns="http://www.w3.org/2000/svg" style="width:100%; min-width:980px; height:auto; border:1px solid #d1d5db; border-radius:12px; background:#ffffff;">
-    <title id="idp-title">Platform engineering IDP conceptual flow</title>
+    <title id="idp-title">Platform Engineering IDP conceptual flow</title>
     <desc id="idp-desc">Platform team templates flow into an IDP UI. A developer works from git code commit context, selects templates, chooses automation stages, submits, and receives generated delivery artifacts.</desc>
 
     <rect x="30" y="60" width="180" height="90" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
@@ -28,7 +28,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
     <text x="350" y="138" text-anchor="middle" font-size="15" fill="#1f2937">Guardrails + standards</text>
 
     <rect x="490" y="60" width="180" height="90" rx="14" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
-    <text x="580" y="92" text-anchor="middle" font-size="21" font-weight="700" fill="#4c1d95">Git code commit</text>
+    <text x="580" y="92" text-anchor="middle" font-size="21" font-weight="700" fill="#4c1d95">Git repo / commit</text>
     <text x="580" y="118" text-anchor="middle" font-size="15" fill="#1f2937">Repository context</text>
     <text x="580" y="138" text-anchor="middle" font-size="15" fill="#1f2937">App or service intent</text>
 
@@ -73,7 +73,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
     <polygon points="970,215 959,217 968,226" fill="#475569"/>
 
     <rect x="40" y="335" width="1100" height="52" rx="12" fill="#111827"/>
-    <text x="590" y="366" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">Templates → IDP UI → Git code commit → Select templates → Select automation stages → Submit → Outputs</text>
+    <text x="590" y="366" text-anchor="middle" font-size="18" font-weight="700" fill="#ffffff">Templates → IDP UI → Git repo / commit → Select templates → Select automation stages → Submit → Outputs</text>
   </svg>
 </div>
 
