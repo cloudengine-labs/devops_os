@@ -1,0 +1,309 @@
+# DevOps OS dev container (Ubuntu LTS optimized)
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG JAVA_VERSION=21
+ARG TARGETOS=linux
+ARG TARGETARCH=amd64
+
+# Unsupported language/runtime toggles
+ARG INSTALL_CSHARP=false
+ARG INSTALL_KOTLIN=false
+ARG INSTALL_C=false
+ARG INSTALL_CPP=false
+
+# CI/CD + platform tools
+ARG INSTALL_DOCKER=true
+ARG INSTALL_PODMAN=false
+ARG INSTALL_TERRAFORM=true
+ARG TERRAFORM_VERSION=1.14.7
+ARG INSTALL_KUBECTL=true
+ARG INSTALL_HELM=true
+ARG HELM_VERSION=4.0.1
+ARG INSTALL_GITHUB_ACTIONS=true
+ARG ACTIONS_RUNNER_VERSION=2.330.0
+
+# Kubernetes tools
+ARG INSTALL_K9S=true
+ARG K9S_VERSION=0.50.16
+ARG INSTALL_KUSTOMIZE=true
+ARG KUSTOMIZE_VERSION=5.8.0
+ARG INSTALL_ARGOCD_CLI=true
+ARG ARGOCD_VERSION=3.3.6
+ARG INSTALL_LENS=false
+ARG INSTALL_KUBESEAL=true
+ARG KUBESEAL_VERSION=0.33.1
+ARG INSTALL_FLUX=true
+ARG FLUX_VERSION=2.8.5
+ARG INSTALL_KIND=true
+ARG KIND_VERSION=0.31.0
+ARG INSTALL_MINIKUBE=true
+ARG MINIKUBE_VERSION=1.37.0
+ARG INSTALL_OPENSHIFT_CLI=false
+
+# Build tools
+ARG INSTALL_MAKE=true
+ARG INSTALL_CMAKE=true
+
+# Code analysis tools
+ARG INSTALL_SONARQUBE=true
+ARG SONAR_SCANNER_VERSION=8.0.1.6346
+ARG INSTALL_CHECKSTYLE=true
+ARG CHECKSTYLE_VERSION=12.1.2
+ARG INSTALL_PMD=true
+ARG PMD_VERSION=7.18.0
+
+# DevOps tools
+ARG INSTALL_NEXUS=true
+ARG NEXUS_VERSION=3.91.0
+ARG INSTALL_PROMETHEUS=true
+ARG PROMETHEUS_VERSION=3.5.1
+ARG INSTALL_GRAFANA=true
+ARG GRAFANA_VERSION=12.4.2
+ARG INSTALL_ELK=true
+ARG INSTALL_JENKINS=false
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/opt/sonar-scanner/bin:/opt/pmd/bin:${PATH}"
+ENV SHELL=/bin/bash
+
+# Base packages shared by most install flows.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      apt-transport-https \
+      build-essential \
+      ca-certificates \
+      curl \
+      git \
+      gnupg \
+      jq \
+      lsb-release \
+      software-properties-common \
+      tar \
+      unzip \
+      wget \
+      xz-utils
+
+# Unsupported language/toolchain installers kept in the repo layer.
+RUN if [ "${INSTALL_CSHARP}" = "true" ]; then \
+      wget -q https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb -O /tmp/packages-microsoft-prod.deb \
+      && dpkg -i /tmp/packages-microsoft-prod.deb \
+      && rm -f /tmp/packages-microsoft-prod.deb \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends dotnet-sdk-8.0; \
+    fi \
+    && if [ "${INSTALL_KOTLIN}" = "true" ]; then \
+      apt-get update && apt-get install -y --no-install-recommends kotlin; \
+    fi \
+    && if [ "${INSTALL_C}" = "true" ] || [ "${INSTALL_CPP}" = "true" ]; then \
+      apt-get update && apt-get install -y --no-install-recommends clang gdb; \
+    fi
+
+# Docker CLI / Podman
+RUN if [ "${INSTALL_DOCKER}" = "true" ]; then \
+      install -m 0755 -d /etc/apt/keyrings \
+      && curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \
+      && chmod a+r /etc/apt/keyrings/docker.gpg \
+      && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends docker-ce-cli docker-buildx-plugin docker-compose-plugin; \
+    fi \
+    && if [ "${INSTALL_PODMAN}" = "true" ]; then \
+      apt-get update \
+      && apt-get install -y --no-install-recommends podman; \
+    fi
+
+# Terraform (vendor-pinned binary + checksum)
+RUN if [ "${INSTALL_TERRAFORM}" = "true" ]; then \
+      case "${TARGETARCH}" in \
+        amd64|x86_64) TF_ARCH="amd64" ;; \
+        arm64|aarch64) TF_ARCH="arm64" ;; \
+        *) echo "Unsupported TARGETARCH for Terraform: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac \
+      && TF_BASE="terraform_${TERRAFORM_VERSION}_linux_${TF_ARCH}" \
+      && curl -fsSLo "/tmp/${TF_BASE}.zip" "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/${TF_BASE}.zip" \
+      && curl -fsSLo /tmp/terraform_SHA256SUMS "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_SHA256SUMS" \
+      && grep " ${TF_BASE}.zip$" /tmp/terraform_SHA256SUMS | sha256sum -c - \
+      && unzip -q "/tmp/${TF_BASE}.zip" -d /usr/local/bin \
+      && rm -f "/tmp/${TF_BASE}.zip" /tmp/terraform_SHA256SUMS; \
+    fi
+
+# kubectl
+RUN if [ "${INSTALL_KUBECTL}" = "true" ]; then \
+      case "${TARGETARCH}" in \
+        amd64|x86_64) K_ARCH="amd64" ;; \
+        arm64|aarch64) K_ARCH="arm64" ;; \
+        *) echo "Unsupported TARGETARCH for kubectl: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac \
+      && KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt)" \
+      && curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${K_ARCH}/kubectl" \
+      && curl -fsSLo /tmp/kubectl.sha256 "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/${TARGETOS}/${K_ARCH}/kubectl.sha256" \
+      && echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check --status \
+      && install -o root -g root -m 0755 /tmp/kubectl /usr/local/bin/kubectl \
+      && rm -f /tmp/kubectl /tmp/kubectl.sha256; \
+    fi
+
+# Helm (vendor-pinned binary + checksum)
+RUN if [ "${INSTALL_HELM}" = "true" ]; then \
+      case "${TARGETARCH}" in \
+        amd64|x86_64) H_ARCH="amd64" ;; \
+        arm64|aarch64) H_ARCH="arm64" ;; \
+        *) echo "Unsupported TARGETARCH for Helm: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac \
+      && HELM_TGZ="helm-v${HELM_VERSION}-${TARGETOS}-${H_ARCH}.tar.gz" \
+      && curl -fsSLo "/tmp/${HELM_TGZ}" "https://get.helm.sh/${HELM_TGZ}" \
+      && curl -fsSLo "/tmp/${HELM_TGZ}.sha256sum" "https://get.helm.sh/${HELM_TGZ}.sha256sum" \
+      && (cd /tmp && sha256sum -c "${HELM_TGZ}.sha256sum") \
+      && tar -xzf "/tmp/${HELM_TGZ}" -C /tmp \
+      && install -m 0755 "/tmp/${TARGETOS}-${H_ARCH}/helm" /usr/local/bin/helm \
+      && rm -rf "/tmp/${HELM_TGZ}" "/tmp/${HELM_TGZ}.sha256sum" "/tmp/${TARGETOS}-${H_ARCH}"; \
+    fi
+
+# Kubernetes utility CLIs
+RUN case "${TARGETARCH}" in \
+      amd64|x86_64) BIN_ARCH="amd64" ;; \
+      arm64|aarch64) BIN_ARCH="arm64" ;; \
+      *) echo "Unsupported TARGETARCH for Kubernetes CLIs: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac \
+    && if [ "${INSTALL_K9S}" = "true" ]; then \
+      mkdir -p /tmp/k9s && cd /tmp/k9s \
+      && curl -fsSLo k9s.tar.gz "https://github.com/derailed/k9s/releases/download/v${K9S_VERSION}/k9s_Linux_${BIN_ARCH}.tar.gz" \
+      && tar -xzf k9s.tar.gz \
+      && install -m 0755 k9s /usr/local/bin/k9s \
+      && rm -rf /tmp/k9s; \
+    fi \
+    && if [ "${INSTALL_KUSTOMIZE}" = "true" ]; then \
+      curl -fsSLo /tmp/kustomize.tar.gz "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_${BIN_ARCH}.tar.gz" \
+      && mkdir -p /tmp/kustomize \
+      && tar -xzf /tmp/kustomize.tar.gz -C /tmp/kustomize \
+      && install -m 0755 /tmp/kustomize/kustomize /usr/local/bin/kustomize \
+      && rm -rf /tmp/kustomize /tmp/kustomize.tar.gz; \
+    fi \
+    && if [ "${INSTALL_ARGOCD_CLI}" = "true" ]; then \
+      curl -fsSLo /usr/local/bin/argocd "https://github.com/argoproj/argo-cd/releases/download/v${ARGOCD_VERSION}/argocd-linux-${BIN_ARCH}" \
+      && chmod +x /usr/local/bin/argocd; \
+    fi \
+    && if [ "${INSTALL_KUBESEAL}" = "true" ]; then \
+      curl -fsSLo /tmp/kubeseal.tar.gz "https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-${BIN_ARCH}.tar.gz" \
+      && tar -xzf /tmp/kubeseal.tar.gz -C /tmp kubeseal \
+      && install -m 0755 /tmp/kubeseal /usr/local/bin/kubeseal \
+      && rm -f /tmp/kubeseal /tmp/kubeseal.tar.gz; \
+    fi \
+    && if [ "${INSTALL_FLUX}" = "true" ]; then \
+      curl -fsSL https://fluxcd.io/install.sh | FLUX_VERSION="v${FLUX_VERSION}" bash; \
+    fi \
+    && if [ "${INSTALL_KIND}" = "true" ]; then \
+      curl -fsSLo /usr/local/bin/kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/kind-${TARGETOS}-${BIN_ARCH}" \
+      && chmod +x /usr/local/bin/kind; \
+    fi \
+    && if [ "${INSTALL_MINIKUBE}" = "true" ]; then \
+      curl -fsSLo /usr/local/bin/minikube "https://storage.googleapis.com/minikube/releases/v${MINIKUBE_VERSION}/minikube-${TARGETOS}-${BIN_ARCH}" \
+      && chmod +x /usr/local/bin/minikube; \
+    fi \
+    && if [ "${INSTALL_OPENSHIFT_CLI}" = "true" ]; then \
+      curl -fsSLo /tmp/oc.tar.gz "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz" \
+      && mkdir -p /tmp/oc \
+      && tar -xzf /tmp/oc.tar.gz -C /tmp/oc \
+      && install -m 0755 /tmp/oc/oc /usr/local/bin/oc \
+      && rm -rf /tmp/oc /tmp/oc.tar.gz; \
+    fi
+
+# Lens desktop app is not practical in headless dev containers.
+RUN if [ "${INSTALL_LENS}" = "true" ]; then \
+      echo "INSTALL_LENS=true requested. Skipping: Lens desktop app is not supported in headless dev containers." >&2; \
+    fi
+
+# GitHub Actions runner
+RUN if [ "${INSTALL_GITHUB_ACTIONS}" = "true" ]; then \
+      case "${TARGETARCH}" in \
+        amd64|x86_64) RUNNER_ARCH="x64" ;; \
+        arm64|aarch64) RUNNER_ARCH="arm64" ;; \
+        *) echo "Unsupported TARGETARCH for actions-runner: ${TARGETARCH}" >&2; exit 1 ;; \
+      esac \
+      && mkdir -p /opt/actions-runner \
+      && cd /opt/actions-runner \
+      && curl -fsSLo "actions-runner-linux-${RUNNER_ARCH}-${ACTIONS_RUNNER_VERSION}.tar.gz" "https://github.com/actions/runner/releases/download/v${ACTIONS_RUNNER_VERSION}/actions-runner-linux-${RUNNER_ARCH}-${ACTIONS_RUNNER_VERSION}.tar.gz" \
+      && tar xzf "actions-runner-linux-${RUNNER_ARCH}-${ACTIONS_RUNNER_VERSION}.tar.gz" \
+      && rm -f "actions-runner-linux-${RUNNER_ARCH}-${ACTIONS_RUNNER_VERSION}.tar.gz" \
+      && ./bin/installdependencies.sh; \
+    fi
+
+# Build tool toggles
+RUN if [ "${INSTALL_MAKE}" = "true" ]; then apt-get update && apt-get install -y --no-install-recommends make; fi \
+    && if [ "${INSTALL_CMAKE}" = "true" ]; then apt-get update && apt-get install -y --no-install-recommends cmake; fi
+
+# Code analysis tools
+RUN if [ "${INSTALL_SONARQUBE}" = "true" ]; then \
+      curl -fsSLo /tmp/sonar-scanner-cli.zip "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux-x64.zip" \
+      && rm -rf /opt/sonar-scanner \
+      && mkdir -p /tmp/sonar-scanner \
+      && unzip -q /tmp/sonar-scanner-cli.zip -d /tmp/sonar-scanner \
+      && mv "/tmp/sonar-scanner/sonar-scanner-${SONAR_SCANNER_VERSION}-linux-x64" /opt/sonar-scanner \
+      && rm -rf /tmp/sonar-scanner /tmp/sonar-scanner-cli.zip; \
+    fi \
+    && if [ "${INSTALL_CHECKSTYLE}" = "true" ]; then \
+      mkdir -p /opt/checkstyle \
+      && curl -fsSLo /opt/checkstyle/checkstyle.jar "https://github.com/checkstyle/checkstyle/releases/download/checkstyle-${CHECKSTYLE_VERSION}/checkstyle-${CHECKSTYLE_VERSION}-all.jar" \
+      && printf '#!/usr/bin/env bash\nexec java -jar /opt/checkstyle/checkstyle.jar "$@"\n' > /usr/local/bin/checkstyle \
+      && chmod +x /usr/local/bin/checkstyle; \
+    fi \
+    && if [ "${INSTALL_PMD}" = "true" ]; then \
+      mkdir -p /opt/pmd \
+      && curl -fsSLo /tmp/pmd.zip "https://github.com/pmd/pmd/releases/download/pmd_releases/${PMD_VERSION}/pmd-dist-${PMD_VERSION}-bin.zip" \
+      && unzip -q /tmp/pmd.zip -d /opt \
+      && mv "/opt/pmd-bin-${PMD_VERSION}" /opt/pmd \
+      && rm -f /tmp/pmd.zip; \
+    fi
+
+# DevOps toolchain binaries
+RUN case "${TARGETARCH}" in \
+      amd64|x86_64) BIN_ARCH="amd64"; NEXUS_ARCH="x86-64" ;; \
+      arm64|aarch64) BIN_ARCH="arm64"; NEXUS_ARCH="aarch64" ;; \
+      *) echo "Unsupported TARGETARCH for DevOps binaries: ${TARGETARCH}" >&2; exit 1 ;; \
+    esac \
+    && if [ "${INSTALL_NEXUS}" = "true" ]; then \
+      apt-get update && apt-get install -y --no-install-recommends openjdk-${JAVA_VERSION}-jre-headless \
+      && mkdir -p /opt/nexus \
+      && curl -fsSLo /tmp/nexus.tar.gz "https://download.sonatype.com/nexus/3/nexus-${NEXUS_VERSION}-linux-${NEXUS_ARCH}.tar.gz" \
+      && tar -xzf /tmp/nexus.tar.gz -C /opt \
+      && rm -rf /opt/nexus \
+      && mv /opt/nexus-* /opt/nexus \
+      && rm -f /tmp/nexus.tar.gz \
+      && printf '#!/usr/bin/env bash\nexec /opt/nexus/bin/nexus "$@"\n' > /usr/local/bin/nexus \
+      && chmod +x /usr/local/bin/nexus \
+      && echo 'export NEXUS_HOME=/opt/nexus' > /etc/profile.d/nexus_home.sh; \
+    fi \
+    && if [ "${INSTALL_PROMETHEUS}" = "true" ]; then \
+      mkdir -p /opt/prometheus \
+      && curl -fsSLo /tmp/prometheus.tar.gz "https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-${BIN_ARCH}.tar.gz" \
+      && tar -xzf /tmp/prometheus.tar.gz -C /opt \
+      && rm -rf /opt/prometheus \
+      && mv /opt/prometheus-* /opt/prometheus \
+      && rm -f /tmp/prometheus.tar.gz \
+      && printf '#!/usr/bin/env bash\nexec /opt/prometheus/prometheus "$@"\n' > /usr/local/bin/prometheus \
+      && chmod +x /usr/local/bin/prometheus; \
+    fi \
+    && if [ "${INSTALL_GRAFANA}" = "true" ]; then \
+      apt-get update && apt-get install -y --no-install-recommends adduser libfontconfig1 \
+      && curl -fsSLo /tmp/grafana.deb "https://dl.grafana.com/oss/release/grafana_${GRAFANA_VERSION}_${BIN_ARCH}.deb" \
+      && apt-get install -y --no-install-recommends /tmp/grafana.deb \
+      && rm -f /tmp/grafana.deb; \
+    fi \
+    && if [ "${INSTALL_ELK}" = "true" ]; then \
+      curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | gpg --dearmor -o /usr/share/keyrings/elasticsearch-keyring.gpg \
+      && echo "deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" > /etc/apt/sources.list.d/elastic-8.x.list \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends elasticsearch kibana logstash; \
+    fi \
+    && if [ "${INSTALL_JENKINS}" = "true" ]; then \
+      curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | tee /usr/share/keyrings/jenkins-keyring.asc >/dev/null \
+      && echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" > /etc/apt/sources.list.d/jenkins.list \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends jenkins; \
+    fi
+
+# Final cleanup
+RUN apt-get autoremove -y \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*

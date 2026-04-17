@@ -303,7 +303,8 @@ python -m cli.devopsos scaffold gha --help
 
 ```text
 devops_os/
-├── .devcontainer/      # Dev container config (Dockerfile, devcontainer.json, setup scripts)
+├── .devcontainer/      # Redirect note; active devcontainer generation lives in cli/templates/devcontainer/
+├── .legacy/            # Archived repo-local devcontainer implementation
 ├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
 ├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, unittest, devopsos)
 ├── kubernetes/         # Kubernetes manifest generator
@@ -349,8 +350,8 @@ The pre-configured dev container gives you a consistent multi-language environme
 
 | Category | Tools |
 |----------|-------|
-| **Languages** | Python 3.11 · Java 17 · Node.js 20 · Go 1.21 |
-| **Build tools** | pip · Maven · Gradle · npm · yarn |
+| **Languages** | Python 3.12 · Java 21 · Node.js 22 · Go 1.25 · Ruby · PHP · Rust · C# · Kotlin · C/C++ |
+| **Build tools** | pip · Maven · Gradle · npm · yarn · Composer · dotnet · Kotlin compiler · clang |
 | **Linting/Testing** | pytest · black · flake8 · mypy · Jest · ESLint · golangci-lint |
 | **Containers** | Docker CLI · Docker Compose |
 | **IaC** | Terraform |
@@ -361,6 +362,13 @@ The pre-configured dev container gives you a consistent multi-language environme
 
 </details>
 
+
+Dev container generation now uses two supported paths:
+
+- `python -m cli.devopsos init` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
+- `python -m cli.devopsos scaffold devcontainer` generates the legacy two-file `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json`.
+
+The old checked-in repo-local `.devcontainer` stack has been archived under `.legacy/devcontainer/`.
 
 Generate a dev container configuration from the CLI instead of editing JSON by hand:
 
@@ -373,7 +381,7 @@ python -m cli.devopsos scaffold devcontainer \
   --devops-tools prometheus,grafana
 ```
 
-You can also customize `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then reopen in VS Code.
+For generated projects, you can customize the generated `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then rebuild or reopen in VS Code.
 
 ---
 

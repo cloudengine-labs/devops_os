@@ -65,17 +65,13 @@ def test_init_dir_option_creates_devcontainer_in_specified_dir():
     checkbox_mock = MagicMock()
     checkbox_mock.execute.return_value = []  # nothing selected
 
-    # First confirm  → Proceed = True
-    # Second confirm → Generate Dockerfile = False (skip, we only need env.json)
+    # Confirm proceed = True
     confirm_proceed = MagicMock()
     confirm_proceed.execute.return_value = True
-    confirm_skip = MagicMock()
-    confirm_skip.execute.return_value = False
 
     with tempfile.TemporaryDirectory() as tmp:
         with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
-             patch("cli.devopsos.inquirer.confirm",
-                   side_effect=[confirm_proceed, confirm_skip]):
+             patch("cli.devopsos.inquirer.confirm", side_effect=[confirm_proceed]):
             runner = CliRunner()
             result = runner.invoke(app, ["init", "--dir", tmp])
 
@@ -85,6 +81,64 @@ def test_init_dir_option_creates_devcontainer_in_specified_dir():
         assert (dc_dir / "devcontainer.env.json").exists(), (
             "Expected devcontainer.env.json inside .devcontainer"
         )
+        assert (dc_dir / "devcontainer.json").exists()
+        assert (dc_dir / "Dockerfile").exists()
+
+def test_init_preserves_existing_devcontainer_and_stops():
+    """Existing .devcontainer must be preserved and init must stop without alternate output."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    with tempfile.TemporaryDirectory() as tmp:
+        existing_dir = Path(tmp) / ".devcontainer"
+        existing_dir.mkdir(parents=True, exist_ok=True)
+        existing_env = existing_dir / "devcontainer.env.json"
+        existing_json = existing_dir / "devcontainer.json"
+        existing_env.write_text('{"protected": true}\n')
+        existing_json.write_text('{"protected": true}\n')
+
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
+             patch("cli.devopsos.inquirer.confirm", side_effect=[confirm_proceed]):
+            runner = CliRunner()
+            result = runner.invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        assert "Preserving it and skipping devcontainer generation" in result.output
+        assert existing_env.read_text() == '{"protected": true}\n'
+        assert existing_json.read_text() == '{"protected": true}\n'
+        assert not (Path(tmp) / ".devcontainer.generated").exists()
+
+def test_init_preserves_existing_devcontainer_when_only_one_file_exists():
+    """Any existing .devcontainer directory is protected even if only one config file exists."""
+    from unittest.mock import MagicMock, patch
+    from typer.testing import CliRunner
+    from cli.devopsos import app
+
+    checkbox_mock = MagicMock()
+    checkbox_mock.execute.return_value = []
+
+    confirm_proceed = MagicMock()
+    confirm_proceed.execute.return_value = True
+    with tempfile.TemporaryDirectory() as tmp:
+        existing_dir = Path(tmp) / ".devcontainer"
+        existing_dir.mkdir(parents=True, exist_ok=True)
+        existing_env = existing_dir / "devcontainer.env.json"
+        existing_env.write_text('{"protected": true}\n')
+
+        with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock), \
+             patch("cli.devopsos.inquirer.confirm", side_effect=[confirm_proceed]):
+            result = CliRunner().invoke(app, ["init", "--dir", tmp])
+
+        assert result.exit_code == 0, result.output
+        assert existing_env.read_text() == '{"protected": true}\n'
+        assert not (existing_dir / "devcontainer.json").exists()
+        assert not (Path(tmp) / ".devcontainer.generated").exists()
 
 def test_init_checkbox_includes_space_instruction():
     """Each checkbox prompt must include an instruction so users know to press Space."""
@@ -97,13 +151,9 @@ def test_init_checkbox_includes_space_instruction():
 
     confirm_proceed = MagicMock()
     confirm_proceed.execute.return_value = True
-    confirm_skip = MagicMock()
-    confirm_skip.execute.return_value = False
-
     with tempfile.TemporaryDirectory() as tmp:
         with patch("cli.devopsos.inquirer.checkbox", return_value=checkbox_mock) as mock_cb, \
-             patch("cli.devopsos.inquirer.confirm",
-                   side_effect=[confirm_proceed, confirm_skip]):
+             patch("cli.devopsos.inquirer.confirm", side_effect=[confirm_proceed]):
             CliRunner().invoke(app, ["init", "--dir", tmp])
 
     # Every checkbox call must pass a non-empty 'instruction' keyword argument
@@ -146,14 +196,10 @@ def test_init_selections_written_to_config():
 
     confirm_proceed = MagicMock()
     confirm_proceed.execute.return_value = True
-    confirm_skip = MagicMock()
-    confirm_skip.execute.return_value = False
-
     with tempfile.TemporaryDirectory() as tmp:
         with patch("cli.devopsos.inquirer.checkbox", side_effect=_checkbox_factory), \
              patch("cli.devopsos.inquirer.text", return_value=text_mock), \
-             patch("cli.devopsos.inquirer.confirm",
-                   side_effect=[confirm_proceed, confirm_skip]):
+             patch("cli.devopsos.inquirer.confirm", side_effect=[confirm_proceed]):
             result = CliRunner().invoke(app, ["init", "--dir", tmp])
 
         assert result.exit_code == 0, result.output

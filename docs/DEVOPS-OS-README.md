@@ -30,11 +30,12 @@ Before getting started, ensure you have the following installed:
    cd your-project
    ```
 
-2. Copy the DevOps-OS .devcontainer files to your project:
+2. Generate a dev container in the project root:
    ```bash
-   mkdir -p .devcontainer
-   cp -r /path/to/devops-os/.devcontainer/* ./.devcontainer/
+   python -m cli.devopsos init --dir .
    ```
+
+   On a fresh target, this creates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from the template-backed generator.
 
 3. Open the project in VS Code and click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command from the Command Palette.
 
@@ -48,17 +49,13 @@ Before getting started, ensure you have the following installed:
 
 2. Generate the dev container configuration using the CLI:
    ```bash
-   # Generate devcontainer.json and devcontainer.env.json
-   python -m cli.scaffold_devcontainer \
-     --languages python,java,go \
-     --cicd-tools docker,terraform,kubectl,helm \
-     --kubernetes-tools k9s,kustomize,argocd_cli,flux \
-     --output-dir .
+   python -m cli.devopsos init --dir .
    ```
 
-   This creates `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json` with the correct build args, VS Code extensions, and forwarded ports for your selected tools.
+   This creates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json`.
+   If you want the legacy two-file output instead, use `python -m cli.scaffold_devcontainer --output-dir .`.
 
-   Run `python -m cli.scaffold_devcontainer --help` to see all options, including version overrides (e.g. `--python-version 3.12`).
+   Run `python -m cli.devopsos init --help` for the interactive initializer, or `python -m cli.scaffold_devcontainer --help` to see the legacy scaffold options and version overrides.
 
    <details>
    <summary>Alternative: create the files manually</summary>
@@ -74,10 +71,6 @@ Before getting started, ensure you have the following installed:
        "context": ".",
        "args": {}
      },
-     "runArgs": [
-       "--init",
-       "--privileged"
-     ],
      "overrideCommand": false,
      "customizations": {
        "vscode": {
@@ -96,8 +89,7 @@ Before getting started, ensure you have the following installed:
      },
      "mounts": [
        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-     ],
-     "postCreateCommand": "python3 .devcontainer/configure.py"
+     ]
    }
    ```
 
@@ -139,9 +131,7 @@ Before getting started, ensure you have the following installed:
 
    </details>
 
-3. Copy the Dockerfile from this repository to your `.devcontainer` directory.
-
-4. Open the project in VS Code and click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command from the Command Palette.
+3. Open the project in VS Code and click "Reopen in Container" when prompted, or run the "Dev Containers: Reopen in Container" command from the Command Palette.
 
 ## Customizing DevOps-OS
 
@@ -155,9 +145,9 @@ python -m cli.scaffold_devcontainer \
   --devops-tools prometheus,grafana
 ```
 
-This regenerates both `devcontainer.json` and `devcontainer.env.json`.
+This regenerates `devcontainer.json` and `devcontainer.env.json`. If you need a generated `Dockerfile` as well, use `python -m cli.devopsos init --dir .` on a fresh target.
 
-You can also edit `devcontainer.env.json` by hand. This file lets you specify which languages, tools, and features to include in your environment.
+You can also edit the generated `devcontainer.env.json` by hand. This file lets you specify which languages, tools, and features to include in your environment.
 
 ### Language Configuration
 
@@ -251,8 +241,8 @@ If the container fails to build:
 If a specific tool isn't working properly:
 
 1. Check the tool is enabled in `devcontainer.env.json`
-2. Run the configuration script again: `python3 .devcontainer/configure.py`
-3. Check if the tool requires additional configuration
+2. Regenerate the dev container files with `python -m cli.scaffold_devcontainer ...` using the desired tool flags
+3. Rebuild the container and check if the tool requires additional configuration
 
 ## Next Steps
 
