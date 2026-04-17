@@ -85,7 +85,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
 2. The **IDP UI** gives developers a guided entry point with platform guardrails.
 3. The flow starts from a **Git repository / code commit context** for the service being onboarded or updated.
 4. The developer **selects the required template** and **chooses automation stages** such as build, test, deploy, GitOps, or observability.
-5. On **submit**, DevOps-OS generates the standardised delivery artifacts that can be committed or reviewed in Git.
+5. On **submit**, DevOps-OS generates the standardized delivery artifacts that can be committed or reviewed in Git.
 
 ---
 
