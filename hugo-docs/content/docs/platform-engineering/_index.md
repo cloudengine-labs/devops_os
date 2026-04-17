@@ -33,7 +33,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
     <text x="580" y="138" text-anchor="middle" font-size="15" fill="#1f2937">App or service intent</text>
 
     <rect x="720" y="40" width="210" height="70" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-    <text x="825" y="72" text-anchor="middle" font-size="20" font-weight="700" fill="#14532d">1. Select template</text>
+    <text x="825" y="72" text-anchor="middle" font-size="20" font-weight="700" fill="#14532d">1. Select templates</text>
     <text x="825" y="95" text-anchor="middle" font-size="14" fill="#1f2937">pipeline, GitOps, SRE, devcontainer</text>
 
     <rect x="720" y="130" width="210" height="70" rx="14" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
@@ -84,7 +84,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
 1. **Platform teams** publish reusable templates into the IDP catalog.
 2. The **IDP UI** gives developers a guided entry point with platform guardrails.
 3. The flow starts from a **Git repository / code commit context** for the service being onboarded or updated.
-4. The developer **selects the required template** and **chooses automation stages** such as build, test, deploy, GitOps, or observability.
+4. The developer **selects the required templates** and **chooses automation stages** such as build, test, deploy, GitOps, or observability.
 5. On **submit**, DevOps-OS generates the standardized delivery artifacts that can be committed or reviewed in Git.
 
 ---
