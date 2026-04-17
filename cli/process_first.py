@@ -21,7 +21,7 @@ PROCESS_FIRST_SUMMARY = """\
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
   "Tools are only as good as the processes that govern them."
-  — Saravanan Gnanagur, Founder, CloudEngineLabs
+  — Saravanan Gnanaguru, Founder, CloudEngine Labs
 
   Process-First is the Systems Thinking of DevOps.
 
