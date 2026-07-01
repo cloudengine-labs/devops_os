@@ -16,6 +16,7 @@ import cli.scaffold_argocd as scaffold_argocd
 import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
 import cli.scaffold_unittest as scaffold_unittest
+import cli.scaffold_hardening as scaffold_hardening
 import cli.process_first as process_first
 from cli import __version__
 
@@ -626,6 +627,58 @@ def scaffold_unittest_cmd(
         # coverage defaults to True; only pass flag when False
         flags.append("--no-coverage")
     _run_scaffold(scaffold_unittest.main, flags)
+
+
+# ── scaffold hardening ──────────────────────────────────────────────────────
+
+@scaffold_app.command("hardening")
+def scaffold_hardening_cmd(
+    ctx: typer.Context,
+    standard: str = typer.Option("all", envvar="DEVOPS_OS_HARDENING_STANDARD",
+                                  help=(
+                                      "Hardening standard: cis-k8s, stig-k8s, nsa-k8s, "
+                                      "cis-docker, cis-rhel9, cis-ubuntu22, pod-security, "
+                                      "image-signing, essential-eight, all (default: all)"
+                                  )),
+    output_type: str = typer.Option("all", "--type", envvar="DEVOPS_OS_HARDENING_TYPE",
+                                     help="Output type: kyverno, inspec, checkov, all (default: all applicable)"),
+    output: str = typer.Option("hardening", "--output", envvar="DEVOPS_OS_HARDENING_OUTPUT",
+                                help="Output directory (default: ./hardening/)"),
+    compliance_framework: str = typer.Option("", "--compliance-framework",
+                                              envvar="DEVOPS_OS_HARDENING_COMPLIANCE_FRAMEWORK",
+                                              help=(
+                                                  "Tag outputs with compliance framework IDs "
+                                                  "(pci-dss, hipaa, iso27001, rbi, nist-800-53, soc2)"
+                                              )),
+    severity: str = typer.Option("medium", envvar="DEVOPS_OS_HARDENING_SEVERITY",
+                                  help="Minimum severity level: critical, high, medium, low (default: medium)"),
+    environment: str = typer.Option("production", envvar="DEVOPS_OS_HARDENING_ENVIRONMENT",
+                                     help=(
+                                         "Target environment profile: dev, staging, production "
+                                         "(adjusts enforcement levels, default: production)"
+                                     )),
+):
+    """Generate infrastructure hardening configs (CIS, STIG, NSA, PSS, Essential Eight).
+
+    \b
+    Examples:
+      devopsos scaffold hardening --standard cis-k8s --output hardening/
+      devopsos scaffold hardening --standard stig-k8s --output hardening/
+      devopsos scaffold hardening --standard cis-rhel9 --type inspec --output hardening/
+      devopsos scaffold hardening --standard all --type kyverno --output hardening/
+      devopsos scaffold hardening --standard cis-k8s --compliance-framework pci-dss --output hardening/
+    """
+    _show_help_if_no_opts(ctx)
+    flags = [
+        "--standard", standard,
+        "--type", output_type,
+        "--output", output,
+        "--severity", severity,
+        "--environment", environment,
+    ]
+    if compliance_framework:
+        flags += ["--compliance-framework", compliance_framework]
+    _run_scaffold(scaffold_hardening.main, flags)
 
 
 @app.command()
