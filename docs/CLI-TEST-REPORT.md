@@ -39,6 +39,8 @@
 |---------------------|------|--------|
 | `init --help` shows `--dir` option | `test_init_help_shows_dir_option` | ✅ |
 | `init --dir <path>` creates `.devcontainer/` in target dir | `test_init_dir_option_creates_devcontainer_in_specified_dir` | ✅ |
+| Existing `.devcontainer/` is preserved and init stops without alternate output | `test_init_preserves_existing_devcontainer_and_stops` | ✅ |
+| Existing `.devcontainer/` with partial config is still preserved | `test_init_preserves_existing_devcontainer_when_only_one_file_exists` | ✅ |
 | Checkbox prompt includes Space-to-toggle instruction | `test_init_checkbox_includes_space_instruction` | ✅ |
 | Selected tools are written to `devcontainer.json` | `test_init_selections_written_to_config` | ✅ |
 

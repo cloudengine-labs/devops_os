@@ -405,8 +405,13 @@ def scaffold_devcontainer(
         "mounts": [
             "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
         ],
-        "postCreateCommand": "python3 .devcontainer/configure.py",
     }
+    if k8s_list:
+        devcontainer_json["postCreateCommand"] = (
+            "chmod +x /workspaces/.devcontainer/k8s-config-generator.py "
+            "&& ln -sf /workspaces/.devcontainer/k8s-config-generator.py "
+            "/usr/local/bin/k8s-config-generator"
+        )
 
     return json.dumps(
         {

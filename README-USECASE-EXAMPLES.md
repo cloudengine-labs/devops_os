@@ -12,7 +12,7 @@ This document provides practical examples and advanced use cases for each major 
 - **Version Pinning**: Ensure all developers use the same versions of compilers, linters, and CI/CD tools.
 
 ### Example: Adding a New Language
-Edit `.devcontainer/devcontainer.env.json` to enable Ruby support:
+In a generated project devcontainer, edit `.devcontainer/devcontainer.env.json` to enable Ruby support:
 ```json
 {
   "languages": {

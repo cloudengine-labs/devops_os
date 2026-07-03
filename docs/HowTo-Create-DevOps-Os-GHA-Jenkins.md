@@ -10,12 +10,12 @@ First, let's create a GitHub repository for your DevOps-OS:
 2. Structure it like this:
 ```
    devops-os/
-   ├── .devcontainer/
-   │   ├── Dockerfile
-   │   ├── devcontainer.json
-   │   ├── devcontainer.env.json
-   │   ├── configure.py
-   │   └── README.md
+   ├── .legacy/
+   │   └── devcontainer/
+   │       ├── Dockerfile
+   │       ├── devcontainer.json
+   │       ├── devcontainer.env.json
+   │       └── README.md
    ├── .github/
    │   └── workflows/
    │       └── example-pipeline.yml
@@ -120,7 +120,9 @@ on:
   push:
     branches: [ main ]
     paths:
-      - '.devcontainer/**'
+      - 'cli/devcontainer_templates.py'
+      - 'cli/templates/devcontainer/**'
+      - 'cli/scaffold_devcontainer.py'
   workflow_dispatch:
 
 jobs:
@@ -134,10 +136,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
-      - name: Generate devcontainer.json
+      - name: Generate devcontainer files
         run: |
-          cd .devcontainer
-          python configure.py
+          python -m cli.devopsos scaffold devcontainer \
+            --languages python,java,javascript,go \
+            --cicd-tools docker,terraform,kubectl,helm,github_actions
       
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
@@ -447,7 +450,9 @@ You can dynamically generate the dev container configuration during the CI/CD pr
       }
     }
     EOF
-    python configure.py
+    python -m cli.devopsos scaffold devcontainer \
+      --languages python,java,javascript,go \
+      --cicd-tools docker,terraform,kubectl,helm,github_actions
 ```
 
 ### 2. Matrix Testing with Different Tools
@@ -475,10 +480,11 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      - name: Configure for ${{ matrix.language }}
+      - name: Generate language-specific devcontainer files
         run: |
-          cd .devcontainer
-          python configure.py --enable-only-language ${{ matrix.language }}
+          python -m cli.devopsos scaffold devcontainer \
+            --languages ${{ matrix.language }} \
+            --cicd-tools docker
       - name: Run tests
         run: ${{ matrix.test_command }}
 ```
