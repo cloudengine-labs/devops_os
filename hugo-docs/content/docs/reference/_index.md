@@ -19,7 +19,7 @@ Complete reference for every DevOps-OS CLI command: options, default values, env
 | Jenkins | `python -m cli.devopsos scaffold jenkins` | `Jenkinsfile` |
 | ArgoCD | `python -m cli.devopsos scaffold argocd` | `argocd/` directory |
 | Flux CD | `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
-| Infrastructure hardening | `python -m cli.devopsos scaffold hardening` | `hardening/` directory |
+| Infrastructure hardening | `python -m cli.devopsos scaffold hardening` | `hardening/` directory with Kyverno, InSpec, Checkov, and mapping outputs |
 | SRE configs | `python -m cli.devopsos scaffold sre` | `sre/` directory |
 | Dev Container | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
 | Combined CI/CD | `python -m cli.devopsos scaffold cicd` | `.github/workflows/` + `Jenkinsfile` |
