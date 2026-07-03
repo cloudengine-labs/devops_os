@@ -15,6 +15,7 @@ All scaffold commands are available through the **unified `devopsos` CLI** — o
 - [devopsos scaffold gitlab — GitLab CI Generator](#devopsos-scaffold-gitlab--gitlab-ci-generator)
 - [devopsos scaffold jenkins — Jenkins Pipeline Generator](#devopsos-scaffold-jenkins--jenkins-pipeline-generator)
 - [devopsos scaffold argocd — ArgoCD / Flux CD Generator](#devopsos-scaffold-argocd--argocd--flux-cd-generator)
+- [devopsos scaffold hardening — Infrastructure Hardening Generator](#devopsos-scaffold-hardening--infrastructure-hardening-generator)
 - [devopsos scaffold sre — SRE Config Generator](#devopsos-scaffold-sre--sre-config-generator)
 - [devopsos scaffold devcontainer — Dev Container Generator](#devopsos-scaffold-devcontainer--dev-container-generator)
 - [devopsos scaffold cicd — Combined CI/CD Generator](#devopsos-scaffold-cicd--combined-cicd-generator)
@@ -55,6 +56,7 @@ python -m cli.devopsos scaffold gha --help     # GHA-specific options
 | Jenkins | `python -m cli.devopsos scaffold jenkins` | `Jenkinsfile` |
 | ArgoCD | `python -m cli.devopsos scaffold argocd` | `argocd/` directory |
 | Flux CD | `python -m cli.devopsos scaffold argocd --method flux` | `flux/` directory |
+| Infrastructure hardening | `python -m cli.devopsos scaffold hardening` | `hardening/` directory |
 | SRE configs | `python -m cli.devopsos scaffold sre` | `sre/` directory |
 | Dev Container | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
 | Unit Tests | `python -m cli.devopsos scaffold unittest` | `unittest/` directory |
@@ -223,6 +225,52 @@ python -m cli.devopsos scaffold argocd [options]
 python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/myorg/my-app.git
 python -m cli.devopsos scaffold argocd --name my-app --auto-sync --rollouts
 python -m cli.devopsos scaffold argocd --name my-app --method flux --image ghcr.io/myorg/my-app
+```
+
+---
+
+## devopsos scaffold hardening — Infrastructure Hardening Generator
+
+Generates infrastructure hardening artifacts for Kubernetes, container runtimes, and operating systems using Kyverno, InSpec, and Checkov-compatible outputs.
+
+### Invocation
+
+```bash
+python -m cli.devopsos scaffold hardening [options]
+```
+
+### Options
+
+| Option | Env var | Default | Description |
+|--------|---------|---------|-------------|
+| `--standard STANDARD` | `DEVOPS_OS_HARDENING_STANDARD` | `all` | Hardening standard: `cis-k8s` \| `stig-k8s` \| `nsa-k8s` \| `cis-docker` \| `cis-rhel9` \| `cis-ubuntu22` \| `pod-security` \| `image-signing` \| `essential-eight` \| `all` |
+| `--type TYPE` | `DEVOPS_OS_HARDENING_TYPE` | `all` | Output type: `kyverno` \| `inspec` \| `checkov` \| `all` |
+| `--output DIR` | `DEVOPS_OS_HARDENING_OUTPUT` | `hardening` | Output directory |
+| `--compliance-framework FRAMEWORK` | `DEVOPS_OS_HARDENING_COMPLIANCE_FRAMEWORK` | _(none)_ | Tag outputs for `pci-dss`, `hipaa`, `iso27001`, `rbi`, `nist-800-53`, or `soc2` catalog mapping |
+| `--severity LEVEL` | `DEVOPS_OS_HARDENING_SEVERITY` | `medium` | Minimum severity: `critical` \| `high` \| `medium` \| `low` |
+| `--environment ENV` | `DEVOPS_OS_HARDENING_ENVIRONMENT` | `production` | Target profile: `dev` \| `staging` \| `production` |
+
+### Output files
+
+| Path | Description |
+|------|-------------|
+| `<output>/kyverno/cis-k8s/` | CIS Kubernetes benchmark policies |
+| `<output>/kyverno/stig-k8s/` | DISA STIG Kubernetes policies |
+| `<output>/kyverno/nsa-k8s/` | NSA/CISA Kubernetes hardening policies |
+| `<output>/kyverno/pod-security-standards.yaml` | Pod Security Standards policy |
+| `<output>/kyverno/image-signing.yaml` | Cosign/Kyverno image-signing policy |
+| `<output>/inspec/docker-cis/` | CIS Docker Benchmark InSpec profile |
+| `<output>/inspec/rhel9-cis/` | CIS RHEL 9 InSpec profile |
+| `<output>/inspec/ubuntu22-cis/` | CIS Ubuntu 22.04 InSpec profile |
+| `<output>/essential-eight/` | Essential Eight README and Checkov checks |
+| `<output>/compliance-mapping.yaml` | Rule-to-framework mapping file |
+
+### Examples
+
+```bash
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec --output baseline-hardening
+python -m cli.devopsos scaffold hardening --standard all --compliance-framework pci-dss
 ```
 
 ---
@@ -479,6 +527,7 @@ Every flag for every command has a corresponding environment variable. The prefi
 | `scaffold gitlab` | `DEVOPS_OS_GITLAB_` | `DEVOPS_OS_GITLAB_LANGUAGES=python,go` |
 | `scaffold jenkins` | `DEVOPS_OS_JENKINS_` | `DEVOPS_OS_JENKINS_KUBERNETES=true` |
 | `scaffold argocd` | `DEVOPS_OS_ARGOCD_` | `DEVOPS_OS_ARGOCD_AUTO_SYNC=true` |
+| `scaffold hardening` | `DEVOPS_OS_HARDENING_` | `DEVOPS_OS_HARDENING_STANDARD=cis-k8s` |
 | `scaffold sre` | `DEVOPS_OS_SRE_` | `DEVOPS_OS_SRE_SLO_TARGET=99.5` |
 | `scaffold devcontainer` | `DEVOPS_OS_DEVCONTAINER_` | `DEVOPS_OS_DEVCONTAINER_LANGUAGES=python,go` |
 | `scaffold unittest` | `DEVOPS_OS_UNITTEST_` | `DEVOPS_OS_UNITTEST_LANGUAGES=python,go` |

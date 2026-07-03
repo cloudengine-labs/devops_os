@@ -85,6 +85,7 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
 |-------|---------------------------|
 | Build & Test | [GitHub Actions / GitLab CI / Jenkins workflows]({{< relref "/docs/ci-cd" >}}) |
 | Deploy | [ArgoCD or Flux GitOps configuration]({{< relref "/docs/gitops" >}}) |
+| Harden | [Infrastructure hardening baselines and compliance mappings]({{< relref "/docs/platform-engineering/hardening" >}}) |
 | Observe | [Prometheus, Grafana, and SLO configuration]({{< relref "/docs/sre" >}}) |
 | Developer Environment | [Dev Container configuration]({{< relref "/docs/dev-container" >}}) |
 

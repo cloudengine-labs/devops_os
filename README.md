@@ -2,7 +2,7 @@
 
 # 🚀 DevOps-OS
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments and SRE dashboards — using a conversational AI assistant or a single CLI command.**
+**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using a conversational AI assistant or a single CLI command.**
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
@@ -29,6 +29,7 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 | 🚀 **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines |
 | ☸️ **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations |
 | 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
+| 🔐 **Infrastructure Hardening** | Generate Kyverno policies, InSpec profiles, Checkov checks, and compliance mappings for CIS, STIG, NSA/CISA, Pod Security Standards, and Essential Eight baselines |
 | 🧪 **Unit Test Scaffold** | Generate pytest, Jest, Vitest, Mocha, or Go test configs with one command |
 | 🤖 **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills |
 | 🛠️ **Dev Container** | Pre-configured multi-language environment (Python · Java · Go · JavaScript) |
@@ -179,6 +180,9 @@ python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https:
 # SRE configs (Prometheus, Grafana, SLO) → sre/ directory
 python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
 
+# Infrastructure hardening baselines → hardening/ directory
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+
 # Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
 python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
 
@@ -195,7 +199,8 @@ python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my
 
 Use `python -m cli.devopsos scaffold --help` to list all available targets and `python -m cli.devopsos scaffold <target> --help` to see every option for a specific target.
 
-> See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.
+> See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.  
+> For hardening-specific standards, outputs, and examples, see [Infrastructure Hardening Sprint](docs/devops-os-hardening-sprint.md).
 
 ---
 
@@ -274,6 +279,10 @@ python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https:
 # ── SRE (Prometheus + Grafana + SLO) ──────────────────────────────────────
 python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
 
+# ── Infrastructure Hardening ───────────────────────────────────────────────
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+python -m cli.devopsos scaffold hardening --standard all --output hardening
+
 # ── Dev Container ──────────────────────────────────────────────────────────
 python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform
 
@@ -305,7 +314,7 @@ python -m cli.devopsos scaffold gha --help
 devops_os/
 ├── .devcontainer/      # Dev container config (Dockerfile, devcontainer.json, setup scripts)
 ├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
-├── cli/                # CLI scaffold tools (scaffold_gha, gitlab, jenkins, argocd, sre, unittest, devopsos)
+├── cli/                # CLI scaffold tools (gha, gitlab, jenkins, argocd, sre, hardening, unittest, devopsos)
 ├── kubernetes/         # Kubernetes manifest generator
 ├── mcp_server/         # MCP server for AI assistant integration (Claude, ChatGPT)
 ├── skills/             # Claude & OpenAI tool/function definitions
@@ -392,6 +401,7 @@ You can also customize `.devcontainer/devcontainer.env.json` directly to enable 
 | [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
 | [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
 | [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
+| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and CLI examples for the hardening scaffold |
 | [🧪 Unit Test Scaffold](docs/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
 | [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
 | [🤖 MCP Server](mcp_server/README.md) | Connect DevOps-OS tools to Claude or ChatGPT |
