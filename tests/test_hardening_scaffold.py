@@ -90,6 +90,15 @@ class TestShouldGenerate:
     def test_checkov_type_rejects_kyverno_standard(self):
         assert scaffold_hardening._should_generate("pod-security", "checkov") is False
 
+    def test_kyverno_type_accepts_asvs_l1(self):
+        assert scaffold_hardening._should_generate("asvs-l1", "kyverno") is True
+
+    def test_checkov_type_accepts_asvs_l1(self):
+        assert scaffold_hardening._should_generate("asvs-l1", "checkov") is True
+
+    def test_inspec_type_rejects_asvs_l1(self):
+        assert scaffold_hardening._should_generate("asvs-l1", "inspec") is False
+
 
 # ---------------------------------------------------------------------------
 # CIS Kubernetes generators
@@ -385,8 +394,106 @@ class TestEssentialEight:
 
 
 # ---------------------------------------------------------------------------
-# Compliance mapping
+# OWASP ASVS L1
 # ---------------------------------------------------------------------------
+
+class TestAsvsL1:
+    def test_generates_four_files(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        paths = scaffold_hardening.generate_asvs_l1(args)
+        assert len(paths) == 4  # README + 2 Kyverno + 1 Checkov
+
+    def test_readme_exists(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        assert (tmp_path / "asvs-l1-checks" / "README.md").exists()
+
+    def test_readme_mentions_owasp(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        content = (tmp_path / "asvs-l1-checks" / "README.md").read_text()
+        assert "OWASP" in content
+        assert "ASVS" in content
+
+    def test_v9_policy_exists(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        assert (tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml").exists()
+
+    def test_v14_policy_exists(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        assert (tmp_path / "asvs-l1-checks" / "kyverno" / "v14-configuration.yaml").exists()
+
+    def test_checkov_checks_file_exists(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        assert (tmp_path / "asvs-l1-checks" / "checkov" / "asvs-l1-checks.py").exists()
+
+    def test_v9_policy_is_cluster_policy(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        assert policy["kind"] == "ClusterPolicy"
+
+    def test_v9_policy_has_two_rules(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        assert len(policy["spec"]["rules"]) == 2
+
+    def test_v9_policy_disallows_port_80(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        rule_names = [r["name"] for r in policy["spec"]["rules"]]
+        assert "asvs-disallow-http-port-80" in rule_names
+
+    def test_v9_policy_requires_tls_ingress(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        rule_names = [r["name"] for r in policy["spec"]["rules"]]
+        assert "asvs-require-tls-ingress" in rule_names
+
+    def test_v14_policy_has_two_rules(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v14-configuration.yaml")
+        assert len(policy["spec"]["rules"]) == 2
+
+    def test_v14_policy_requires_non_root(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v14-configuration.yaml")
+        rule_names = [r["name"] for r in policy["spec"]["rules"]]
+        assert "asvs-require-run-as-non-root" in rule_names
+
+    def test_production_enforcement_is_enforce(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), environment="production")
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        assert policy["spec"]["validationFailureAction"] == "Enforce"
+
+    def test_dev_enforcement_is_audit(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), environment="dev")
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        assert policy["spec"]["validationFailureAction"] == "Audit"
+
+    def test_kyverno_policies_have_asvs_compliance_annotation(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        policy = _load_yaml(tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml")
+        assert "asvs-l1" in policy["metadata"]["annotations"]["devops-os/compliance"]
+
+    def test_checkov_checks_has_asvs_classes(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path))
+        scaffold_hardening.generate_asvs_l1(args)
+        content = (tmp_path / "asvs-l1-checks" / "checkov" / "asvs-l1-checks.py").read_text()
+        assert "AsvsL1V2AuthMfaEnforced" in content
+        assert "AsvsL1V6EncryptionAtRest" in content
+        assert "AsvsL1V8SensitiveDataNotLogged" in content
 
 class TestComplianceMapping:
     def test_generates_one_file(self, tmp_path):
@@ -411,7 +518,7 @@ class TestComplianceMapping:
         scaffold_hardening.generate_compliance_mapping(args)
         mapping = _load_yaml(tmp_path / "compliance-mapping.yaml")
         for standard in ["cis-k8s", "stig-k8s", "nsa-k8s", "cis-docker",
-                          "cis-rhel9", "cis-ubuntu22", "essential-eight"]:
+                          "cis-rhel9", "cis-ubuntu22", "essential-eight", "asvs-l1"]:
             assert standard in mapping["mappings"], f"Standard {standard} missing from compliance mapping"
 
     def test_mapping_entries_have_title(self, tmp_path):
@@ -476,3 +583,30 @@ class TestGenerateHardening:
         scaffold_hardening.generate_hardening(args)
         policy = _load_yaml(tmp_path / "kyverno" / "stig-k8s" / "stig-cluster-policies.yaml")
         assert policy["spec"]["validationFailureAction"] == "Audit"
+
+    def test_asvs_l1_standard_generates_kyverno_and_checkov(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), standard="asvs-l1", output_type="all")
+        scaffold_hardening.generate_hardening(args)
+        assert (tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml").exists()
+        assert (tmp_path / "asvs-l1-checks" / "kyverno" / "v14-configuration.yaml").exists()
+        assert (tmp_path / "asvs-l1-checks" / "checkov" / "asvs-l1-checks.py").exists()
+
+    def test_asvs_l1_included_in_all_standard_run(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), standard="all", output_type="all")
+        scaffold_hardening.generate_hardening(args)
+        assert (tmp_path / "asvs-l1-checks" / "README.md").exists()
+
+    def test_kyverno_type_includes_asvs_l1_kyverno_output(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), standard="asvs-l1", output_type="kyverno")
+        scaffold_hardening.generate_hardening(args)
+        assert (tmp_path / "asvs-l1-checks" / "kyverno" / "v9-communications.yaml").exists()
+
+    def test_checkov_type_includes_asvs_l1_checkov_output(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), standard="asvs-l1", output_type="checkov")
+        scaffold_hardening.generate_hardening(args)
+        assert (tmp_path / "asvs-l1-checks" / "checkov" / "asvs-l1-checks.py").exists()
+
+    def test_inspec_type_excludes_asvs_l1(self, tmp_path):
+        args = _hardening_args(output=str(tmp_path), standard="asvs-l1", output_type="inspec")
+        scaffold_hardening.generate_hardening(args)
+        assert not (tmp_path / "asvs-l1-checks").exists()

@@ -13,8 +13,9 @@ DevOps-OS includes `python -m cli.devopsos scaffold hardening` to generate reusa
 
 | Output type | Purpose | Default location |
 |-------------|---------|------------------|
-| Kyverno policies | Kubernetes admission guardrails for CIS, STIG, NSA/CISA, Pod Security Standards, and image signing | `hardening/kyverno/` |
+| Kyverno policies | Kubernetes admission guardrails for CIS, STIG, NSA/CISA, Pod Security Standards, image signing, and OWASP ASVS L1 | `hardening/kyverno/` |
 | InSpec profiles | Compliance profiles for Docker, RHEL 9, and Ubuntu 22.04 | `hardening/inspec/` |
+| ASVS L1 checks | OWASP ASVS L1 infra-layer Kyverno policies and Checkov checks | `hardening/asvs-l1-checks/` |
 | Checkov checks | Essential Eight checks and supporting metadata | `hardening/essential-eight/` |
 | Compliance mapping | Rule-to-framework mapping for catalog linking | `hardening/compliance-mapping.yaml` |
 
@@ -29,6 +30,7 @@ DevOps-OS includes `python -m cli.devopsos scaffold hardening` to generate reusa
 | NSA/CISA Kubernetes Hardening Guide | Kyverno policies + network policies |
 | Pod Security Standards | Kyverno policy |
 | Container image signing | Kyverno policy |
+| OWASP ASVS L1 (infra layer) | Kyverno policies + Checkov checks |
 | CIS Docker Benchmark v1.6 | InSpec profile |
 | CIS RHEL 9 Benchmark | InSpec profile |
 | CIS Ubuntu 22.04 Benchmark | InSpec profile |
@@ -41,6 +43,9 @@ DevOps-OS includes `python -m cli.devopsos scaffold hardening` to generate reusa
 ```bash
 # CIS Kubernetes guardrails
 python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+
+# OWASP ASVS L1 infra-layer checks
+python -m cli.devopsos scaffold hardening --standard asvs-l1
 
 # Operating system baseline
 python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec
@@ -78,6 +83,10 @@ hardening/
 │   ├── docker-cis/
 │   ├── rhel9-cis/
 │   └── ubuntu22-cis/
+├── asvs-l1-checks/
+│   ├── README.md
+│   ├── kyverno/
+│   └── checkov/
 ├── essential-eight/
 └── compliance-mapping.yaml
 ```

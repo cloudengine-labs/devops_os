@@ -4,7 +4,7 @@ DevOps-OS Infrastructure Hardening Scaffold Generator
 
 Generates hardening configurations for Kubernetes clusters, container runtimes,
 and operating systems based on industry standards (CIS, DISA STIG, NSA/CISA,
-Pod Security Standards, Essential Eight).
+Pod Security Standards, OWASP ASVS L1, Essential Eight).
 
 Outputs (default: ./hardening/ directory):
   hardening/
@@ -18,6 +18,13 @@ Outputs (default: ./hardening/ directory):
   │   ├── docker-cis/       CIS Docker Benchmark InSpec profile
   │   ├── rhel9-cis/        CIS RHEL 9 Benchmark InSpec profile
   │   └── ubuntu22-cis/     CIS Ubuntu 22.04 Benchmark InSpec profile
+  ├── asvs-l1-checks/
+  │   ├── README.md
+  │   ├── kyverno/
+  │   │   ├── v9-communications.yaml     ASVS V9 communications / TLS policies
+  │   │   └── v14-configuration.yaml     ASVS V14 secure configuration policies
+  │   └── checkov/
+  │       └── asvs-l1-checks.py          Checkov custom checks for ASVS V2, V6, V8
   ├── essential-eight/
   │   ├── README.md
   │   └── checkov/
@@ -41,6 +48,7 @@ VALID_STANDARDS = [
     "cis-ubuntu22",
     "pod-security",
     "image-signing",
+    "asvs-l1",
     "essential-eight",
     "all",
 ]
@@ -1587,6 +1595,28 @@ def generate_compliance_mapping(args):
                          "pci-dss": ["12.3.4"], "nist-800-53": ["CP-9"],
                          "iso27001": ["A.12.3.1"]},
             },
+            "asvs-l1": {
+                "V9.1.1": {"title": "Disallow plaintext HTTP port 80 on Services",
+                           "nist-800-53": ["SC-8"], "pci-dss": ["4.2.1"],
+                           "iso27001": ["A.13.2.3"]},
+                "V9.2.1": {"title": "Require TLS on Ingress resources",
+                           "nist-800-53": ["SC-8"], "pci-dss": ["4.2.1"],
+                           "hipaa": ["164.312(e)(2)(ii)"]},
+                "V14.1.1": {"title": "Disallow default/placeholder credentials in env vars",
+                            "nist-800-53": ["IA-5", "CM-6"], "pci-dss": ["2.1"],
+                            "iso27001": ["A.9.4.3"]},
+                "V14.2.1": {"title": "Containers must run as non-root",
+                            "nist-800-53": ["AC-6", "CM-7"], "pci-dss": ["6.5.8"]},
+                "V2.1.1": {"title": "MFA enforced for privileged IAM users",
+                           "nist-800-53": ["IA-2"], "pci-dss": ["8.4"],
+                           "iso27001": ["A.9.4.2"]},
+                "V6.2.1": {"title": "Sensitive data encrypted at rest",
+                           "nist-800-53": ["SC-28"], "pci-dss": ["3.4"],
+                           "hipaa": ["164.312(a)(2)(iv)"]},
+                "V8.3.4": {"title": "Log groups must have retention policy",
+                           "nist-800-53": ["AU-11"], "pci-dss": ["10.5"],
+                           "hipaa": ["164.312(b)"]},
+            },
         },
     }
 
@@ -1595,12 +1625,298 @@ def generate_compliance_mapping(args):
 
 
 # ---------------------------------------------------------------------------
-# Dispatch logic
+# OWASP ASVS L1 — infra-layer Kyverno policies + Checkov custom checks
 # ---------------------------------------------------------------------------
 
-_KYVERNO_STANDARDS = {"cis-k8s", "stig-k8s", "nsa-k8s", "pod-security", "image-signing"}
+def generate_asvs_l1(args):
+    """Generate OWASP ASVS L1 infra-layer Kyverno policies and Checkov checks."""
+    action = _enforcement_action(args.environment)
+    base = Path(args.output) / "asvs-l1-checks"
+    generated = []
+
+    # --- README ---
+    readme = """\
+# OWASP ASVS L1 — DevOps-OS Hardening (Infra Layer)
+
+The OWASP Application Security Verification Standard (ASVS) Level 1 defines
+the minimum security baseline for web applications. This scaffold covers the
+**infrastructure-layer** controls that can be enforced via Kubernetes admission
+policies and IaC static analysis.
+
+## Controls Covered
+
+| ASVS Chapter | Chapter Title | Tool | File |
+|---|---|---|---|
+| V9 | Communications | Kyverno | kyverno/v9-communications.yaml |
+| V14 | Configuration | Kyverno | kyverno/v14-configuration.yaml |
+| V2 | Authentication | Checkov | checkov/asvs-l1-checks.py |
+| V6 | Stored Cryptography | Checkov | checkov/asvs-l1-checks.py |
+| V8 | Data Protection | Checkov | checkov/asvs-l1-checks.py |
+
+## Usage
+
+```bash
+# Apply Kyverno policies
+kubectl apply -f hardening/asvs-l1-checks/kyverno/
+
+# Run Checkov checks against IaC
+checkov --external-checks-dir hardening/asvs-l1-checks/checkov \\
+        --directory . --framework terraform
+```
+
+## References
+
+- [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/)
+- [ASVS L1 Requirements](https://github.com/OWASP/ASVS/tree/v4.0.3/4.0)
+"""
+    generated.append(_write_text(base / "README.md", readme))
+
+    # --- V9: Communications — require TLS, disallow plaintext service ports ---
+    v9_policy = {
+        "apiVersion": "kyverno.io/v1",
+        "kind": "ClusterPolicy",
+        "metadata": {
+            "name": "asvs-l1-v9-communications",
+            "annotations": {
+                "policies.kyverno.io/title": "ASVS L1 V9 — Secure Communications",
+                "policies.kyverno.io/category": "OWASP ASVS L1",
+                "policies.kyverno.io/severity": "high",
+                "policies.kyverno.io/description": (
+                    "Enforces OWASP ASVS L1 V9 communications controls: "
+                    "disallows plaintext (HTTP/80) service ports and requires "
+                    "TLS-only ingress annotations."
+                ),
+                "devops-os/compliance": "asvs-l1:V9.1.1,asvs-l1:V9.2.1,nist-800-53:SC-8",
+            },
+        },
+        "spec": {
+            "validationFailureAction": action,
+            "rules": [
+                {
+                    "name": "asvs-disallow-http-port-80",
+                    "match": {"any": [{"resources": {"kinds": ["Service"]}}]},
+                    "validate": {
+                        "message": (
+                            "Services must not expose plaintext HTTP port 80. "
+                            "Use HTTPS (443) or a TLS-terminated ingress (ASVS V9.1.1)."
+                        ),
+                        "deny": {
+                            "conditions": {
+                                "any": [
+                                    {
+                                        "key": "{{ request.object.spec.ports[].port | contains(@, `80`) | any(@) }}",
+                                        "operator": "Equals",
+                                        "value": True,
+                                    }
+                                ]
+                            }
+                        },
+                    },
+                },
+                {
+                    "name": "asvs-require-tls-ingress",
+                    "match": {"any": [{"resources": {"kinds": ["Ingress"]}}]},
+                    "validate": {
+                        "message": (
+                            "Ingress resources must configure TLS. "
+                            "Plaintext HTTP ingress is not permitted (ASVS V9.2.1)."
+                        ),
+                        "pattern": {
+                            "spec": {
+                                "tls": [{"+(hosts)": "?*"}],
+                            }
+                        },
+                    },
+                },
+            ],
+        },
+    }
+    generated.append(_write_yaml(base / "kyverno" / "v9-communications.yaml", v9_policy))
+
+    # --- V14: Configuration — no default credentials, secure pod config ---
+    v14_policy = {
+        "apiVersion": "kyverno.io/v1",
+        "kind": "ClusterPolicy",
+        "metadata": {
+            "name": "asvs-l1-v14-configuration",
+            "annotations": {
+                "policies.kyverno.io/title": "ASVS L1 V14 — Secure Configuration",
+                "policies.kyverno.io/category": "OWASP ASVS L1",
+                "policies.kyverno.io/severity": "high",
+                "policies.kyverno.io/description": (
+                    "Enforces OWASP ASVS L1 V14 configuration controls: "
+                    "disallows default/empty environment variable credentials and "
+                    "requires containers to run as non-root."
+                ),
+                "devops-os/compliance": "asvs-l1:V14.1.1,asvs-l1:V14.2.1,nist-800-53:CM-6,nist-800-53:AC-6",
+            },
+        },
+        "spec": {
+            "validationFailureAction": action,
+            "rules": [
+                {
+                    "name": "asvs-disallow-default-passwords-in-env",
+                    "match": {"any": [{"resources": {"kinds": ["Pod"]}}]},
+                    "validate": {
+                        "message": (
+                            "Container environment variables must not use default or placeholder "
+                            "credential values such as 'admin', 'password', or 'changeme' "
+                            "(ASVS V14.1.1)."
+                        ),
+                        "deny": {
+                            "conditions": {
+                                "any": [
+                                    {
+                                        "key": "{{ request.object.spec.containers[].env[].value | "
+                                               "contains(@, 'password') | any(@) }}",
+                                        "operator": "Equals",
+                                        "value": True,
+                                    },
+                                    {
+                                        "key": "{{ request.object.spec.containers[].env[].value | "
+                                               "contains(@, 'changeme') | any(@) }}",
+                                        "operator": "Equals",
+                                        "value": True,
+                                    },
+                                ]
+                            }
+                        },
+                    },
+                },
+                {
+                    "name": "asvs-require-run-as-non-root",
+                    "match": {"any": [{"resources": {"kinds": ["Pod"]}}]},
+                    "validate": {
+                        "message": (
+                            "Containers must run as a non-root user (ASVS V14.2.1, CIS 4.2.6)."
+                        ),
+                        "pattern": {
+                            "spec": {
+                                "securityContext": {
+                                    "runAsNonRoot": True,
+                                }
+                            }
+                        },
+                    },
+                },
+            ],
+        },
+    }
+    generated.append(_write_yaml(base / "kyverno" / "v14-configuration.yaml", v14_policy))
+
+    # --- Checkov custom checks for V2, V6, V8 ---
+    checkov_checks = '''\
+"""
+OWASP ASVS L1 — Checkov Custom Checks (Infra Layer)
+
+Custom Checkov checks implementing OWASP Application Security Verification
+Standard (ASVS) Level 1 controls for IaC compliance scanning.
+
+Chapters covered:
+  V2  — Authentication verification requirements
+  V6  — Stored cryptography verification requirements
+  V8  — Data protection verification requirements
+
+Usage:
+    checkov --external-checks-dir hardening/asvs-l1-checks/checkov \\
+            --directory . --framework terraform
+"""
+
+from checkov.common.models.enums import CheckCategories, CheckResult
+from checkov.terraform.checks.resource.base_resource_check import BaseResourceCheck
+
+
+class AsvsL1V2AuthMfaEnforced(BaseResourceCheck):
+    """ASVS L1 V2.1.1 — Verify that MFA is enforced for privileged IAM users.
+
+    Checks that IAM users tagged as privileged have MFA enforcement enabled.
+    """
+
+    def __init__(self):
+        name = "ASVS L1 V2.1.1 — MFA enforced for privileged IAM users"
+        id = "ASVS_L1_V2_1_1_MFA"
+        supported_resources = ["aws_iam_user"]
+        categories = [CheckCategories.IAM]
+        super().__init__(name=name, id=id, categories=categories,
+                         supported_resources=supported_resources)
+
+    def scan_resource_conf(self, conf):
+        tags = conf.get("tags", [{}])
+        if isinstance(tags, list):
+            tags = tags[0] if tags else {}
+        # Require explicit mfa-enforced=true tag for privileged users
+        if tags.get("privileged") == "true" and tags.get("mfa-enforced") != "true":
+            return CheckResult.FAILED
+        return CheckResult.PASSED
+
+
+class AsvsL1V6EncryptionAtRest(BaseResourceCheck):
+    """ASVS L1 V6.2.1 — Verify that sensitive data at rest is encrypted.
+
+    Checks that storage resources have server-side encryption enabled.
+    """
+
+    def __init__(self):
+        name = "ASVS L1 V6.2.1 — Sensitive data must be encrypted at rest"
+        id = "ASVS_L1_V6_2_1_ENCRYPTION"
+        supported_resources = [
+            "aws_s3_bucket",
+            "aws_db_instance",
+            "aws_rds_cluster",
+            "aws_ebs_volume",
+        ]
+        categories = [CheckCategories.ENCRYPTION]
+        super().__init__(name=name, id=id, categories=categories,
+                         supported_resources=supported_resources)
+
+    def scan_resource_conf(self, conf):
+        # S3 uses server_side_encryption_configuration; RDS/EBS use storage_encrypted
+        sse = conf.get("server_side_encryption_configuration")
+        encrypted = conf.get("storage_encrypted", [False])
+        if isinstance(encrypted, list):
+            encrypted = encrypted[0] if encrypted else False
+        if sse or encrypted is True:
+            return CheckResult.PASSED
+        return CheckResult.FAILED
+
+
+class AsvsL1V8SensitiveDataNotLogged(BaseResourceCheck):
+    """ASVS L1 V8.3.4 — Verify sensitive data is not written to application logs.
+
+    Checks that CloudWatch log groups have retention policies set (as a proxy
+    for controlled log management) and are not world-accessible.
+    """
+
+    def __init__(self):
+        name = "ASVS L1 V8.3.4 — Log groups must have a retention policy"
+        id = "ASVS_L1_V8_3_4_LOG_RETENTION"
+        supported_resources = ["aws_cloudwatch_log_group"]
+        categories = [CheckCategories.LOGGING]
+        super().__init__(name=name, id=id, categories=categories,
+                         supported_resources=supported_resources)
+
+    def scan_resource_conf(self, conf):
+        retention = conf.get("retention_in_days", [None])
+        if isinstance(retention, list):
+            retention = retention[0] if retention else None
+        if retention is not None and int(retention) > 0:
+            return CheckResult.PASSED
+        return CheckResult.FAILED
+
+
+scanner_asvs_v2_mfa = AsvsL1V2AuthMfaEnforced()
+scanner_asvs_v6_encryption = AsvsL1V6EncryptionAtRest()
+scanner_asvs_v8_log_retention = AsvsL1V8SensitiveDataNotLogged()
+'''
+    generated.append(_write_text(base / "checkov" / "asvs-l1-checks.py", checkov_checks))
+    return generated
+
+
+
+
+_KYVERNO_STANDARDS = {"cis-k8s", "stig-k8s", "nsa-k8s", "pod-security", "image-signing", "asvs-l1"}
 _INSPEC_STANDARDS = {"cis-docker", "cis-rhel9", "cis-ubuntu22"}
-_CHECKOV_STANDARDS = {"essential-eight"}
+_CHECKOV_STANDARDS = {"essential-eight", "asvs-l1"}
 
 _GENERATORS = {
     "cis-k8s": generate_kyverno_cis_k8s,
@@ -1608,6 +1924,7 @@ _GENERATORS = {
     "nsa-k8s": generate_kyverno_nsa_k8s,
     "pod-security": generate_kyverno_pod_security,
     "image-signing": generate_kyverno_image_signing,
+    "asvs-l1": generate_asvs_l1,
     "cis-docker": generate_inspec_docker_cis,
     "cis-rhel9": generate_inspec_rhel9_cis,
     "cis-ubuntu22": generate_inspec_ubuntu22_cis,

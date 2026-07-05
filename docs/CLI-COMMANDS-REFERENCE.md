@@ -243,7 +243,7 @@ python -m cli.devopsos scaffold hardening [options]
 
 | Option | Env var | Default | Description |
 |--------|---------|---------|-------------|
-| `--standard STANDARD` | `DEVOPS_OS_HARDENING_STANDARD` | `all` | Hardening standard: `cis-k8s` \| `stig-k8s` \| `nsa-k8s` \| `cis-docker` \| `cis-rhel9` \| `cis-ubuntu22` \| `pod-security` \| `image-signing` \| `essential-eight` \| `all` |
+| `--standard STANDARD` | `DEVOPS_OS_HARDENING_STANDARD` | `all` | Hardening standard: `cis-k8s` \| `stig-k8s` \| `nsa-k8s` \| `cis-docker` \| `cis-rhel9` \| `cis-ubuntu22` \| `pod-security` \| `image-signing` \| `asvs-l1` \| `essential-eight` \| `all` |
 | `--type TYPE` | `DEVOPS_OS_HARDENING_TYPE` | `all` | Output type: `kyverno` \| `inspec` \| `checkov` \| `all` |
 | `--output DIR` | `DEVOPS_OS_HARDENING_OUTPUT` | `hardening` | Output directory |
 | `--compliance-framework FRAMEWORK` | `DEVOPS_OS_HARDENING_COMPLIANCE_FRAMEWORK` | _(none)_ | Tag outputs for `pci-dss`, `hipaa`, `iso27001`, `rbi`, `nist-800-53`, or `soc2` catalog mapping |
@@ -262,6 +262,8 @@ python -m cli.devopsos scaffold hardening [options]
 | `<output>/inspec/docker-cis/` | CIS Docker Benchmark InSpec profile |
 | `<output>/inspec/rhel9-cis/` | CIS RHEL 9 InSpec profile |
 | `<output>/inspec/ubuntu22-cis/` | CIS Ubuntu 22.04 InSpec profile |
+| `<output>/asvs-l1-checks/kyverno/` | OWASP ASVS L1 Kyverno policies (V9, V14) |
+| `<output>/asvs-l1-checks/checkov/` | OWASP ASVS L1 Checkov checks (V2, V6, V8) |
 | `<output>/essential-eight/` | Essential Eight README and Checkov checks |
 | `<output>/compliance-mapping.yaml` | Rule-to-framework mapping file |
 
@@ -270,6 +272,7 @@ python -m cli.devopsos scaffold hardening [options]
 ```bash
 python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
 python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec --output baseline-hardening
+python -m cli.devopsos scaffold hardening --standard asvs-l1 --output hardening
 python -m cli.devopsos scaffold hardening --standard all --compliance-framework pci-dss
 ```
 

@@ -18,6 +18,7 @@ The `devopsos scaffold hardening` command delivers production-ready infrastructu
 | NSA/CISA Kubernetes Hardening Guide | Kubernetes cluster | Kyverno + NetworkPolicy | `kyverno/nsa-k8s/pod-security.yaml`, `network-policies.yaml` |
 | Pod Security Standards (Kubernetes) | Pod admission | Kyverno ClusterPolicy | `kyverno/pod-security-standards.yaml` |
 | Container Image Signing | CI/CD + admission | Kyverno + Cosign policy | `kyverno/image-signing.yaml` |
+| OWASP ASVS L1 (infra layer) | Application deployment | Kyverno + Checkov | `asvs-l1-checks/` |
 | Essential Eight (Australia ASD) | General controls | Checkov | `essential-eight/` |
 
 ---
@@ -92,6 +93,13 @@ hardening/
 │   └── ubuntu22-cis/
 │       ├── inspec.yml
 │       └── controls/ (same structure as rhel9-cis)
+├── asvs-l1-checks/
+│   ├── README.md                           — controls covered and usage
+│   ├── kyverno/
+│   │   ├── v9-communications.yaml          — ASVS V9: disallow HTTP port 80, require TLS ingress
+│   │   └── v14-configuration.yaml          — ASVS V14: no default credentials, run as non-root
+│   └── checkov/
+│       └── asvs-l1-checks.py              — Checkov custom checks for V2, V6, V8
 ├── essential-eight/
 │   ├── README.md                           — maturity levels and applicability
 │   └── checkov/

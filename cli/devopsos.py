@@ -638,7 +638,7 @@ def scaffold_hardening_cmd(
                                   help=(
                                       "Hardening standard: cis-k8s, stig-k8s, nsa-k8s, "
                                       "cis-docker, cis-rhel9, cis-ubuntu22, pod-security, "
-                                      "image-signing, essential-eight, all (default: all)"
+                                      "image-signing, asvs-l1, essential-eight, all (default: all)"
                                   )),
     output_type: str = typer.Option("all", "--type", envvar="DEVOPS_OS_HARDENING_TYPE",
                                      help="Output type: kyverno, inspec, checkov, all (default: all applicable)"),
@@ -658,7 +658,7 @@ def scaffold_hardening_cmd(
                                          "(adjusts enforcement levels, default: production)"
                                      )),
 ):
-    """Generate infrastructure hardening configs (CIS, STIG, NSA, PSS, Essential Eight).
+    """Generate infrastructure hardening configs (CIS, STIG, NSA, PSS, ASVS L1, Essential Eight).
 
     \b
     Examples:
@@ -666,6 +666,7 @@ def scaffold_hardening_cmd(
       devopsos scaffold hardening --standard stig-k8s --output hardening/
       devopsos scaffold hardening --standard cis-rhel9 --type inspec --output hardening/
       devopsos scaffold hardening --standard all --type kyverno --output hardening/
+      devopsos scaffold hardening --standard asvs-l1 --output hardening/
       devopsos scaffold hardening --standard cis-k8s --compliance-framework pci-dss --output hardening/
     """
     _show_help_if_no_opts(ctx)

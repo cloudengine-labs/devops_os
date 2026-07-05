@@ -137,20 +137,21 @@ python -m cli.devopsos scaffold hardening [options]
 
 | Option | Env var | Default | Description |
 |--------|---------|---------|-------------|
-| `--standard STANDARD` | `DEVOPS_OS_HARDENING_STANDARD` | `all` | `cis-k8s` \| `stig-k8s` \| `nsa-k8s` \| `cis-docker` \| `cis-rhel9` \| `cis-ubuntu22` \| `pod-security` \| `image-signing` \| `essential-eight` \| `all` |
+| `--standard STANDARD` | `DEVOPS_OS_HARDENING_STANDARD` | `all` | `cis-k8s` \| `stig-k8s` \| `nsa-k8s` \| `cis-docker` \| `cis-rhel9` \| `cis-ubuntu22` \| `pod-security` \| `image-signing` \| `asvs-l1` \| `essential-eight` \| `all` |
 | `--type TYPE` | `DEVOPS_OS_HARDENING_TYPE` | `all` | `kyverno` \| `inspec` \| `checkov` \| `all` |
 | `--output DIR` | `DEVOPS_OS_HARDENING_OUTPUT` | `hardening` | Output directory |
 | `--compliance-framework FRAMEWORK` | `DEVOPS_OS_HARDENING_COMPLIANCE_FRAMEWORK` | _(none)_ | Tag outputs for `pci-dss`, `hipaa`, `iso27001`, `rbi`, `nist-800-53`, or `soc2` |
 | `--severity LEVEL` | `DEVOPS_OS_HARDENING_SEVERITY` | `medium` | `critical` \| `high` \| `medium` \| `low` |
 | `--environment ENV` | `DEVOPS_OS_HARDENING_ENVIRONMENT` | `production` | `dev` \| `staging` \| `production` |
 
-**Output:** `<output>/kyverno/`, `<output>/inspec/`, `<output>/essential-eight/`, and `<output>/compliance-mapping.yaml`
+**Output:** `<output>/kyverno/`, `<output>/inspec/`, `<output>/asvs-l1-checks/`, `<output>/essential-eight/`, and `<output>/compliance-mapping.yaml`
 
 ### Examples
 
 ```bash
 python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
 python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec
+python -m cli.devopsos scaffold hardening --standard asvs-l1 --output hardening
 python -m cli.devopsos scaffold hardening --standard all --compliance-framework pci-dss
 ```
 
