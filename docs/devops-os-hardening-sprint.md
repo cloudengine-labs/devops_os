@@ -46,7 +46,7 @@ devopsos scaffold hardening --standard cis-k8s --compliance-framework pci-dss --
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--standard` | Hardening standard: `cis-k8s`, `stig-k8s`, `nsa-k8s`, `cis-docker`, `cis-rhel9`, `cis-ubuntu22`, `pod-security`, `image-signing`, `essential-eight`, `all` | `all` |
+| `--standard` | Hardening standard: `cis-k8s`, `stig-k8s`, `nsa-k8s`, `cis-docker`, `cis-rhel9`, `cis-ubuntu22`, `pod-security`, `image-signing`, `asvs-l1`, `essential-eight`, `all` | `all` |
 | `--type` | Output type: `kyverno`, `inspec`, `checkov`, `all` | `all` applicable |
 | `--output` | Output directory | `./hardening/` |
 | `--compliance-framework` | Tag outputs with compliance framework IDs (`pci-dss`, `hipaa`, `iso27001`, `rbi`, `nist-800-53`, `soc2`) for GovPilot catalog linking | _(none)_ |
@@ -92,7 +92,12 @@ hardening/
 │   │       └── 5_access.rb                 — CIS 5.x access, auth, sudo
 │   └── ubuntu22-cis/
 │       ├── inspec.yml
-│       └── controls/ (same structure as rhel9-cis)
+│       └── controls/
+│           ├── 1_filesystem.rb             — CIS 1.x filesystem partitions and mount options (Ubuntu-specific)
+│           ├── 2_software.rb               — CIS 2.x software updates, apt, snap, and package management
+│           ├── 3_network.rb                — CIS 3.x network parameters and firewall (ufw)
+│           ├── 4_logging.rb                — CIS 4.x logging, auditing (auditd), and rsyslog
+│           └── 5_access.rb                 — CIS 5.x user accounts, PAM, shadow passwords, and file permissions
 ├── asvs-l1-checks/
 │   ├── README.md                           — controls covered and usage
 │   ├── kyverno/
