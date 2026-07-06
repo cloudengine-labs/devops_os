@@ -86,11 +86,15 @@ jobs:
         id: resolve_url
         if: always()
         run: |
-          if [[ "${{ steps.deployment_retry.outcome }}" == "success" && -n "${{ steps.deployment_retry.outputs.page_url }}" ]]; then
+          if [[ "${{ steps.deployment_retry.outcome }}" == "success" ]]; then
             echo "page_url=${{ steps.deployment_retry.outputs.page_url }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ steps.deployment.outcome }}" == "success" && -n "${{ steps.deployment.outputs.page_url }}" ]]; then
+          elif [[ "${{ steps.deployment.outcome }}" == "success" ]]; then
             echo "page_url=${{ steps.deployment.outputs.page_url }}" >> "$GITHUB_OUTPUT"
           else
             repo_name="${GITHUB_REPOSITORY#*/}"
-            echo "page_url=https://${GITHUB_REPOSITORY_OWNER}.github.io/${repo_name}/" >> "$GITHUB_OUTPUT"
+            if [[ "${repo_name}" == "${GITHUB_REPOSITORY_OWNER}.github.io" ]]; then
+              echo "page_url=https://${GITHUB_REPOSITORY_OWNER}.github.io/" >> "$GITHUB_OUTPUT"
+            else
+              echo "page_url=https://${GITHUB_REPOSITORY_OWNER}.github.io/${repo_name}/" >> "$GITHUB_OUTPUT"
+            fi
           fi
