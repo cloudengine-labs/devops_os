@@ -895,8 +895,8 @@ def _collect_templates():
     by_category = {}
     for mod in _SCAFFOLD_MODULES:
         info = getattr(mod, "TEMPLATE_INFO", None)
-        if info:
-            cat = info.get("category", "Other")
+        if isinstance(info, dict):
+            cat = info.get("category") or "Other"
             by_category.setdefault(cat, []).append(info)
     return by_category
 
