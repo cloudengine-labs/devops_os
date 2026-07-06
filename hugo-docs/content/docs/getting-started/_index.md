@@ -12,13 +12,14 @@ Welcome! This guide walks you through DevOps-OS from **zero to your first genera
 
 ## What is DevOps-OS?
 
-DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, and SRE monitoring configs — so you can stop writing boilerplate and start shipping.
+DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, infrastructure hardening baselines, and SRE monitoring configs — so you can stop writing boilerplate and start shipping.
 
 | Category | Tools |
 |----------|-------|
 | CI/CD | GitHub Actions, GitLab CI, Jenkins |
 | GitOps / Deploy | ArgoCD, Flux CD, kubectl, Kustomize |
 | Containers | Docker, Helm |
+| Hardening / Compliance | Kyverno policies, InSpec profiles, Checkov checks, compliance mappings |
 | SRE / Observability | Prometheus alert rules, Grafana dashboards, SLO configs |
 | Unit Testing | pytest, Jest, Vitest, Mocha, Go test |
 | AI Integration | Claude (MCP Server), OpenAI (function calling) |
@@ -128,7 +129,23 @@ python -m cli.devopsos scaffold argocd --name my-app --method flux \
 
 ---
 
-## 5 — Generate SRE configs
+## 5 — Generate infrastructure hardening baselines
+
+```bash
+# Kubernetes policy baselines
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+
+# Operating system compliance profiles
+python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec
+```
+
+**Output:** `hardening/` directory containing Kyverno policies, InSpec profiles, Checkov checks, and a compliance mapping file.
+
+See [Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) for supported standards and validation examples.
+
+---
+
+## 6 — Generate SRE configs
 
 ```bash
 python -m cli.devopsos scaffold sre --name my-app --team platform
@@ -142,7 +159,7 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 
 ---
 
-## 6 — Generate unit test configs
+## 7 — Generate unit test configs
 
 ```bash
 # Python — generates pytest.ini, conftest.py, and a sample test file
@@ -162,7 +179,7 @@ See [CLI Reference]({{< relref "/docs/reference" >}}) for all options and output
 
 ---
 
-## 7 — Interactive wizard (all-in-one)
+## 8 — Interactive wizard (all-in-one)
 
 ```bash
 python -m cli.devopsos init              # interactive project configurator
@@ -170,6 +187,7 @@ python -m cli.devopsos scaffold gha      # scaffold GitHub Actions
 python -m cli.devopsos scaffold gitlab   # scaffold GitLab CI
 python -m cli.devopsos scaffold jenkins  # scaffold Jenkins
 python -m cli.devopsos scaffold argocd   # scaffold ArgoCD / Flux
+python -m cli.devopsos scaffold hardening # scaffold hardening baselines
 python -m cli.devopsos scaffold sre      # scaffold SRE configs
 python -m cli.devopsos scaffold cicd     # scaffold GHA + Jenkins in one step
 python -m cli.devopsos scaffold unittest # scaffold unit test configs
@@ -177,7 +195,7 @@ python -m cli.devopsos scaffold unittest # scaffold unit test configs
 
 ---
 
-## 8 — Use with an AI assistant
+## 9 — Use with an AI assistant
 
 ```bash
 pip install -r mcp_server/requirements.txt
@@ -202,12 +220,13 @@ Then ask Claude: *"Generate a complete GitLab CI pipeline for a Python Flask API
 
 ---
 
-## Next steps
+## 10 — Next steps
 
 | I want to… | Read |
 |-----------|------|
 | Understand the Process-First philosophy | [Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) |
 | See every CLI option and output path | [CLI Reference]({{< relref "/docs/reference" >}}) |
+| Generate infrastructure hardening baselines | [Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) |
 | Deep-dive GitHub Actions | [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) |
 | Deep-dive GitLab CI | [GitLab CI]({{< relref "/docs/ci-cd/gitlab-ci" >}}) |
 | Deep-dive Jenkins | [Jenkins]({{< relref "/docs/ci-cd/jenkins" >}}) |

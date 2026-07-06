@@ -143,6 +143,26 @@ python -m cli.devopsos scaffold argocd --name my-app --method flux \
 
 ---
 
+## Infrastructure Hardening
+
+```bash
+# CIS Kubernetes policies
+# Output: hardening/kyverno/cis-k8s/
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+
+# CIS RHEL 9 InSpec profile
+# Output: hardening/inspec/rhel9-cis/
+python -m cli.devopsos scaffold hardening --standard cis-rhel9 --type inspec
+
+# Full baseline set with compliance mapping
+# Output: hardening/
+python -m cli.devopsos scaffold hardening --standard all --compliance-framework pci-dss
+```
+
+See the [Infrastructure Hardening guide]({{< relref "/docs/platform-engineering/hardening" >}}) for supported standards and output structure.
+
+---
+
 ## SRE Configuration
 
 ```bash
@@ -209,6 +229,7 @@ python -m cli.devopsos scaffold gha --help
 python -m cli.devopsos scaffold gitlab --help
 python -m cli.devopsos scaffold jenkins --help
 python -m cli.devopsos scaffold argocd --help
+python -m cli.devopsos scaffold hardening --help
 python -m cli.devopsos scaffold sre --help
 python -m cli.devopsos scaffold devcontainer --help
 python -m cli.devopsos process-first --help
@@ -219,6 +240,7 @@ cat .gitlab-ci.yml             # GitLab CI
 cat Jenkinsfile                # Jenkins
 ls -la argocd/                 # ArgoCD
 ls -la flux/                   # Flux CD
+ls -la hardening/              # Infrastructure hardening
 ls -la sre/                    # SRE configs
 ls -la .devcontainer/          # Dev container
 ```

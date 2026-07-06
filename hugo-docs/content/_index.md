@@ -5,7 +5,7 @@ type: "docs"
 
 # 🚀 DevOps-OS
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments and SRE dashboards — using a conversational AI assistant or a single CLI command.**
+**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using a conversational AI assistant or a single CLI command.**
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
@@ -26,6 +26,7 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 | 🚀 | **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines — [→ CI/CD Generators]({{< relref "/docs/ci-cd" >}}) |
 | ☸️ | **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations — [→ GitOps & ArgoCD]({{< relref "/docs/gitops" >}}) |
 | 📊 | **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests — [→ SRE Configuration]({{< relref "/docs/sre" >}}) |
+| 🔐 | **Infrastructure Hardening** | Generate Kyverno policies, InSpec profiles, Checkov checks, and compliance mappings — [→ Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) |
 | 🤖 | **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills — [→ AI Integration]({{< relref "/docs/ai-integration" >}}) |
 | 🛠️ | **Dev Container** | Pre-configured multi-language environment: Python · Java · Go · JavaScript — [→ Dev Container]({{< relref "/docs/dev-container" >}}) |
 | 🔄 | **Process-First** | Built-in education on the Process-First SDLC philosophy and how every tool maps to an SDLC principle — [→ Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) |
@@ -52,7 +53,11 @@ python -m cli.devopsos scaffold gha --name my-app --languages python,javascript 
 python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
 # Output: .gitlab-ci.yml
 
-# 5. Generate SRE configs (Prometheus + Grafana + SLO)
+# 5. Generate infrastructure hardening configs
+python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
+# Output: hardening/ directory
+
+# 6. Generate SRE configs (Prometheus + Grafana + SLO)
 python -m cli.devopsos scaffold sre --name my-app --team platform
 # Output: sre/ directory
 ```
@@ -69,6 +74,7 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 | **CI/CD** | GitHub Actions, GitLab CI, Jenkins |
 | **GitOps / Deploy** | ArgoCD, Flux CD, kubectl, Kustomize |
 | **Containers** | Docker, Helm |
+| **Hardening / Compliance** | Kyverno, InSpec, Checkov, Pod Security Standards, CIS / STIG / NSA baselines |
 | **SRE / Observability** | Prometheus, Grafana, SLO (Sloth-compatible) |
 | **AI Integration** | Claude MCP Server, OpenAI function calling |
 | **Languages** | Python · Java · Go · JavaScript / TypeScript |
@@ -81,6 +87,7 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 |-------|-------------|
 | [Getting Started]({{< relref "/docs/getting-started" >}}) | Zero to first pipeline in 5 minutes |
 | [Platform Engineering IDP]({{< relref "/docs/platform-engineering" >}}) | Conceptual self-service IDP flow from templates to generated automation |
+| [Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) | Generate hardening baselines and compliance mappings |
 | [Process-First Philosophy]({{< relref "/docs/getting-started/process-first" >}}) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
 | [Quick Start Reference]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands at a glance |
 | [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) | Generate GHA workflows |
