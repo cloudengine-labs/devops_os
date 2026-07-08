@@ -131,16 +131,22 @@ jobs:
                   "D": "Removed",
                   "R": "Renamed",
                   "C": "Copied",
-              }.get(status[:1], "Updated")
+              }.get(status[:1])
+              if status_label is None:
+                  print(f"WARNING: unknown git diff status '{status}' for '{file_path}', treating as Updated")
+                  status_label = "Updated"
               changes.append(f"- {status_label} file `{file_path}`.")
 
           if not changes:
-              raise SystemExit("ERROR: no release file changes detected from git diff")
+              raise SystemExit(
+                  "ERROR: no release file changes detected from git diff. "
+                  "Check prior version-bump and badge-update steps."
+              )
 
           entry = (
               f"\n## [{new_version}] - {today}\n\n"
               f"### Changed\n"
-              f"{'\\n'.join(changes)}\n\n"
+              f"{'\n'.join(changes)}\n\n"
               f"---\n"
           )
 
