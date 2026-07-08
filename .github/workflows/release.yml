@@ -78,22 +78,75 @@ jobs:
               out.write(f"new_version={new_version}\n")
           PYEOF
 
-      # ── 2. Update CHANGELOG.md ────────────────────────────────────────────
+      # ── 2. Update version badge in Hugo docs index ────────────────────────
+      - name: Update version badge in Hugo docs
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          # Replace any existing version-X.Y.Z-blue badge with the new version
+          sed -i -E \
+            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
+            hugo-docs/content/_index.md
+
+      # ── 3. Update version badge in root README ────────────────────────────
+      - name: Update version badge in root README
+        env:
+          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
+        run: |
+          # Replace any existing version-X.Y.Z-blue badge with the new version
+          sed -i -E \
+            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
+            README.md
+
+      # ── 4. Update CHANGELOG.md from git diff ──────────────────────────────
       - name: Prepend CHANGELOG entry for new version
         env:
           NEW_VERSION: ${{ steps.bump.outputs.new_version }}
         run: |
           python - <<'PYEOF'
           import os
+          import subprocess
           from datetime import date
 
           new_version = os.environ["NEW_VERSION"]
           today = date.today().isoformat()
 
+          diff_output = subprocess.check_output(
+              ["git", "diff", "--name-status", "HEAD"], text=True
+          ).strip()
+
+          changes = []
+          for line in diff_output.splitlines():
+              if not line.strip():
+                  continue
+              parts = line.split("\t", 1)
+              if len(parts) != 2:
+                  continue
+              status, file_path = parts
+              if file_path == "CHANGELOG.md":
+                  continue
+              status_label = {
+                  "A": "Added",
+                  "M": "Updated",
+                  "D": "Removed",
+                  "R": "Renamed",
+                  "C": "Copied",
+              }.get(status[:1])
+              if status_label is None:
+                  print(f"WARNING: unknown git diff status '{status}' for '{file_path}', treating as Updated")
+                  status_label = "Updated"
+              changes.append(f"- {status_label} `{file_path}`.")
+
+          if not changes:
+              raise SystemExit(
+                  "ERROR: no release file changes detected from git diff. "
+                  "Check prior version-bump and badge-update steps."
+              )
+
           entry = (
               f"\n## [{new_version}] - {today}\n\n"
               f"### Changed\n"
-              f"- Automated patch release — version bump to {new_version}.\n\n"
+              f"{'\n'.join(changes)}\n\n"
               f"---\n"
           )
 
@@ -114,26 +167,6 @@ jobs:
 
           print(f"CHANGELOG updated with {new_version} entry")
           PYEOF
-
-      # ── 3. Update version badge in Hugo docs index ────────────────────────
-      - name: Update version badge in Hugo docs
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
-        run: |
-          # Replace any existing version-X.Y.Z-blue badge with the new version
-          sed -i -E \
-            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
-            hugo-docs/content/_index.md
-
-      # ── 4. Update version badge in root README ────────────────────────────
-      - name: Update version badge in root README
-        env:
-          NEW_VERSION: ${{ steps.bump.outputs.new_version }}
-        run: |
-          # Replace any existing version-X.Y.Z-blue badge with the new version
-          sed -i -E \
-            "s|version-[0-9]+\.[0-9]+\.[0-9]+-blue|version-${NEW_VERSION}-blue|g" \
-            README.md
 
       # ── 5. Open a PR with the version-bump changes ────────────────────────
       # peter-evans/create-pull-request creates commits via the GitHub API so
