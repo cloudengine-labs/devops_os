@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.7] - 2026-07-08
+
+### Changed
+- Bumped CLI version to `0.4.7` in `cli/__version__.py`.
+- Updated version badge to `0.4.7` in `README.md`.
+- Updated version badge to `0.4.7` in `hugo-docs/content/_index.md`.
+
+---
+
 ## [0.4.6] - 2026-04-01
 
 ### Changed
