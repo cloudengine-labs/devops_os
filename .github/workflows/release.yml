@@ -132,10 +132,10 @@ jobs:
                   "R": "Renamed",
                   "C": "Copied",
               }.get(status[:1], "Updated")
-              changes.append(f"- {status_label} `{file_path}`.")
+              changes.append(f"- {status_label} file `{file_path}`.")
 
           if not changes:
-              changes = [f"- Updated release metadata for `{new_version}`."]
+              raise SystemExit("ERROR: no release file changes detected from git diff")
 
           entry = (
               f"\n## [{new_version}] - {today}\n\n"
