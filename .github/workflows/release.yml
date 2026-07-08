@@ -123,6 +123,8 @@ jobs:
               if len(parts) != 2:
                   continue
               status, file_path = parts
+              if file_path == "CHANGELOG.md":
+                  continue
               status_label = {
                   "A": "Added",
                   "M": "Updated",
@@ -135,12 +137,10 @@ jobs:
           if not changes:
               changes = [f"- Updated release metadata for `{new_version}`."]
 
-          changes.append("- Updated `CHANGELOG.md`.")
-
           entry = (
               f"\n## [{new_version}] - {today}\n\n"
               f"### Changed\n"
-              f"{chr(10).join(changes)}\n\n"
+              f"{'\\n'.join(changes)}\n\n"
               f"---\n"
           )
 
