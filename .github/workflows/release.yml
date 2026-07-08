@@ -135,7 +135,7 @@ jobs:
               if status_label is None:
                   print(f"WARNING: unknown git diff status '{status}' for '{file_path}', treating as Updated")
                   status_label = "Updated"
-              changes.append(f"- {status_label} file `{file_path}`.")
+              changes.append(f"- {status_label} `{file_path}`.")
 
           if not changes:
               raise SystemExit(
