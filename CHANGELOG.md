@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.7] - 2026-07-08
+
+### Changed
+- Automated patch release — version bump to 0.4.7.
+
+---
+
 ## [0.4.6] - 2026-04-01
 
 ### Changed
