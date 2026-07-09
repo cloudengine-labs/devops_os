@@ -16,6 +16,12 @@ Outputs:
   └── image-update-automation.yaml Flux image update automation
 """
 
+TEMPLATE_INFO = {
+    "name": "argocd",
+    "category": "GitOps",
+    "description": "ArgoCD/Flux manifests",
+}
+
 import os
 import argparse
 import yaml

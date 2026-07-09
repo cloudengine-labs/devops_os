@@ -15,6 +15,12 @@ Features:
 - Support for various source control management (SCM) systems
 """
 
+TEMPLATE_INFO = {
+    "name": "jenkins",
+    "category": "CI/CD",
+    "description": "Jenkins pipelines",
+}
+
 import os
 import sys
 import argparse

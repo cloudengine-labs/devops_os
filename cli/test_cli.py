@@ -24,6 +24,28 @@ def _strip_ansi(s):
 
 # -- devopsos CLI ----------------------------------------------------------
 
+def test_list_command():
+    """Test that list command shows all templates grouped by category."""
+    result = _run_module("cli.devopsos", ["list"])
+    assert result.returncode == 0
+    out = _strip_ansi(result.stdout)
+    assert "CI/CD" in out
+    assert "GitOps" in out
+    assert "SRE" in out
+    assert "Testing" in out
+    assert "Development" in out
+    assert "gha" in out
+    assert "jenkins" in out
+    assert "argocd" in out
+
+
+def test_list_in_help():
+    """Test that list appears in main help."""
+    result = _run_module("cli.devopsos", ["--help"])
+    assert result.returncode == 0
+    assert "list" in result.stdout
+
+
 def test_help():
     result = _run(["-m", "cli.devopsos", "--help"])
     assert result.returncode == 0

@@ -11,6 +11,12 @@ Usage:
     python -m cli.devopsos scaffold cicd [options]
 """
 
+TEMPLATE_INFO = {
+    "name": "cicd",
+    "category": "CI/CD",
+    "description": "Combined CI/CD (GHA + Jenkins)",
+}
+
 import os
 import sys
 import argparse

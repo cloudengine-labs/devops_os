@@ -14,6 +14,12 @@ Features:
 - Merge request pipelines and branch protection
 """
 
+TEMPLATE_INFO = {
+    "name": "gitlab",
+    "category": "CI/CD",
+    "description": "GitLab CI pipelines",
+}
+
 import os
 import sys
 import argparse
