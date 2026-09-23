@@ -1085,5 +1085,10 @@ def main():
     if args.kubernetes:
         print(f"Kubernetes deployment method: {args.k8s_method}")
 
+    return {
+        "workflow": str(Path(filepath)),
+        "type": "github_actions",
+    }
+
 if __name__ == "__main__":
     main()

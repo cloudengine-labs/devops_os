@@ -339,6 +339,11 @@ def main():
     if args.kubernetes:
         print(f"Kubernetes deployment method: {args.k8s_method}")
 
+    return {
+        "pipeline": str(output_path),
+        "type": "gitlab_ci",
+    }
+
 
 if __name__ == "__main__":
     main()

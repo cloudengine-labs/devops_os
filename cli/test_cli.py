@@ -255,6 +255,24 @@ def test_scaffold_gha_via_cli():
         assert result.returncode == 0, result.stderr
         assert "error: unrecognized arguments" not in result.stderr
 
+def test_scaffold_gha_json_output():
+    """--json returns only a structured GitHub Actions result."""
+    with tempfile.TemporaryDirectory() as tmp:
+        output_dir = os.path.join(tmp, ".github/workflows")
+        result = _run([
+            "-m", "cli.devopsos", "scaffold", "gha",
+            "--name", "my-app", "--type", "complete",
+            "--output", output_dir, "--json",
+        ])
+
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload == {
+            "workflow": os.path.normpath(os.path.join(output_dir, "my-app-complete.yml")),
+            "type": "github_actions",
+        }
+        assert result.stderr == ""
+
 def test_scaffold_gitlab_via_cli():
     """Regression: `python -m cli.devopsos scaffold gitlab` must not raise argparse error."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -267,6 +285,46 @@ def test_scaffold_gitlab_via_cli():
         )
         assert result.returncode == 0, result.stderr
         assert "error: unrecognized arguments" not in result.stderr
+
+def test_scaffold_gitlab_json_output():
+    """--json returns only the structured GitLab CI result."""
+    with tempfile.TemporaryDirectory() as tmp:
+        output_path = os.path.join(tmp, ".gitlab-ci.yml")
+        result = _run([
+            "-m", "cli.devopsos", "scaffold", "gitlab",
+            "--name", "my-app", "--type", "build",
+            "--output", output_path, "--json",
+        ])
+
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload == {
+            "pipeline": os.path.normpath(output_path),
+            "type": "gitlab_ci",
+        }
+        assert result.stderr == ""
+
+def test_scaffold_sre_json_output_lists_generated_files():
+    """Multi-file scaffold commands expose every generated file in JSON mode."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run([
+            "-m", "cli.devopsos", "scaffold", "sre",
+            "--name", "my-app", "--output-dir", tmp, "--json",
+        ])
+
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout)
+        assert payload["type"] == "sre"
+        assert {os.path.normpath(path) for path in payload["files"]} == {
+            os.path.normpath(os.path.join(tmp, filename))
+            for filename in (
+                "alert-rules.yaml",
+                "grafana-dashboard.json",
+                "slo.yaml",
+                "alertmanager-config.yaml",
+            )
+        }
+        assert result.stderr == ""
 
 def test_scaffold_argocd_via_cli():
     """Regression: `python -m cli.devopsos scaffold argocd` must not raise argparse error."""

@@ -156,7 +156,23 @@ python -m cli.devopsos scaffold gha --name my-app --languages python --type comp
 
 # With Kubernetes deployment via Kustomize
 python -m cli.devopsos scaffold gha --name my-app --languages python --kubernetes --k8s-method kustomize
+
+# Return a machine-readable result for automation pipelines
+python -m cli.devopsos scaffold gha --name my-app --json
 ```
+
+With `--json`, the command keeps the generated files unchanged and writes only
+the result object to standard output, for example:
+
+```json
+{
+  "workflow": ".github/workflows/my-app-complete.yml",
+  "type": "github_actions"
+}
+```
+
+The flag is available on every `scaffold` target. Multi-file generators return
+the generated paths in a `files` array.
 
 ---
 

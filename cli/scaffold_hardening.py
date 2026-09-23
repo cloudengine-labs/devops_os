@@ -1982,6 +1982,8 @@ def main():
             "Check that the standard supports the requested output type."
         )
 
+    return {"files": [str(path) for path in generated], "type": "hardening"}
+
 
 if __name__ == "__main__":
     main()

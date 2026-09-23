@@ -1,0 +1,124 @@
+name: my-app CI/CD
+'on':
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to deploy to
+        required: true
+        default: dev
+        type: choice
+        options:
+        - dev
+        - test
+        - staging
+        - prod
+permissions:
+  contents: read
+  packages: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Set up build environment
+      run: echo 'Setting up build environment for DevOps-OS'
+    - name: Install Python dependencies
+      run: if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Build Python package
+      run: if [ -f setup.py ]; then pip install -e .; elif [ -f pyproject.toml ];
+        then pip install -e .; fi
+    - name: Install Node.js dependencies
+      run: if [ -f package.json ]; then npm ci; fi
+    - name: Build JavaScript/TypeScript
+      run: if [ -f package.json ]; then npm run build --if-present; fi
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: dist/
+        retention-days: 1
+        if-no-files-found: warn
+  test:
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+    - name: Set up test environment
+      run: echo 'Setting up test environment for DevOps-OS'
+    - name: Install Python dependencies
+      run: |
+        python -m pip install -r cli/requirements.txt -r mcp_server/requirements.txt
+        python -m pip install pytest pytest-cov
+    - name: Run Python tests
+      run: if [ -d tests ]; then python -m pytest --cov=./ --cov-report=xml; fi
+    - name: Run Pylint
+      run: if command -v pylint &> /dev/null; then pylint --disable=C0111 **/*.py;
+        fi
+    - name: Install Node.js dependencies
+      run: if [ -f package.json ]; then npm ci; fi
+    - name: Run JavaScript tests
+      run: if [ -f package.json ]; then npm test; fi
+    - name: Run ESLint
+      run: if [ -f package.json ] && grep -q eslint package.json; then npm run lint;
+        fi
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: test-reports/
+        retention-days: 1
+        if-no-files-found: warn
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage.xml,./coverage/lcov.info
+        fail_ci_if_error: false
+  deploy:
+    needs:
+    - test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Set up deployment environment
+      run: echo 'Setting up deployment environment for DevOps-OS'
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      env:
+        IMAGE_NAME: ghcr.io/${{ github.repository }}
+      run: |
+        docker build -t "$IMAGE_NAME:latest" -t "$IMAGE_NAME:${{ github.sha }}" .
+        docker push "$IMAGE_NAME:latest"
+        docker push "$IMAGE_NAME:${{ github.sha }}"

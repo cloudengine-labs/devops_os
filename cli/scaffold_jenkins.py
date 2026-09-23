@@ -541,5 +541,10 @@ def main():
     if args.parameters:
         print("Pipeline includes runtime parameters")
 
+    return {
+        "pipeline": str(Path(output_path)),
+        "type": "jenkins",
+    }
+
 if __name__ == "__main__":
     main()

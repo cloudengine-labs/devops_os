@@ -1,4 +1,5 @@
 import enum
+import io
 import sys
 import typer
 from InquirerPy import inquirer
@@ -6,6 +7,7 @@ import json
 import os
 from pathlib import Path
 from typing import Optional
+from contextlib import redirect_stdout
 
 # Import scaffold modules — used as libraries by the unified scaffold sub-commands
 import cli.scaffold_cicd as scaffold_cicd
@@ -90,7 +92,7 @@ scaffold_app = typer.Typer(
 app.add_typer(scaffold_app, name="scaffold")
 
 
-def _run_scaffold(module_main, flags: list):
+def _run_scaffold(module_main, flags: list, json_output: bool = False):
     """Call *module_main()* with the given CLI flag list via sys.argv.
 
     Each scaffold module uses argparse internally.  We temporarily replace
@@ -100,9 +102,15 @@ def _run_scaffold(module_main, flags: list):
     _saved = sys.argv[:]
     sys.argv = sys.argv[:1] + flags
     try:
-        module_main()
+        if json_output:
+            with redirect_stdout(io.StringIO()):
+                result = module_main()
+            typer.echo(json.dumps(result, indent=2))
+        else:
+            result = module_main()
     finally:
         sys.argv = _saved
+    return result
 
 
 def _show_help_if_no_opts(ctx: typer.Context) -> None:
@@ -123,6 +131,7 @@ def _show_help_if_no_opts(ctx: typer.Context) -> None:
 @scaffold_app.command("gha")
 def scaffold_gha_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_GHA_NAME",
                               help="Workflow name"),
     workflow_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_GHA_TYPE",
@@ -181,7 +190,7 @@ def scaffold_gha_cmd(
         flags += ["--custom-values", custom_values]
     if env_file:
         flags += ["--env-file", env_file]
-    _run_scaffold(scaffold_gha.main, flags)
+    _run_scaffold(scaffold_gha.main, flags, json_output)
 
 
 # ── scaffold jenkins ────────────────────────────────────────────────────────
@@ -189,6 +198,7 @@ def scaffold_gha_cmd(
 @scaffold_app.command("jenkins")
 def scaffold_jenkins_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_JENKINS_NAME",
                               help="Pipeline name"),
     pipeline_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_JENKINS_TYPE",
@@ -242,7 +252,7 @@ def scaffold_jenkins_cmd(
         flags += ["--custom-values", custom_values]
     if env_file:
         flags += ["--env-file", env_file]
-    _run_scaffold(scaffold_jenkins.main, flags)
+    _run_scaffold(scaffold_jenkins.main, flags, json_output)
 
 
 # ── scaffold gitlab ─────────────────────────────────────────────────────────
@@ -250,6 +260,7 @@ def scaffold_jenkins_cmd(
 @scaffold_app.command("gitlab")
 def scaffold_gitlab_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_GITLAB_NAME",
                               help="Application / pipeline name"),
     pipeline_type: str = typer.Option("complete", "--type", envvar="DEVOPS_OS_GITLAB_TYPE",
@@ -295,7 +306,7 @@ def scaffold_gitlab_cmd(
         flags += ["--kube-namespace", kube_namespace]
     if custom_values:
         flags += ["--custom-values", custom_values]
-    _run_scaffold(scaffold_gitlab.main, flags)
+    _run_scaffold(scaffold_gitlab.main, flags, json_output)
 
 
 # ── scaffold argocd ─────────────────────────────────────────────────────────
@@ -303,6 +314,7 @@ def scaffold_gitlab_cmd(
 @scaffold_app.command("argocd")
 def scaffold_argocd_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_ARGOCD_NAME",
                               help="Application name"),
     method: str = typer.Option("argocd", envvar="DEVOPS_OS_ARGOCD_METHOD",
@@ -358,7 +370,7 @@ def scaffold_argocd_cmd(
         flags.append("--rollouts")
     if allow_any_source_repo:
         flags.append("--allow-any-source-repo")
-    _run_scaffold(scaffold_argocd.main, flags)
+    _run_scaffold(scaffold_argocd.main, flags, json_output)
 
 
 # ── scaffold sre ────────────────────────────────────────────────────────────
@@ -366,6 +378,7 @@ def scaffold_argocd_cmd(
 @scaffold_app.command("sre")
 def scaffold_sre_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_SRE_NAME",
                               help="Application / service name"),
     team: str = typer.Option("platform", envvar="DEVOPS_OS_SRE_TEAM",
@@ -414,7 +427,7 @@ def scaffold_sre_cmd(
     ]
     if pagerduty_key:
         flags += ["--pagerduty-key", pagerduty_key]
-    _run_scaffold(scaffold_sre.main, flags)
+    _run_scaffold(scaffold_sre.main, flags, json_output)
 
 
 # ── scaffold devcontainer ───────────────────────────────────────────────────
@@ -422,6 +435,7 @@ def scaffold_sre_cmd(
 @scaffold_app.command("devcontainer")
 def scaffold_devcontainer_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     languages: str = typer.Option("python", envvar="DEVOPS_OS_DEVCONTAINER_LANGUAGES",
                                    help="Comma-separated languages to enable (default: python)"),
     cicd_tools: str = typer.Option("docker,github_actions", "--cicd-tools",
@@ -506,7 +520,7 @@ def scaffold_devcontainer_cmd(
         "--grafana-version", grafana_version,
         "--output-dir", output_dir,
     ]
-    _run_scaffold(scaffold_devcontainer.main, flags)
+    _run_scaffold(scaffold_devcontainer.main, flags, json_output)
 
 
 # ── scaffold cicd ───────────────────────────────────────────────────────────
@@ -514,6 +528,7 @@ def scaffold_devcontainer_cmd(
 @scaffold_app.command("cicd")
 def scaffold_cicd_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("DevOps-OS", help="CI/CD pipeline name"),
     cicd_type: str = typer.Option("complete", "--type",
                                    help="Pipeline type: build | test | deploy | complete"),
@@ -569,7 +584,7 @@ def scaffold_cicd_cmd(
         flags.append("--all")
     if custom_values:
         flags += ["--custom-values", custom_values]
-    _run_scaffold(scaffold_cicd.main, flags)
+    _run_scaffold(scaffold_cicd.main, flags, json_output)
 
 
 # ── scaffold unittest ────────────────────────────────────────────────────────
@@ -577,6 +592,7 @@ def scaffold_cicd_cmd(
 @scaffold_app.command("unittest")
 def scaffold_unittest_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     name: str = typer.Option("my-app", envvar="DEVOPS_OS_UNITTEST_NAME",
                               help="Project / application name"),
     languages: str = typer.Option("python", envvar="DEVOPS_OS_UNITTEST_LANGUAGES",
@@ -636,7 +652,7 @@ def scaffold_unittest_cmd(
     if not coverage:
         # coverage defaults to True; only pass flag when False
         flags.append("--no-coverage")
-    _run_scaffold(scaffold_unittest.main, flags)
+    _run_scaffold(scaffold_unittest.main, flags, json_output)
 
 
 # ── scaffold hardening ──────────────────────────────────────────────────────
@@ -644,6 +660,7 @@ def scaffold_unittest_cmd(
 @scaffold_app.command("hardening")
 def scaffold_hardening_cmd(
     ctx: typer.Context,
+    json_output: bool = typer.Option(False, "--json", help="Print the generated result as JSON"),
     standard: str = typer.Option("all", envvar="DEVOPS_OS_HARDENING_STANDARD",
                                   help=(
                                       "Hardening standard: cis-k8s, stig-k8s, nsa-k8s, "
@@ -689,7 +706,7 @@ def scaffold_hardening_cmd(
     ]
     if compliance_framework:
         flags += ["--compliance-framework", compliance_framework]
-    _run_scaffold(scaffold_hardening.main, flags)
+    _run_scaffold(scaffold_hardening.main, flags, json_output)
 
 
 @app.command()

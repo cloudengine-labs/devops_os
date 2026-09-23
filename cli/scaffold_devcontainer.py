@@ -357,6 +357,11 @@ def main():
     print(f"  {env_json_path}")
     print(f"  {dc_json_path}")
 
+    return {
+        "files": [str(env_json_path), str(dc_json_path)],
+        "type": "devcontainer",
+    }
+
 
 if __name__ == "__main__":
     main()

@@ -604,6 +604,11 @@ def main():
         print("Framework override:", args.framework)
     print("Coverage enabled:", args.coverage)
 
+    return {
+        "files": [str(path) for path, _ in written],
+        "type": "unit_tests",
+    }
+
 
 if __name__ == "__main__":
     main()

@@ -503,6 +503,8 @@ def main():
     for p in generated:
         print(f"  {p}")
 
+    return {"files": generated, "type": "sre"}
+
 
 if __name__ == "__main__":
     main()

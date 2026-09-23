@@ -16,7 +16,7 @@ import sys
 import argparse
 
 
-def _run_module_main(module_main, flags: list) -> bool:
+def _run_module_main(module_main, flags: list):
     """Call *module_main()* with the given CLI flag list via sys.argv swap.
 
     Returns True on success, False if the module exits with a non-zero code.
@@ -24,8 +24,7 @@ def _run_module_main(module_main, flags: list) -> bool:
     saved = sys.argv[:]
     sys.argv = sys.argv[:1] + flags
     try:
-        module_main()
-        return True
+        return module_main()
     except SystemExit as exc:
         if exc.code not in (None, 0):
             return False
@@ -136,12 +135,13 @@ def run_github_generator(args) -> bool:
     if args.custom_values:
         flags += ["--custom-values", args.custom_values]
 
-    ok = _run_module_main(scaffold_gha.main, flags)
+    result = _run_module_main(scaffold_gha.main, flags)
+    ok = bool(result)
     if ok:
         print("GitHub Actions workflow generated successfully!")
     else:
         print("Error generating GitHub Actions workflow. Check output above.")
-    return ok
+    return result if ok else False
 
 
 def run_jenkins_generator(args) -> bool:
@@ -167,12 +167,13 @@ def run_jenkins_generator(args) -> bool:
     if args.custom_values:
         flags += ["--custom-values", args.custom_values]
 
-    ok = _run_module_main(scaffold_jenkins.main, flags)
+    result = _run_module_main(scaffold_jenkins.main, flags)
+    ok = bool(result)
     if ok:
         print("Jenkins pipeline generated successfully!")
     else:
         print("Error generating Jenkins pipeline. Check output above.")
-    return ok
+    return result if ok else False
 
 def create_readme(args):
     """Create a README.md file explaining the generated CI/CD files."""
@@ -227,20 +228,42 @@ def main():
     args = parse_arguments()
     
     success = True
+    generated = []
     
     if args.github:
-        if not run_github_generator(args):
+        result = run_github_generator(args)
+        if not result:
             success = False
+        else:
+            generated.append(result)
     
     if args.jenkins:
-        if not run_jenkins_generator(args):
+        result = run_jenkins_generator(args)
+        if not result:
             success = False
+        else:
+            generated.append(result)
     
     if success:
         create_readme(args)
         print("\nCI/CD generation completed successfully!")
     else:
         print("\nCI/CD generation completed with errors. Please check the output above.")
+
+    files = []
+    for result in generated:
+        files.extend(result.get("files", []))
+        for key in ("workflow", "pipeline"):
+            if result.get(key):
+                files.append(result[key])
+                break
+    if success:
+        files.append(os.path.join(args.output_dir, "CICD-README.md"))
+
+    return {
+        "files": files,
+        "type": "cicd",
+    }
 
 if __name__ == "__main__":
     main()
