@@ -24,7 +24,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from typer.testing import CliRunner
 
-from cli.devopsos import app
+from devops_os.core import app
 
 
 

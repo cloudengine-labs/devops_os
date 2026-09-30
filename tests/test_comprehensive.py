@@ -18,7 +18,7 @@ from pathlib import Path
 # Ensure repo root is on path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from cli import (
+from devops_os.core import (
     scaffold_gha,
     scaffold_jenkins,
     scaffold_gitlab,

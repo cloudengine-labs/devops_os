@@ -235,7 +235,7 @@ def generate_github_actions_workflow(
     except ValidationError as e:
         raise ValueError(str(e)) from e
     
-    from cli import scaffold_gha
+    from devops_os.core import scaffold_gha
 
     with tempfile.TemporaryDirectory() as tmp:
         args = _build_gha_args(
@@ -300,7 +300,7 @@ def generate_jenkins_pipeline(
         validate_tool_inputs("generate_jenkins_pipeline", name=name, languages=languages)
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    from cli import scaffold_jenkins
+    from devops_os.core import scaffold_jenkins
 
     with tempfile.TemporaryDirectory() as tmp:
         out_path = os.path.join(tmp, "Jenkinsfile")
@@ -583,7 +583,7 @@ def generate_gitlab_ci_pipeline(
         validate_tool_inputs("generate_gitlab_ci_pipeline", name=name, languages=languages)
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    from cli import scaffold_gitlab
+    from devops_os.core import scaffold_gitlab
     import yaml
 
     args = argparse.Namespace(
@@ -646,7 +646,7 @@ def generate_argocd_config(
         validate_tool_inputs("generate_argocd_config", name=name, namespace=namespace)
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    from cli import scaffold_argocd
+    from devops_os.core import scaffold_argocd
     import yaml as _yaml
 
     args = argparse.Namespace(
@@ -718,7 +718,7 @@ def generate_sre_configs(
         )
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    from cli import scaffold_sre
+    from devops_os.core import scaffold_sre
     import yaml as _yaml
 
     args = argparse.Namespace(
@@ -777,7 +777,7 @@ def generate_unittest_config(
         validate_tool_inputs("generate_unittest_config", project_name=name, languages=languages)
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    from cli import scaffold_unittest
+    from devops_os.core import scaffold_unittest
 
     result = {}
 
