@@ -7,8 +7,8 @@ Uses the scaffold_gha and scaffold_jenkins modules directly — no subprocess
 calls, no external script files required.
 
 Usage:
-    python -m cli.scaffold_cicd [options]
-    python -m cli.devopsos scaffold cicd [options]
+    from devops_os.core import scaffold_cicd
+    scaffold_cicd.generate_all_configs(...)
 """
 
 import os
