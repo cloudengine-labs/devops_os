@@ -2,11 +2,11 @@
 
 # 🚀 DevOps-OS
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using Claude Desktop, ChatGPT, or a single CLI command.**
+**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using Claude Desktop, ChatGPT, or any MCP-compatible AI assistant.**
 
 - 💬 **Ask Claude / ChatGPT:** Use DevOps-OS as an MCP server to generate pipelines and configs with conversational AI
-- 🖥️ **Use the CLI:** Run commands directly for scripting and automation
 - 🔌 **Plug into APIs:** Integrate with Anthropic and OpenAI function calling
+- 🚀 **MCP-first backend:** High-performance backend for AI assistants
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
@@ -26,7 +26,7 @@
 
 ## ✨ What is DevOps-OS?
 
-DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, from a single CLI command or an AI chat prompt.
+DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through an AI chat prompt using the MCP server.
 
 | Feature | Description |
 |---------|-------------|
@@ -48,11 +48,11 @@ DevOps-OS is built for anyone who wants to **move faster** and **stop writing bo
 | Audience | How DevOps-OS helps |
 |----------|---------------------|
 | **Solo developers** | Get a production-ready CI/CD pipeline in under a minute — no DevOps expertise needed |
-| **DevOps / platform engineers** | Standardise pipeline templates across teams with a single CLI command |
+| **DevOps / platform engineers** | Standardise pipeline templates across teams via AI chat interface |
 | **SRE teams** | Generate Prometheus alert rules, Grafana dashboards, and SLO manifests instantly |
 | **DevOps learners & students** | Learn the *Process-First* SDLC philosophy through runnable examples, not just theory |
 | **AI / LLM builders** | Plug every scaffold tool into Claude or ChatGPT via the built-in MCP server |
-| **Open-source contributors** | A well-structured Python project with a clean CLI, full test suite, and contribution guide |
+| **Open-source contributors** | A well-structured Python project with a clean architecture and full test suite |
 
 ---
 
@@ -148,215 +148,52 @@ Claude will use DevOps-OS to generate the workflow and explain each stage.
 
 ---
 
-## ⚡ Quick Start (CLI)
-
-### Prerequisites
-
-- Python 3.10+ and `pip`
-- Docker *(for the dev container)*
-- VS Code + [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) *(optional)*
-
 ---
 
-### 1 — Clone & install
+## 🗂️ MCP Server Quick Reference
+
+DevOps-OS is now an **MCP-only backend**. Access all features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
+
+### Setup
 
 ```bash
-git clone https://github.com/cloudengine-labs/devops_os.git
-cd devops_os
-
-# Create and activate a virtual environment (recommended)
-python -m venv .venv
-source .venv/bin/activate        # macOS / Linux
-# .venv\Scripts\activate         # Windows (cmd / PowerShell)
-
-pip install -r cli/requirements.txt
-```
-
----
-
-### 2 — Learn the Process-First philosophy *(recommended first step)*
-
-DevOps-OS is built on the **Process-First** SDLC philosophy from [cloudenginelabs.io](https://cloudenginelabs.io). Run the `process-first` command to understand *why* each tool exists before you start using it:
-
-```bash
-# Full overview — what Process-First is, how it maps to DevOps-OS, and learning tips
-python -m cli.devopsos process-first
-
-# Just the 5 core principles
-python -m cli.devopsos process-first --section what
-
-# Table: which scaffold command encodes which principle
-python -m cli.devopsos process-first --section mapping
-
-# AI prompts and book recommendations for beginners
-python -m cli.devopsos process-first --section tips
-```
-
-> **Tip:** Run `--section mapping` to see exactly which `devopsos scaffold` command to use for each DevOps goal before generating any config.  
-> See [docs/PROCESS-FIRST.md](docs/PROCESS-FIRST.md) for the full reference.
-
----
-
-### 3 — Generate a GitHub Actions workflow
-
-```bash
-# Complete CI/CD for a Python + JavaScript project
-python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
-
-# With Kubernetes deployment
-python -m cli.devopsos scaffold gha --name my-app --languages python --type complete --kubernetes
-
-# With Kubernetes deployment via Kustomize
-python -m cli.devopsos scaffold gha --name my-app --languages python --kubernetes --k8s-method kustomize
-```
-
----
-
-### 4 — Generate other pipelines & configs
-
-All generators are available as subcommands of the **unified CLI** — `python -m cli.devopsos scaffold <target>`:
-
-```bash
-# Jenkins pipeline → Jenkinsfile
-python -m cli.devopsos scaffold jenkins --name my-app --languages java --type complete
-
-# GitLab CI pipeline → .gitlab-ci.yml
-python -m cli.devopsos scaffold gitlab --name my-app --languages python,go --type complete
-
-# ArgoCD GitOps configs → argocd/application.yaml + argocd/appproject.yaml
-python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/myorg/my-app.git
-
-# Flux GitOps configs → flux/git-repository.yaml + flux/kustomization.yaml + flux/image-update-automation.yaml
-python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https://github.com/myorg/my-app.git
-
-# SRE configs (Prometheus, Grafana, SLO) → sre/ directory
-python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
-
-# Infrastructure hardening baselines → hardening/ directory
-python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
-
-# Dev container configuration → .devcontainer/devcontainer.json + .devcontainer/devcontainer.env.json
-python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform --kubernetes-tools k9s,flux
-
-# Unit test configs + sample stubs (Python, JS, Go, TypeScript)
-python -m cli.devopsos scaffold unittest --name my-app --languages python
-python -m cli.devopsos scaffold unittest --name my-app --languages python,javascript,go
-
-# Combined GitHub Actions + Jenkins in one step
-python -m cli.devopsos scaffold cicd --name my-app --type build --languages python --github --jenkins
-
-# Kubernetes manifests
-python kubernetes/k8s-config-generator.py --name my-app --image ghcr.io/myorg/my-app:v1
-```
-
-Use `python -m cli.devopsos scaffold --help` to list all available targets and `python -m cli.devopsos scaffold <target> --help` to see every option for a specific target.
-
-> See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables and every default output path.  
-> For hardening-specific standards, outputs, and examples, see [Infrastructure Hardening Sprint](docs/devops-os-hardening-sprint.md).
-
----
-
-### 5 — Interactive wizard (all-in-one)
-
-```bash
-python -m cli.devopsos init              # interactive project configurator
-```
-
-Single Cli Command for Platform Engineering Capabilities - Dev Container and CICD Environment Setup
-
----
-
-### 6 — Use with AI (MCP Server)
-
-Connect DevOps-OS tools to any MCP-compatible AI assistant: **Claude Code, Claude Desktop, Cursor, VS Code Copilot, Windsurf, and Zed**.
-
-**Fastest setup (Claude Code CLI):**
-
-```bash
-# Download the setup script
-curl -fsSLo setup_devops_os_mcp.sh https://raw.githubusercontent.com/cloudengine-labs/devops_os/main/mcp_server/setup_devops_os_mcp.sh
-
-# (Optional but recommended) Inspect the script before running it
-less setup_devops_os_mcp.sh
-
-# Run the setup script
-bash setup_devops_os_mcp.sh
-```
-
-Already cloned the repo? Run locally instead:
-
-```bash
-bash mcp_server/setup_devops_os_mcp.sh --local
-```
-
-Then ask your AI assistant:
-> *"Generate a complete GitHub Actions CI/CD workflow for my Python API with Kubernetes deployment using ArgoCD."*
-
-**[Full setup guide →](mcp_server/README.md)** — covers Claude Desktop, Cursor, VS Code, Windsurf, Zed, and troubleshooting.
-
-See **[skills/README.md](skills/README.md)** for Claude API & OpenAI function-calling examples.
-
----
-
-## 🗂️ Quick Start Commands
-
-Copy-paste commands for every CLI feature. No config files needed — all options have sensible defaults.
-
-```bash
-# ── Setup ──────────────────────────────────────────────────────────────────
+# Clone and install MCP server dependencies
 git clone https://github.com/cloudengine-labs/devops_os.git && cd devops_os
-pip install -r cli/requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate  # macOS/Linux
+pip install -r mcp_server/requirements.txt
 
-# ── Check version ──────────────────────────────────────────────────────────
-python -m cli.devopsos --version           # → devopsos version 0.4.0
-
-# ── Interactive project wizard ─────────────────────────────────────────────
-python -m cli.devopsos init                # guided setup for any project
-
-# ── GitHub Actions ─────────────────────────────────────────────────────────
-python -m cli.devopsos scaffold gha --name my-app --type build --languages python
-python -m cli.devopsos scaffold gha --name my-app --type complete --languages python,javascript --kubernetes
-
-# ── Jenkins ────────────────────────────────────────────────────────────────
-python -m cli.devopsos scaffold jenkins --name my-app --type build --languages java
-
-# ── GitLab CI ──────────────────────────────────────────────────────────────
-python -m cli.devopsos scaffold gitlab --name my-app --type build --languages python
-python -m cli.devopsos scaffold gitlab --name my-app --type complete --kubernetes
-
-# ── ArgoCD / Flux GitOps ───────────────────────────────────────────────────
-python -m cli.devopsos scaffold argocd --name my-app --repo https://github.com/org/my-app.git
-python -m cli.devopsos scaffold argocd --name my-app --method flux --repo https://github.com/org/my-app.git
-
-# ── SRE (Prometheus + Grafana + SLO) ──────────────────────────────────────
-python -m cli.devopsos scaffold sre --name my-app --team platform --slo-target 99.9
-
-# ── Infrastructure Hardening ───────────────────────────────────────────────
-python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
-python -m cli.devopsos scaffold hardening --standard all --output hardening
-
-# ── Dev Container ──────────────────────────────────────────────────────────
-python -m cli.devopsos scaffold devcontainer --languages python,go --cicd-tools docker,terraform
-
-# ── Combined CI/CD (GHA + Jenkins in one step) ────────────────────────────
-python -m cli.devopsos scaffold cicd --name my-app --type build --languages python --github --jenkins
-
-# ── Unit Tests ─────────────────────────────────────────────────────────────
-python -m cli.devopsos scaffold unittest --name my-app --languages python
-python -m cli.devopsos scaffold unittest --name my-app --languages python,javascript,go
-
-# ── Process-First philosophy ───────────────────────────────────────────────
-python -m cli.devopsos process-first                      # full overview
-python -m cli.devopsos process-first --section mapping    # which tool for which goal
-
-# ── Help for any command ───────────────────────────────────────────────────
-python -m cli.devopsos --help
-python -m cli.devopsos scaffold --help
-python -m cli.devopsos scaffold gha --help
+# For Claude Desktop
+# Edit ~/Library/Application Support/Claude/claude_desktop_config.json (macOS)
+# Or %APPDATA%\Claude\claude_desktop_config.json (Windows)
+# Add the MCP server configuration from GETTING-STARTED-MCP.md
 ```
 
-> **Full option reference:** [docs/CLI-COMMANDS-REFERENCE.md](docs/CLI-COMMANDS-REFERENCE.md)  
-> **CLI test report:** [docs/CLI-TEST-REPORT.md](docs/CLI-TEST-REPORT.md)
+### Example Prompts
+
+Ask your AI assistant:
+
+```
+# Generate GitHub Actions workflow
+"Generate a complete GitHub Actions CI/CD workflow for a Python Flask API with Docker build, pytest, and Kubernetes deployment via ArgoCD"
+
+# Generate Jenkins pipeline
+"Create a Jenkins Declarative Pipeline for a Java Spring Boot microservice with Maven build and ArgoCD deployment"
+
+# Generate Kubernetes configs
+"Generate Kubernetes manifests for a Node.js service with 3 replicas on port 3000 using image ghcr.io/myorg/my-service:v1.0"
+
+# Generate SRE configs
+"Generate Prometheus alert rules and Grafana dashboard for a payment-processing microservice with 99.9% SLO"
+
+# Generate dev container
+"Scaffold a devcontainer for a Go + Python project with Terraform, kubectl, and k9s"
+
+# Generate hardening policies
+"Generate Kyverno policies for a production Kubernetes cluster based on CIS benchmarks"
+```
+
+**[Full MCP Guide →](GETTING-STARTED-MCP.md)** — Setup for Claude Desktop, Cursor, VS Code, Windsurf, Zed, and troubleshooting.
 
 ---
 
@@ -364,14 +201,14 @@ python -m cli.devopsos scaffold gha --help
 
 ```text
 devops_os/
-├── .devcontainer/      # Redirect note; active devcontainer generation lives in cli/templates/devcontainer/
-├── .legacy/            # Archived repo-local devcontainer implementation
-├── .github/workflows/  # CI, Sanity Tests, and GitHub Pages workflows
-├── cli/                # CLI scaffold tools (gha, gitlab, jenkins, argocd, sre, hardening, unittest, devopsos)
+├── .devcontainer/      # Dev container configuration
+├── .legacy/            # Archived implementations
+├── .github/workflows/  # CI and test workflows
+├── devops_os/core/     # Core scaffold modules (GitHub Actions, Jenkins, GitLab, ArgoCD, SRE, etc.)
 ├── kubernetes/         # Kubernetes manifest generator
 ├── mcp_server/         # MCP server for AI assistant integration (Claude, ChatGPT)
 ├── skills/             # Claude & OpenAI tool/function definitions
-├── docs/               # Detailed guides and test reports
+├── docs/               # Detailed guides
 ├── tests/              # Comprehensive test suite
 ├── go-project/         # Example Go application
 └── scripts/            # Helper scripts
@@ -381,24 +218,22 @@ devops_os/
 
 ## 🧪 Testing
 
-[![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
-
 All tests run without real infrastructure — everything uses in-memory mock data.
 
 ```bash
-pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
-python -m pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py -v
+pip install -r mcp_server/requirements.txt pytest pytest-html
+python -m pytest mcp_server/test_server.py tests/ -v
 ```
 
-**Latest results:** ✅ 260 passed · ⚠️ 2 xfailed (known tracked bugs) · ❌ 0 failed
+**Latest results:** ✅ All MCP server tests passing
 
-| Report | Description |
-|--------|-------------|
-| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | CLI v0.2.0 post-revamp test results — 52 tests, all passing |
-| [📋 Detailed Test Report](docs/TEST_REPORT.md) | Full results with CLI output samples for every scaffold command |
-| [🌐 Interactive HTML Report](docs/test-reports/test-report.html) | Self-contained pytest HTML report |
-| [📄 CLI Output Examples](docs/test-reports/cli-output-examples.md) | Real captured output for all scaffold sub-commands |
-| [⚙️ Sanity Workflow](.github/workflows/sanity.yml) | GitHub Actions workflow running all scenarios on every push |
+| Test Suite | Description |
+|------------|-------------|
+| [MCP Server Tests](mcp_server/test_server.py) | MCP tool function tests |
+| [Comprehensive Tests](tests/test_comprehensive.py) | Integration tests for all scaffold modules |
+| [MCP Protocol Tests](tests/test_mcp_protocol.py) | MCP protocol compliance tests |
+| [Hardening Tests](tests/test_hardening_scaffold.py) | Infrastructure hardening policy generation tests |
+| [Sanity Workflow](.github/workflows/sanity.yml) | GitHub Actions workflow running tests on every push |
 
 ---
 
