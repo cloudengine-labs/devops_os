@@ -1,10 +1,12 @@
 ---
-title: "Platform Engineering IDP"
-description: "Conceptual platform engineering IDP flow from templates through the UI to generated automation."
-weight: 15
+title: "Platform Engineering Concepts & IDP Evolution"
+description: "Comprehensive guide to platform engineering from Process-First principles through Internal Developer Platform evolution."
+weight: 10
 ---
 
-# Platform Engineering IDP Concept
+# Platform Engineering Concepts & IDP Evolution
+
+Platform engineering is the discipline of building tools, infrastructure, and self-service capabilities that enable development teams to deploy, operate, and maintain their applications with minimal cognitive overhead. This documentation explores the journey from traditional DevOps tooling through platform engineering principles to a fully realized Internal Developer Platform (IDP).
 
 DevOps-OS can be used as a lightweight **internal developer platform (IDP)** experience: platform teams publish golden-path templates, and developers consume them through a guided self-service flow.
 
