@@ -8,7 +8,7 @@
 - 🔌 **Plug into APIs:** Integrate with Anthropic and OpenAI function calling
 - 🚀 **AI-First Interface:** High-performance MCP backend for seamless AI integration
 
-**📌 Note:** This is the MCP implementation. For the original CLI tool, see [chefgs/devops_os](https://github.com/chefgs/devops_os).
+**📌 Note:** This is the MCP implementation. For the original CLI tool, see [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os).
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
@@ -42,7 +42,7 @@
 
 | Project | Purpose | Use Case |
 |---------|---------|----------|
-| [**DevOps-OS CLI**](https://github.com/chefgs/devops_os) | Original command-line interface | Automation scripts, CI/CD pipelines, local development |
+| [**DevOps-OS CLI**](https://github.com/cloudengine-labs/devops_os) | Original command-line interface | Automation scripts, CI/CD pipelines, local development |
 | **DevOps-OS MCP** (this repo) | MCP server implementation | Claude Desktop, ChatGPT, Cursor, VS Code Copilot integration |
 
 Both projects share the same **core scaffold modules** for generating:
@@ -173,7 +173,7 @@ Claude will use DevOps-OS to generate the workflow and explain each stage.
 
 **DevOps-OS MCP** is the MCP server implementation. Access features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
 
-For the **original CLI tool**, see [chefgs/devops_os](https://github.com/chefgs/devops_os).
+For the **original CLI tool**, see [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os).
 
 ### Setup
 

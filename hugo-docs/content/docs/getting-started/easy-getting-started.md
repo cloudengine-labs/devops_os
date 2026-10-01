@@ -9,7 +9,7 @@ This is the **simplest way** to start using DevOps-OS MCP with Claude or ChatGPT
 
 > **🔗 Two Versions of DevOps-OS**
 > - **DevOps-OS MCP** (this repo): Use with AI assistants (Claude, ChatGPT, Cursor, etc.)
-> - **DevOps-OS CLI** ([chefgs/devops_os](https://github.com/chefgs/devops_os)): Use in scripts and automation
+> - **DevOps-OS CLI** ([cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os)): Use in scripts and automation
 > 
 > This guide covers MCP. For the CLI version, see the original project.
 

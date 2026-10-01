@@ -6,7 +6,7 @@ bookFlatSection: false
 
 # DevOps-OS MCP Server Documentation
 
-**DevOps-OS MCP** is the Model Context Protocol implementation for AI assistant integration. The original CLI is available in a [separate project](https://github.com/chefgs/devops_os).
+**DevOps-OS MCP** is the Model Context Protocol implementation for AI assistant integration. The original CLI is available in a [separate project](https://github.com/cloudengine-labs/devops_os).
 
 ---
 
@@ -15,7 +15,7 @@ bookFlatSection: false
 | Project | Purpose | When to Use |
 |---------|---------|----------|
 | **DevOps-OS MCP** (this repo) | MCP server for Claude, ChatGPT, Cursor, etc. | Use with AI assistants for interactive config generation |
-| **DevOps-OS CLI** ([chefgs/devops_os](https://github.com/chefgs/devops_os)) | Original command-line tool | Use in scripts, CI/CD pipelines, automation workflows |
+| **DevOps-OS CLI** ([cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os)) | Original command-line tool | Use in scripts, CI/CD pipelines, automation workflows |
 
 Both projects share the same **core scaffold modules**. Choose based on your use case.
 

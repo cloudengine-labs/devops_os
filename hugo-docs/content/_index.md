@@ -22,7 +22,7 @@ This project is the **MCP Server implementation** of DevOps-OS, designed to inte
 | Project | Purpose | URL |
 |---------|---------|-----|
 | **DevOps-OS MCP** (this repo) | MCP server for AI assistants (Claude, ChatGPT, Cursor, etc.) | [chefgs/devops_os_mcp](https://github.com/chefgs/devops_os_mcp) |
-| **DevOps-OS CLI** | Original command-line tool for automation scripts and CI/CD | [chefgs/devops_os](https://github.com/chefgs/devops_os) |
+| **DevOps-OS CLI** | Original command-line tool for automation scripts and CI/CD | [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os) |
 
 Both projects share the same **core scaffold modules** but serve different use cases:
 - **Use MCP** if you want to integrate with Claude, ChatGPT, Cursor, or other AI assistants

@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-> **📌 Note:** This is the **DevOps-OS MCP Server** — a separate MCP implementation for AI tool integration. The original DevOps-OS CLI is available at [chefgs/devops_os](https://github.com/chefgs/devops_os). Both projects share the same core scaffold modules.
+> **📌 Note:** This is the **DevOps-OS MCP Server** — a separate MCP implementation for AI tool integration. The original DevOps-OS CLI is available at [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os). Both projects share the same core scaffold modules.
 
 ---
 
