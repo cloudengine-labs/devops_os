@@ -29,7 +29,7 @@
 ## 📊 How It Works
 
 <div align="center">
-  <img src="./assets/devops-os-mcp-hero.svg" alt="DevOps-OS MCP Architecture" width="100%" max-width="1200px"/>
+  <img src="https://raw.githubusercontent.com/chefgs/devops_os_mcp/main/assets/devops-os-mcp-hero.svg" alt="DevOps-OS MCP Architecture" width="100%" style="max-width: 1200px;"/>
 </div>
 
 ---
