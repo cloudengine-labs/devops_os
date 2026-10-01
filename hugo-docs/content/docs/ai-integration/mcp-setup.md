@@ -563,8 +563,8 @@ ValidationError: name must be 1-63 characters
 
 - [AI Integration Overview]({{< relref "/docs/ai-integration" >}})
 - [MCP Quick Start (5 minutes)]({{< relref "/docs/getting-started/mcp-quickstart" >}})
-- [Authentication Setup Details]({{< relref "/docs/ai-integration/auth-setup" >}})
-- [Troubleshooting & FAQ]({{< relref "/docs/troubleshooting" >}})
+- [Authentication Setup Details]({{< relref "/docs/ai-integration/mcp-setup#remote-setup-authenticated-access" >}})
+- [Troubleshooting & FAQ]({{< relref "/docs/ai-integration/mcp-setup#troubleshooting" >}})
 - [CLI Reference]({{< relref "/docs/reference" >}})
 
 ---
