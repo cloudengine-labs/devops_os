@@ -1,36 +1,55 @@
 <div align="center">
 
-# 🚀 DevOps-OS
+# 🚀 DevOps-OS MCP Server
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using Claude Desktop, ChatGPT, or any MCP-compatible AI assistant.**
+**MCP (Model Context Protocol) implementation of DevOps-OS — Generate production-ready CI/CD pipelines, Kubernetes configs, and SRE dashboards using Claude Desktop, ChatGPT, or any MCP-compatible AI assistant.**
 
-- 💬 **Ask Claude / ChatGPT:** Use DevOps-OS as an MCP server to generate pipelines and configs with conversational AI
+- 💬 **Ask Claude / ChatGPT:** Use DevOps-OS MCP server to generate pipelines and configs with conversational AI
 - 🔌 **Plug into APIs:** Integrate with Anthropic and OpenAI function calling
-- 🚀 **MCP-first backend:** High-performance backend for AI assistants
+- 🚀 **AI-First Interface:** High-performance MCP backend for seamless AI integration
+
+**📌 Note:** This is the MCP implementation. For the original CLI tool, see [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os).
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
 [![Version](https://img.shields.io/badge/version-0.4.7-blue)](CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/cloudengine-labs/devops_os)
-[![GitHub Stars](https://img.shields.io/github/stars/cloudengine-labs/devops_os?style=social)](https://github.com/cloudengine-labs/devops_os/stargazers)
+[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/chefgs/devops_os_mcp)
+[![GitHub Stars](https://img.shields.io/github/stars/chefgs/devops_os_mcp?style=social)](https://github.com/chefgs/devops_os_mcp/stargazers)
 
 <br/>
 
-> **Category:** DevOps Automation · AI-Assisted Infrastructure · GitOps · SRE Tooling
+> **Category:** DevOps Automation · AI-Assisted Infrastructure · GitOps · SRE Tooling · MCP Integration
 
 </div>
 
 ---
 
-## ✨ What is DevOps-OS?
+## 📊 How It Works
 
-DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through an AI chat prompt using the MCP server.
+<div align="center">
+  <img src="https://raw.githubusercontent.com/chefgs/devops_os_mcp/main/assets/devops-os-mcp-hero.svg" alt="DevOps-OS MCP Architecture" width="100%" style="max-width: 1200px;"/>
+</div>
+
+---
+
+## ✨ What is DevOps-OS MCP?
+
+**DevOps-OS MCP** is the Model Context Protocol implementation of DevOps-OS that bridges AI assistants (Claude, ChatGPT, etc.) with production-ready DevOps configuration generators. It exposes all DevOps-OS scaffolding capabilities as MCP tools, enabling seamless AI-driven infrastructure automation.
+
+### Two Projects, One Platform
+
+| Project | Purpose | Use Case |
+|---------|---------|----------|
+| [**DevOps-OS CLI**](https://github.com/cloudengine-labs/devops_os) | Original command-line interface | Automation scripts, CI/CD pipelines, local development |
+| **DevOps-OS MCP** (this repo) | MCP server implementation | Claude Desktop, ChatGPT, Cursor, VS Code Copilot integration |
+
+Both projects share the same **core scaffold modules** for generating:
 
 | Feature | Description |
 |---------|-------------|
-| 🤖 **MCP Server (Claude & ChatGPT)** | Use DevOps-OS as an AI skill — ask Claude or ChatGPT in natural language, get production-ready configs and pipelines |
+| 🤖 **MCP Server (Claude & ChatGPT)** | Use DevOps-OS MCP as an AI skill — ask Claude or ChatGPT in natural language, get production-ready configs and pipelines |
 | 🚀 **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines |
 | ☸️ **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations |
 | 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
@@ -150,9 +169,11 @@ Claude will use DevOps-OS to generate the workflow and explain each stage.
 
 ---
 
-## 🗂️ MCP Server Quick Reference
+## 🗂️ Quick Reference
 
-DevOps-OS is now an **MCP-only backend**. Access all features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
+**DevOps-OS MCP** is the MCP server implementation. Access features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
+
+For the **original CLI tool**, see [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os).
 
 ### Setup
 
@@ -258,26 +279,13 @@ The pre-configured dev container gives you a consistent multi-language environme
 
 </details>
 
+Generate a dev container configuration by asking Claude:
 
-Dev container generation now uses two supported paths:
-
-- `python -m cli.devopsos init` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
-- `python -m cli.devopsos scaffold devcontainer` generates the legacy two-file `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json`.
-
-The old checked-in repo-local `.devcontainer` stack has been archived under `.legacy/devcontainer/`.
-
-Generate a dev container configuration from the CLI instead of editing JSON by hand:
-
-```bash
-# Generate devcontainer.json and devcontainer.env.json for a Python + Go project
-python -m cli.devopsos scaffold devcontainer \
-  --languages python,go \
-  --cicd-tools docker,terraform,kubectl \
-  --kubernetes-tools k9s,flux \
-  --devops-tools prometheus,grafana
+```
+"Generate a dev container (devcontainer.json) for a Python + Go project with Terraform, kubectl, and k9s for Kubernetes development."
 ```
 
-For generated projects, you can customize the generated `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then rebuild or reopen in VS Code.
+The MCP server will generate all necessary dev container configuration files for your project.
 
 ---
 
@@ -291,15 +299,6 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 | [🔧 MCP Setup & Configuration](hugo-docs/content/docs/ai-integration/mcp-setup.md) | Install, configure, deploy with Docker, ChatGPT setup, troubleshooting |
 | [🧠 AI Skills with OpenAI/Anthropic](skills/README.md) | Integrate with API function calling (alternative to MCP) |
 
-### 📖 CLI Reference (For automation & scripting)
-
-| Guide | Description |
-|-------|-------------|
-| [🚀 Getting Started](docs/GETTING-STARTED.md) | Step-by-step guide for CLI usage |
-| [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
-| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | v0.4.0 CLI test results — 62 tests, all passing |
-| [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
-
 ### 🏗️ Generators & Configuration
 
 | Guide | Description |
@@ -310,7 +309,7 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 | [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
 | [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
 | [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
-| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and CLI examples for the hardening scaffold |
+| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and examples for the hardening scaffold |
 | [🧪 Unit Test Scaffold](docs/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
 | [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
 
@@ -318,7 +317,6 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 
 | Guide | Description |
 |-------|-------------|
-| [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [🤖 MCP Server Architecture](mcp_server/README.md) | Technical details about the MCP implementation |
 
 ---

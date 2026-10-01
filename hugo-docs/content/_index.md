@@ -3,67 +3,88 @@ title: "DevOps-OS"
 type: "docs"
 ---
 
-# 🚀 DevOps-OS
+# 🚀 DevOps-OS MCP Server
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using a conversational AI assistant or a single CLI command.**
+**Model Context Protocol implementation of DevOps-OS — Generate production-ready CI/CD pipelines, Kubernetes configs, and SRE dashboards using Claude, ChatGPT, or any MCP-compatible AI assistant.**
 
-[![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
-[![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
-[![Version](https://img.shields.io/badge/version-0.4.7-blue)](https://github.com/cloudengine-labs/devops_os/blob/main/CHANGELOG.md)
+[![CI](https://github.com/chefgs/devops_os_mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/chefgs/devops_os_mcp/actions/workflows/ci.yml)
+[![Sanity Tests](https://github.com/chefgs/devops_os_mcp/actions/workflows/sanity.yml/badge.svg)](https://github.com/chefgs/devops_os_mcp/actions/workflows/sanity.yml)
+[![Version](https://img.shields.io/badge/version-0.4.7-blue)](https://github.com/chefgs/devops_os_mcp/blob/main/CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/cloudengine-labs/devops_os/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/chefgs/devops_os_mcp/blob/main/LICENSE)
 
 ---
 
-## What is DevOps-OS?
+## 📌 About DevOps-OS MCP
 
-DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, from a single CLI command or an AI chat prompt.
+This project is the **MCP Server implementation** of DevOps-OS, designed to integrate with AI assistants. It's a separate project from the original CLI:
+
+| Project | Purpose | URL |
+|---------|---------|-----|
+| **DevOps-OS MCP** (this repo) | MCP server for AI assistants (Claude, ChatGPT, Cursor, etc.) | [chefgs/devops_os_mcp](https://github.com/chefgs/devops_os_mcp) |
+| **DevOps-OS CLI** | Original command-line tool for automation scripts and CI/CD | [cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os) |
+
+Both projects share the same **core scaffold modules** but serve different use cases:
+- **Use MCP** if you want to integrate with Claude, ChatGPT, Cursor, or other AI assistants
+- **Use CLI** if you want to run generators in scripts, pipelines, or local automation
+
+---
+
+## What is DevOps-OS MCP?
+
+DevOps-OS MCP is an open-source MCP server that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through conversational AI.
 
 ## Features
 
 | | Feature | Description |
 |--|---------|-------------|
-| 🚀 | **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines — [→ CI/CD Generators]({{< relref "/docs/ci-cd" >}}) |
+| 🤖 | **MCP Server (Claude & ChatGPT)** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills — [→ AI Integration]({{< relref "/docs/ai-integration" >}}) |
+| 🚀 | **CI/CD Generators** | Generate GitHub Actions, GitLab CI, and Jenkins pipelines — [→ CI/CD Generators]({{< relref "/docs/ci-cd" >}}) |
 | ☸️ | **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations — [→ GitOps & ArgoCD]({{< relref "/docs/gitops" >}}) |
 | 📊 | **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests — [→ SRE Configuration]({{< relref "/docs/sre" >}}) |
 | 🔐 | **Infrastructure Hardening** | Generate Kyverno policies, InSpec profiles, Checkov checks, and compliance mappings — [→ Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) |
-| 🤖 | **MCP Server** | Plug DevOps-OS tools into Claude or ChatGPT as native AI skills — [→ AI Integration]({{< relref "/docs/ai-integration" >}}) |
 | 🛠️ | **Dev Container** | Pre-configured multi-language environment: Python · Java · Go · JavaScript — [→ Dev Container]({{< relref "/docs/dev-container" >}}) |
 | 🔄 | **Process-First** | Built-in education on the Process-First SDLC philosophy and how every tool maps to an SDLC principle — [→ Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) |
-| 📖 | **CLI Reference** | Complete option tables, input files, and exact output paths for every command — [→ CLI Reference]({{< relref "/docs/reference" >}}) |
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (MCP with Claude)
 
 ```bash
-# 1. Clone and install
-git clone https://github.com/cloudengine-labs/devops_os.git
-cd devops_os
-pip install -r cli/requirements.txt
+# 1. Clone and install MCP server
+git clone https://github.com/chefgs/devops_os_mcp.git
+cd devops_os_mcp
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r mcp_server/requirements.txt
 
-# 2. Learn the Process-First philosophy (recommended first step)
-python -m cli.devopsos process-first
+# 2. Get your path
+pwd
+# Copy the output (e.g., /Users/alice/projects/devops_os_mcp)
 
-# 3. Generate a GitHub Actions workflow
-python -m cli.devopsos scaffold gha --name my-app --languages python,javascript --type complete
-# Output: .github/workflows/my-app-complete.yml
+# 3. Add to Claude Desktop config
+# macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
+# Windows: %APPDATA%\Claude\claude_desktop_config.json
+# Add this (replace path):
+# {
+#   "mcpServers": {
+#     "devops-os": {
+#       "command": "python",
+#       "args": ["-m", "mcp_server.server"],
+#       "cwd": "/your/path/here"
+#     }
+#   }
+# }
 
-# 4. Generate a GitLab CI pipeline
-python -m cli.devopsos scaffold gitlab --name my-app --languages python --type complete
-# Output: .gitlab-ci.yml
+# 4. Restart Claude Desktop
+# You'll see a wrench icon 🔧 at the bottom right
 
-# 5. Generate infrastructure hardening configs
-python -m cli.devopsos scaffold hardening --standard cis-k8s --type kyverno --environment production
-# Output: hardening/ directory
-
-# 6. Generate SRE configs (Prometheus + Grafana + SLO)
-python -m cli.devopsos scaffold sre --name my-app --team platform
-# Output: sre/ directory
+# 5. Ask Claude to generate!
+# "Generate a GitHub Actions workflow for a Python Flask API with Docker and Kubernetes deployment"
 ```
 
 > [!NOTE]
-> **New here?** Start with the [Getting Started guide]({{< relref "/docs/getting-started" >}}) for a step-by-step walkthrough.
+> **New here?** Start with the [Easy Getting Started guide]({{< relref "/docs/getting-started/easy-getting-started" >}}) — copy-paste 3 commands + restart Claude.
 
 ---
 
@@ -85,18 +106,19 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 
 | Guide | Description |
 |-------|-------------|
-| [Getting Started]({{< relref "/docs/getting-started" >}}) | Zero to first pipeline in 5 minutes |
-| [Platform Engineering IDP]({{< relref "/docs/platform-engineering" >}}) | Conceptual self-service IDP flow from templates to generated automation |
-| [Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) | Generate hardening baselines and compliance mappings |
-| [Process-First Philosophy]({{< relref "/docs/getting-started/process-first" >}}) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
-| [Quick Start Reference]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands at a glance |
-| [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) | Generate GHA workflows |
-| [GitLab CI]({{< relref "/docs/ci-cd/gitlab-ci" >}}) | Generate GitLab pipelines |
-| [Jenkins]({{< relref "/docs/ci-cd/jenkins" >}}) | Generate Jenkinsfiles |
+| [Easy Getting Started]({{< relref "/docs/getting-started/easy-getting-started" >}}) | **Fastest way:** Copy-paste 3 commands + restart Claude |
+| [Getting Started]({{< relref "/docs/getting-started" >}}) | Step-by-step MCP setup walkthrough |
+| [MCP Quick Start]({{< relref "/docs/getting-started/mcp-quickstart" >}}) | 5-minute Claude Desktop setup |
+| [MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}}) | ChatGPT, HTTP endpoints, Docker, troubleshooting |
+| [AI Integration]({{< relref "/docs/ai-integration" >}}) | MCP server & AI skills overview |
+| [Process-First Philosophy]({{< relref "/docs/getting-started/process-first" >}}) | What Process-First means and how it maps to DevOps-OS tools |
+| [Infrastructure Hardening]({{< relref "/docs/platform-engineering/hardening" >}}) | Generate security baselines and compliance mappings |
+| [GitHub Actions]({{< relref "/docs/ci-cd/github-actions" >}}) | Generate and customize GHA workflows |
+| [GitLab CI]({{< relref "/docs/ci-cd/gitlab-ci" >}}) | Generate and customize GitLab pipelines |
+| [Jenkins]({{< relref "/docs/ci-cd/jenkins" >}}) | Generate and customize Jenkinsfiles |
 | [ArgoCD & Flux]({{< relref "/docs/gitops" >}}) | Generate GitOps configs |
 | [SRE Configuration]({{< relref "/docs/sre" >}}) | Generate monitoring & alerting configs |
 | [Kubernetes]({{< relref "/docs/kubernetes" >}}) | Generate K8s manifests |
 | [Dev Container]({{< relref "/docs/dev-container" >}}) | Configure the dev container |
-| [AI Integration]({{< relref "/docs/ai-integration" >}}) | MCP server & AI skills |
-| [CLI Reference]({{< relref "/docs/reference" >}}) | Full CLI options and output paths |
-| [Chennai FOSS 2026 Presentation]({{< relref "/docs/talks/chennai-foss-2026" >}}) | GitHub Pages-friendly conference deck with embedded playback |
+| [Reference (Archives)]({{< relref "/docs/reference" >}}) | Historical CLI command options — for reference only |
+| [Chennai FOSS 2026 Presentation]({{< relref "/docs/talks/chennai-foss-2026" >}}) | Conference deck with playback |

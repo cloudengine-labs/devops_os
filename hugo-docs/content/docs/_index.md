@@ -4,27 +4,42 @@ weight: 1
 bookFlatSection: false
 ---
 
-# DevOps-OS Documentation
+# DevOps-OS MCP Server Documentation
 
-Welcome to the DevOps-OS documentation. Use the sidebar to navigate between sections, or start with the guides below.
+**DevOps-OS MCP** is the Model Context Protocol implementation for AI assistant integration. The original CLI is available in a [separate project](https://github.com/cloudengine-labs/devops_os).
+
+---
+
+## 📌 Two Projects, One Core
+
+| Project | Purpose | When to Use |
+|---------|---------|----------|
+| **DevOps-OS MCP** (this repo) | MCP server for Claude, ChatGPT, Cursor, etc. | Use with AI assistants for interactive config generation |
+| **DevOps-OS CLI** ([cloudengine-labs/devops_os](https://github.com/cloudengine-labs/devops_os)) | Original command-line tool | Use in scripts, CI/CD pipelines, automation workflows |
+
+Both projects share the same **core scaffold modules**. Choose based on your use case.
+
+---
 
 ## Where to start
 
 > [!NOTE]
-> **New users:** Read [Getting Started]({{< relref "/docs/getting-started" >}}) first — it walks you through installation and generates your first pipeline in under 5 minutes.
+> **New users:** Read [Getting Started - Easy Path]({{< relref "/docs/getting-started/easy-getting-started" >}}) first — copy-paste setup in 3 commands, then start generating configs with AI.
 
 ## Documentation sections
 
 | Section | What you'll find |
 |---------|-----------------|
-| [Getting Started]({{< relref "/docs/getting-started" >}}) | Prerequisites, installation, first pipeline |
-| [Platform Engineering IDP]({{< relref "/docs/platform-engineering" >}}) | Conceptual self-service flow from templates to generated automation |
-| [Quick Start]({{< relref "/docs/getting-started/quickstart" >}}) | All CLI commands with output paths |
-| [CI/CD Generators]({{< relref "/docs/ci-cd" >}}) | GitHub Actions, GitLab CI, Jenkins |
+| [Easy Getting Started]({{< relref "/docs/getting-started/easy-getting-started" >}}) | **Fastest way:** Copy-paste 3 commands + restart Claude |
+| [Getting Started]({{< relref "/docs/getting-started" >}}) | Detailed walkthrough: install, configure, generate |
+| [MCP Quick Start]({{< relref "/docs/getting-started/mcp-quickstart" >}}) | 5-minute guide for Claude Desktop |
+| [AI Integration]({{< relref "/docs/ai-integration" >}}) | **MCP Server** for Claude / ChatGPT + API function calling |
+| [MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}}) | ChatGPT, HTTP endpoints, Docker deployment, troubleshooting |
+| [CI/CD Generators]({{< relref "/docs/ci-cd" >}}) | GitHub Actions, GitLab CI, Jenkins — ask Claude to generate |
 | [GitOps & ArgoCD]({{< relref "/docs/gitops" >}}) | ArgoCD and Flux CD configs |
 | [SRE Configuration]({{< relref "/docs/sre" >}}) | Prometheus, Grafana, SLO, Alertmanager |
 | [Kubernetes]({{< relref "/docs/kubernetes" >}}) | Kubernetes manifest generator |
 | [Dev Container]({{< relref "/docs/dev-container" >}}) | Multi-language dev environment setup |
-| [AI Integration]({{< relref "/docs/ai-integration" >}}) | MCP server for Claude / ChatGPT |
-| [CLI Reference]({{< relref "/docs/reference" >}}) | Complete command options and output paths |
-| [Talks & Presentations]({{< relref "/docs/talks" >}}) | GitHub Pages access to conference-ready DevOps-OS decks |
+| [Platform Engineering]({{< relref "/docs/platform-engineering" >}}) | Infrastructure hardening, security baselines |
+| [Reference (CLI Archives)]({{< relref "/docs/reference" >}}) | Historical CLI commands reference — for reference only |
+| [Talks & Presentations]({{< relref "/docs/talks" >}}) | Conference-ready DevOps-OS decks
