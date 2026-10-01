@@ -44,7 +44,7 @@ jobs:
           docker images | grep devops-os-mcp:test
           
           # Verify non-root user in image
-          docker run --rm devops-os-mcp:test whoami | grep -q devops-os
+          docker run --rm --entrypoint whoami devops-os-mcp:test | grep -q devops-os
           echo "✓ Non-root user verified"
 
       - name: Test container startup (stdio profile)
