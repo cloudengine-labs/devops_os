@@ -4,9 +4,22 @@ weight: 1
 bookFlatSection: false
 ---
 
-# DevOps-OS Documentation
+# DevOps-OS MCP Server Documentation
 
-**DevOps-OS is now MCP-only.** Use the guides below to connect to Claude, ChatGPT, Cursor, VS Code Copilot, or any MCP-compatible AI assistant.
+**DevOps-OS MCP** is the Model Context Protocol implementation for AI assistant integration. The original CLI is available in a [separate project](https://github.com/chefgs/devops_os).
+
+---
+
+## 📌 Two Projects, One Core
+
+| Project | Purpose | When to Use |
+|---------|---------|----------|
+| **DevOps-OS MCP** (this repo) | MCP server for Claude, ChatGPT, Cursor, etc. | Use with AI assistants for interactive config generation |
+| **DevOps-OS CLI** ([chefgs/devops_os](https://github.com/chefgs/devops_os)) | Original command-line tool | Use in scripts, CI/CD pipelines, automation workflows |
+
+Both projects share the same **core scaffold modules**. Choose based on your use case.
+
+---
 
 ## Where to start
 

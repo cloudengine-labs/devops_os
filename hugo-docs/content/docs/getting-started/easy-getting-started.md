@@ -5,9 +5,15 @@ weight: 12
 
 # 🚀 Easy Getting Started — Just Copy & Paste
 
-This is the **simplest way** to start using DevOps-OS with Claude or ChatGPT.
+This is the **simplest way** to start using DevOps-OS MCP with Claude or ChatGPT.
 
-No configuration, just 3 commands + restart Claude.
+> **🔗 Two Versions of DevOps-OS**
+> - **DevOps-OS MCP** (this repo): Use with AI assistants (Claude, ChatGPT, Cursor, etc.)
+> - **DevOps-OS CLI** ([chefgs/devops_os](https://github.com/chefgs/devops_os)): Use in scripts and automation
+> 
+> This guide covers MCP. For the CLI version, see the original project.
+
+No complex configuration, just 3 commands + restart Claude.
 
 ---
 
@@ -18,7 +24,7 @@ No configuration, just 3 commands + restart Claude.
 Copy and paste this in your terminal:
 
 ```bash
-git clone https://github.com/cloudengine-labs/devops_os.git && cd devops_os && python3 -m venv .venv && source .venv/bin/activate && pip install -r mcp_server/requirements.txt
+git clone https://github.com/chefgs/devops_os_mcp.git && cd devops_os_mcp && python3 -m venv .venv && source .venv/bin/activate && pip install -r mcp_server/requirements.txt
 ```
 
 (On Windows, use `.venv\Scripts\activate` instead of `source .venv/bin/activate`)
@@ -29,7 +35,7 @@ git clone https://github.com/cloudengine-labs/devops_os.git && cd devops_os && p
 pwd
 ```
 
-Copy the output (example: `/Users/alice/projects/devops_os`)
+Copy the output (example: `/Users/alice/projects/devops_os_mcp`)
 
 ### 3️⃣ Add to Claude
 

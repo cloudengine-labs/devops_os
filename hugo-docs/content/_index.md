@@ -3,21 +3,36 @@ title: "DevOps-OS"
 type: "docs"
 ---
 
-# 🚀 DevOps-OS — AI-Powered Infrastructure Automation
+# 🚀 DevOps-OS MCP Server
 
-**Generate production-ready CI/CD pipelines, Kubernetes configs, and SRE dashboards — in seconds, using Claude, ChatGPT, or any MCP-compatible AI assistant.**
+**Model Context Protocol implementation of DevOps-OS — Generate production-ready CI/CD pipelines, Kubernetes configs, and SRE dashboards using Claude, ChatGPT, or any MCP-compatible AI assistant.**
 
-[![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
-[![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
-[![Version](https://img.shields.io/badge/version-0.4.7-blue)](https://github.com/cloudengine-labs/devops_os/blob/main/CHANGELOG.md)
+[![CI](https://github.com/chefgs/devops_os_mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/chefgs/devops_os_mcp/actions/workflows/ci.yml)
+[![Sanity Tests](https://github.com/chefgs/devops_os_mcp/actions/workflows/sanity.yml/badge.svg)](https://github.com/chefgs/devops_os_mcp/actions/workflows/sanity.yml)
+[![Version](https://img.shields.io/badge/version-0.4.7-blue)](https://github.com/chefgs/devops_os_mcp/blob/main/CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/cloudengine-labs/devops_os/blob/main/LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/chefgs/devops_os_mcp/blob/main/LICENSE)
 
 ---
 
-## What is DevOps-OS?
+## 📌 About DevOps-OS MCP
 
-DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through conversational AI using the MCP server.
+This project is the **MCP Server implementation** of DevOps-OS, designed to integrate with AI assistants. It's a separate project from the original CLI:
+
+| Project | Purpose | URL |
+|---------|---------|-----|
+| **DevOps-OS MCP** (this repo) | MCP server for AI assistants (Claude, ChatGPT, Cursor, etc.) | [chefgs/devops_os_mcp](https://github.com/chefgs/devops_os_mcp) |
+| **DevOps-OS CLI** | Original command-line tool for automation scripts and CI/CD | [chefgs/devops_os](https://github.com/chefgs/devops_os) |
+
+Both projects share the same **core scaffold modules** but serve different use cases:
+- **Use MCP** if you want to integrate with Claude, ChatGPT, Cursor, or other AI assistants
+- **Use CLI** if you want to run generators in scripts, pipelines, or local automation
+
+---
+
+## What is DevOps-OS MCP?
+
+DevOps-OS MCP is an open-source MCP server that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through conversational AI.
 
 ## Features
 
@@ -37,15 +52,15 @@ DevOps-OS is an open-source DevOps automation platform that scaffolds production
 
 ```bash
 # 1. Clone and install MCP server
-git clone https://github.com/cloudengine-labs/devops_os.git
-cd devops_os
+git clone https://github.com/chefgs/devops_os_mcp.git
+cd devops_os_mcp
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r mcp_server/requirements.txt
 
 # 2. Get your path
 pwd
-# Copy the output (e.g., /Users/alice/projects/devops_os)
+# Copy the output (e.g., /Users/alice/projects/devops_os_mcp)
 
 # 3. Add to Claude Desktop config
 # macOS: ~/Library/Application Support/Claude/claude_desktop_config.json
@@ -105,5 +120,5 @@ pwd
 | [SRE Configuration]({{< relref "/docs/sre" >}}) | Generate monitoring & alerting configs |
 | [Kubernetes]({{< relref "/docs/kubernetes" >}}) | Generate K8s manifests |
 | [Dev Container]({{< relref "/docs/dev-container" >}}) | Configure the dev container |
-| [CLI Reference (Archives)]({{< relref "/docs/reference" >}}) | Historical CLI command options — for reference only |
+| [Reference (Archives)]({{< relref "/docs/reference" >}}) | Historical CLI command options — for reference only |
 | [Chennai FOSS 2026 Presentation]({{< relref "/docs/talks/chennai-foss-2026" >}}) | Conference deck with playback |

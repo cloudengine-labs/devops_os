@@ -4,15 +4,23 @@ weight: 10
 bookCollapseSection: true
 ---
 
-# Getting Started with DevOps-OS (MCP-First)
+# Getting Started with DevOps-OS MCP Server
 
-Welcome! DevOps-OS is now an **MCP-only backend**. This guide walks you through getting started with the MCP server in under **5 minutes**.
+Welcome! **DevOps-OS MCP Server** is the Model Context Protocol implementation that connects AI assistants (Claude, ChatGPT, etc.) with DevOps-OS generators.
+
+> **📌 About the Two Projects**
+> - **DevOps-OS MCP** (this repo): MCP server for AI assistant integration
+> - **DevOps-OS CLI** (see [chefgs/devops_os](https://github.com/chefgs/devops_os)): Original command-line tool
+> 
+> Both share the same core scaffold modules. Choose based on your use case:
+> - **Use MCP** if you want to integrate with Claude, ChatGPT, Cursor, or other AI assistants
+> - **Use CLI** if you want to run generators in scripts, pipelines, or local automation
 
 ---
 
-## What is DevOps-OS?
+## What is DevOps-OS MCP?
 
-DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, infrastructure hardening baselines, and SRE monitoring configs — **through conversational AI** using the MCP server.
+DevOps-OS MCP is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, infrastructure hardening baselines, and SRE monitoring configs — **through conversational AI** using the MCP server.
 
 Ask Claude or ChatGPT:
 
@@ -50,8 +58,8 @@ You get production-ready YAML in seconds.
 ### Step 1: Clone and Install
 
 ```bash
-git clone https://github.com/cloudengine-labs/devops_os.git
-cd devops_os
+git clone https://github.com/chefgs/devops_os_mcp.git
+cd devops_os_mcp
 
 # Set up Python environment
 python3 -m venv .venv

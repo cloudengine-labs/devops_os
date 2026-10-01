@@ -1,24 +1,26 @@
 <div align="center">
 
-# 🚀 DevOps-OS
+# 🚀 DevOps-OS MCP Server
 
-**Automate your entire DevOps lifecycle — from CI/CD pipelines to Kubernetes deployments, infrastructure hardening baselines, and SRE dashboards — using Claude Desktop, ChatGPT, or any MCP-compatible AI assistant.**
+**MCP (Model Context Protocol) implementation of DevOps-OS — Generate production-ready CI/CD pipelines, Kubernetes configs, and SRE dashboards using Claude Desktop, ChatGPT, or any MCP-compatible AI assistant.**
 
-- 💬 **Ask Claude / ChatGPT:** Use DevOps-OS as an MCP server to generate pipelines and configs with conversational AI
+- 💬 **Ask Claude / ChatGPT:** Use DevOps-OS MCP server to generate pipelines and configs with conversational AI
 - 🔌 **Plug into APIs:** Integrate with Anthropic and OpenAI function calling
-- 🚀 **MCP-first backend:** High-performance backend for AI assistants
+- 🚀 **AI-First Interface:** High-performance MCP backend for seamless AI integration
+
+**📌 Note:** This is the MCP implementation. For the original CLI tool, see [chefgs/devops_os](https://github.com/chefgs/devops_os).
 
 [![CI](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/ci.yml)
 [![Sanity Tests](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml/badge.svg)](https://github.com/cloudengine-labs/devops_os/actions/workflows/sanity.yml)
 [![Version](https://img.shields.io/badge/version-0.4.7-blue)](CHANGELOG.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/cloudengine-labs/devops_os)
-[![GitHub Stars](https://img.shields.io/github/stars/cloudengine-labs/devops_os?style=social)](https://github.com/cloudengine-labs/devops_os/stargazers)
+[![Open Source](https://img.shields.io/badge/open%20source-%E2%9D%A4-red)](https://github.com/chefgs/devops_os_mcp)
+[![GitHub Stars](https://img.shields.io/github/stars/chefgs/devops_os_mcp?style=social)](https://github.com/chefgs/devops_os_mcp/stargazers)
 
 <br/>
 
-> **Category:** DevOps Automation · AI-Assisted Infrastructure · GitOps · SRE Tooling
+> **Category:** DevOps Automation · AI-Assisted Infrastructure · GitOps · SRE Tooling · MCP Integration
 
 </div>
 
@@ -32,13 +34,22 @@
 
 ---
 
-## ✨ What is DevOps-OS?
+## ✨ What is DevOps-OS MCP?
 
-DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through an AI chat prompt using the MCP server.
+**DevOps-OS MCP** is the Model Context Protocol implementation of DevOps-OS that bridges AI assistants (Claude, ChatGPT, etc.) with production-ready DevOps configuration generators. It exposes all DevOps-OS scaffolding capabilities as MCP tools, enabling seamless AI-driven infrastructure automation.
+
+### Two Projects, One Platform
+
+| Project | Purpose | Use Case |
+|---------|---------|----------|
+| [**DevOps-OS CLI**](https://github.com/chefgs/devops_os) | Original command-line interface | Automation scripts, CI/CD pipelines, local development |
+| **DevOps-OS MCP** (this repo) | MCP server implementation | Claude Desktop, ChatGPT, Cursor, VS Code Copilot integration |
+
+Both projects share the same **core scaffold modules** for generating:
 
 | Feature | Description |
 |---------|-------------|
-| 🤖 **MCP Server (Claude & ChatGPT)** | Use DevOps-OS as an AI skill — ask Claude or ChatGPT in natural language, get production-ready configs and pipelines |
+| 🤖 **MCP Server (Claude & ChatGPT)** | Use DevOps-OS MCP as an AI skill — ask Claude or ChatGPT in natural language, get production-ready configs and pipelines |
 | 🚀 **CI/CD Generators** | One-command scaffolding for GitHub Actions, GitLab CI, and Jenkins pipelines |
 | ☸️ **GitOps Config Generator** | Kubernetes manifests, ArgoCD Applications, and Flux CD Kustomizations |
 | 📊 **SRE Config Generator** | Prometheus alert rules, Grafana dashboards, and SLO manifests |
@@ -158,9 +169,11 @@ Claude will use DevOps-OS to generate the workflow and explain each stage.
 
 ---
 
-## 🗂️ MCP Server Quick Reference
+## 🗂️ Quick Reference
 
-DevOps-OS is now an **MCP-only backend**. Access all features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
+**DevOps-OS MCP** is the MCP server implementation. Access features through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, Windsurf, or Zed.
+
+For the **original CLI tool**, see [chefgs/devops_os](https://github.com/chefgs/devops_os).
 
 ### Setup
 
