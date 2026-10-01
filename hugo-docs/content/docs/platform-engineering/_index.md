@@ -92,3 +92,138 @@ DevOps-OS can be used as a lightweight **internal developer platform (IDP)** exp
 | Developer Environment | [Dev Container configuration]({{< relref "/docs/dev-container" >}}) |
 
 This makes DevOps-OS a practical way to present **platform engineering standards as a self-service IDP experience**.
+
+---
+
+## 📚 Complete Documentation Roadmap
+
+### **Phase 1: Foundation – Understanding Platform Engineering Core Concepts**
+
+→ [**Process-First Mapping**](01-process-first-mapping.md) — Map DevOps tools to Process-First SDLC phases and understand how traditional tools evolve into platform engineering
+
+→ [**Pipeline Templatization**](02-pipeline-templatization.md) — Design golden-path templates, establish guardrails, and manage template evolution
+
+### **Phase 2: Kubernetes-Based Platform Engineering**
+
+→ [**Kubernetes Platform Engineering**](03-kubernetes-platform-engineering.md) — In-cluster CI/CD with Tekton, GitOps-first design with ArgoCD/Flux, and Kubernetes-native observability
+
+### **Phase 3: Cloud-Based Platform Engineering**
+
+→ [**Cloud-Based Platform**](04-cloud-based-platform.md) — Multi-cloud abstractions, serverless patterns, and FinOps integration
+
+### **Phase 4: Internal Developer Platform (IDP) Evolution**
+
+→ [**Internal Developer Portal**](05-internal-developer-portal.md) — IDP design, UI/UX (AI-assisted, web portal, CLI), and operational patterns
+
+### **Phase 5: Educational Content & Reference Architecture**
+
+→ [**Reference Architecture**](06-reference-architecture.md) — Complete end-to-end architecture showing how all components work together
+
+→ [**Case Studies**](07-case-studies.md) — Real-world implementations across startups, mid-market, enterprise, and data organizations
+
+→ [**Thought Leadership**](08-thought-leadership.md) — Curated references from industry leaders and research organizations
+
+### **Phase 6-8: Implementation & Validation**
+
+→ [**Implementation Roadmap**](09-implementation-roadmap.md) — Phased approach from Phase 1 (Foundation) through Phase 4 (Optimization)
+
+---
+
+## 🎯 Quick Start by Role
+
+### **Platform Engineer / DevOps Lead**
+Start here: [Process-First Mapping](01-process-first-mapping.md) → [Pipeline Templatization](02-pipeline-templatization.md) → [Reference Architecture](06-reference-architecture.md)
+
+### **Kubernetes / Cloud Architect**
+Start here: [Kubernetes Platform Engineering](03-kubernetes-platform-engineering.md) → [Cloud-Based Platform](04-cloud-based-platform.md) → [Reference Architecture](06-reference-architecture.md)
+
+### **Product Manager / Platform Stakeholder**
+Start here: [Internal Developer Portal](05-internal-developer-portal.md) → [Case Studies](07-case-studies.md) → [Implementation Roadmap](09-implementation-roadmap.md)
+
+### **Developer / Team Lead**
+Start here: [Case Studies](07-case-studies.md) → [Internal Developer Portal](05-internal-developer-portal.md) → Return to [overview](./_index.md)
+
+---
+
+## 🔑 Core Principles
+
+Every aspect of this platform engineering guide adheres to these principles:
+
+1. **Process-First**: Business processes drive technical choices
+2. **Developer Experience (DX)**: Reduce cognitive load, not add complexity
+3. **Standardization with Flexibility**: Enable teams, don't constrain them
+4. **Observability First**: Measure everything that matters
+5. **Cost Consciousness**: Financial impact visible at every layer
+6. **Cloud-Native Default**: Kubernetes and cloud-native patterns as primary target
+7. **AI-Assisted**: AI integration (Claude, ChatGPT, Copilot) as first-class interface via MCP
+
+---
+
+## 🛠️ DevOps-OS + Platform Engineering
+
+This documentation describes platform engineering concepts. **DevOps-OS** provides the technical tooling:
+
+| Capability | DevOps-OS Generator |
+|-----------|-------------------|
+| Pipeline templates | GitHub Actions, GitLab CI, Jenkins scaffolding |
+| GitOps configuration | ArgoCD, Flux CD manifest generation |
+| Observability | Prometheus, Grafana, SLO scaffolding |
+| Infrastructure hardening | Kyverno, InSpec, Checkov policy generation |
+| Cloud infrastructure | Terraform module generation (multi-cloud) |
+| Developer environments | Dev container configuration |
+| **Self-service at scale** | MCP server for AI-assisted scaffold generation |
+
+---
+
+## 📊 Typical Platform Engineering Journey
+
+```
+↓ Time (Months)
+Year 1
+├─ Months 1-2: Foundation (3-5 core templates)
+├─ Months 3-5: Scaling (15+ templates, IDP CLI/portal)
+└─ Months 6-9: Operationalization (80% adoption, multiple interfaces)
+
+Year 2
+├─ Months 10-12: Advanced features (multi-cloud, cost tracking)
+├─ Months 13-15: Metrics & product thinking
+└─ Months 16-18: Mature platform (85%+ adoption, clear ROI)
+```
+
+*Timeline varies based on organization size and complexity. See [Implementation Roadmap](09-implementation-roadmap.md) for detailed guidance.*
+
+---
+
+## 🌟 Success Indicators
+
+By the end of your platform engineering journey, you should see:
+
+- **85%+ adoption** of platform templates
+- **>2 deployments per day** per team (deployment frequency)
+- **<15 min MTTR** (mean time to recover from incidents)
+- **15-20% cost reduction** through optimization
+- **4.5+/5.0 developer satisfaction** (template quality)
+- **Zero compliance violations** (policy enforcement working)
+- **1:20 platform engineer ratio** (efficient support model)
+
+---
+
+## 🔗 Links
+
+- **GitHub Repository**: [chefgs/devops_os_mcp](https://github.com/chefgs/devops_os_mcp)
+- **Contributing**: See [CONTRIBUTING.md](../../../../CONTRIBUTING.md)
+- **DevOps-OS MCP Setup**: [Quick Start Guide](../../../../GETTING-STARTED-MCP.md)
+
+---
+
+## 📖 Table of Contents
+
+1. [Process-First Mapping](01-process-first-mapping.md) — How DevOps tools map to underlying principles
+2. [Pipeline Templatization](02-pipeline-templatization.md) — Designing reusable, composable templates
+3. [Kubernetes Platform Engineering](03-kubernetes-platform-engineering.md) — Container-native CI/CD and GitOps
+4. [Cloud-Based Platform](04-cloud-based-platform.md) — Multi-cloud, serverless, and FinOps
+5. [Internal Developer Portal](05-internal-developer-portal.md) — IDP design and operational patterns
+6. [Reference Architecture](06-reference-architecture.md) — Complete end-to-end system design
+7. [Case Studies](07-case-studies.md) — Real-world implementations by organization type
+8. [Thought Leadership](08-thought-leadership.md) — Industry resources and research
+9. [Implementation Roadmap](09-implementation-roadmap.md) — Phased rollout strategy
