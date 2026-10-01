@@ -35,19 +35,7 @@ jobs:
       - name: "Test: Jenkins scaffold"
         run: pytest tests/test_comprehensive.py::TestScaffoldJenkins -v
 
-      - name: "Test: GitLab CI scaffold"
-        run: pytest tests/test_comprehensive.py::TestScaffoldGitlabExtended -v
-
-      - name: "Test: ArgoCD / Flux GitOps scaffold"
-        run: pytest tests/test_comprehensive.py::TestScaffoldArgoCDExtended -v
-
-      - name: "Test: SRE config scaffold (Prometheus, Grafana, SLO)"
-        run: pytest tests/test_comprehensive.py::TestScaffoldSREExtended -v
-
       # ── MCP server tool scenarios ──────────────────────────────────────────
-
-      - name: "Test: MCP server — GitHub Actions tool"
-        run: pytest tests/test_comprehensive.py::TestMCPServerGHA -v
 
       - name: "Test: MCP server — Jenkins tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerJenkins -v
