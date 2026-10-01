@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+> **📌 Note:** Starting from **v0.5.0+**, DevOps-OS is an **MCP-only backend**. All CLI functionality has been moved to MCP server. Access DevOps-OS exclusively through AI assistants like Claude, ChatGPT, Cursor, VS Code Copilot, or any MCP-compatible client. See [GETTING-STARTED-MCP.md](GETTING-STARTED-MCP.md) for quick start.
+
+---
+
 ## [0.4.7] - 2026-07-08
 
 ### Changed

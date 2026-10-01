@@ -4,25 +4,33 @@ weight: 10
 bookCollapseSection: true
 ---
 
-# Getting Started with DevOps-OS
+# Getting Started with DevOps-OS (MCP-First)
 
-Welcome! This guide walks you through DevOps-OS from **zero to your first generated pipeline** in under five minutes.
+Welcome! DevOps-OS is now an **MCP-only backend**. This guide walks you through getting started with the MCP server in under **5 minutes**.
 
 ---
 
 ## What is DevOps-OS?
 
-DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, infrastructure hardening baselines, and SRE monitoring configs — so you can stop writing boilerplate and start shipping.
+DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernetes manifests, infrastructure hardening baselines, and SRE monitoring configs — **through conversational AI** using the MCP server.
 
-| Category | Tools |
+Ask Claude or ChatGPT:
+
+```
+"Generate a complete GitHub Actions CI/CD workflow for a Python Flask API with Docker build, pytest tests, and deployment to Kubernetes."
+```
+
+You get production-ready YAML in seconds.
+
+| Category | What You Can Generate |
 |----------|-------|
-| CI/CD | GitHub Actions, GitLab CI, Jenkins |
-| GitOps / Deploy | ArgoCD, Flux CD, kubectl, Kustomize |
-| Containers | Docker, Helm |
-| Hardening / Compliance | Kyverno policies, InSpec profiles, Checkov checks, compliance mappings |
+| CI/CD | GitHub Actions, GitLab CI, Jenkins workflows |
+| GitOps / Deploy | ArgoCD Applications, Flux CD Kustomizations |
+| Containers | Docker configs, Helm charts |
+| Hardening / Compliance | Kyverno policies, InSpec profiles, Checkov checks |
 | SRE / Observability | Prometheus alert rules, Grafana dashboards, SLO configs |
-| Unit Testing | pytest, Jest, Vitest, Mocha, Go test |
-| AI Integration | Claude (MCP Server), OpenAI (function calling) |
+| Unit Testing | pytest, Jest, Vitest, Mocha, Go test scaffolds |
+| Dev Environment | Dev container configuration |
 
 ---
 
@@ -30,53 +38,91 @@ DevOps-OS is a toolkit that generates production-ready CI/CD pipelines, Kubernet
 
 | Requirement | Why |
 |------------|-----|
-| Python 3.10+ | Runs the CLI generators |
+| Python 3.10+ | Runs the MCP server |
 | pip | Installs Python dependencies |
 | Git | Clones the repo |
-| Docker *(optional)* | Builds / runs the dev container |
-| VS Code + Dev Containers extension *(optional)* | Opens the pre-configured dev environment |
+| Claude Desktop or ChatGPT | The AI assistant you'll use to generate configs |
 
 ---
 
-## 1 — Clone and install
+## Quick Start: 5 Minutes to First Generated Config
+
+### Step 1: Clone and Install
 
 ```bash
 git clone https://github.com/cloudengine-labs/devops_os.git
 cd devops_os
+
+# Set up Python environment
+python3 -m venv .venv
+source .venv/bin/activate  # macOS / Linux
+# .venv\Scripts\activate   # Windows (cmd)
+
+# Install MCP server dependencies
+pip install -r mcp_server/requirements.txt
 ```
 
-**Set up a virtual environment** (strongly recommended):
+### Step 2: Configure Claude Desktop (or ChatGPT)
 
-```bash
-python -m venv .venv
+**For Claude Desktop:**
 
-# Activate
-source .venv/bin/activate        # macOS / Linux
-# .venv\Scripts\activate         # Windows (cmd)
-# .venv\Scripts\Activate.ps1     # Windows (PowerShell)
+1. Get your repo path: `pwd` (copy output)
+2. Edit `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows)
+3. Add this config:
+
+```json
+{
+  "mcpServers": {
+    "devops-os": {
+      "command": "python",
+      "args": ["-m", "mcp_server.server"],
+      "cwd": "/your/repo/path/here"
+    }
+  }
+}
 ```
 
-**Install the CLI dependencies:**
+4. Restart Claude Desktop. You'll see a wrench icon 🔧 at the bottom right.
 
-```bash
-pip install -r cli/requirements.txt
+**For ChatGPT or other MCP clients:**
+
+See [MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}}) for detailed instructions.
+
+### Step 3: Generate Your First Config
+
+Ask Claude:
+
+```
+Generate a GitHub Actions workflow for a Python Flask API with:
+- Lint and test stages (using pytest)
+- Docker build and push to Docker Hub
+- Deployment to Kubernetes
 ```
 
-> [!WARNING]
-> Run `source .venv/bin/activate` in every new terminal session before using `python -m cli.*` commands.
+Done! Claude will generate the complete workflow YAML.
 
 ---
 
-## 2 — Learn the Process-First philosophy *(recommended)*
+## 🎯 Example Prompts to Try
 
-Before running any generator, understand *why* each tool exists:
+Once connected, try these prompts:
 
-```bash
-python -m cli.devopsos process-first                    # full overview
-python -m cli.devopsos process-first --section what     # 5 core principles
-python -m cli.devopsos process-first --section mapping  # which scaffold encodes which principle
-python -m cli.devopsos process-first --section tips     # AI prompts for deeper learning
-```
+| What You Want | Prompt |
+|---------------|--------|
+| GitHub Actions Workflow | Generate a GitHub Actions CI/CD workflow for a Python project with Docker build and deployment to AWS |
+| Jenkins Pipeline | Create a Declarative Jenkins Pipeline for a Java Spring Boot app with Maven build and ArgoCD deployment |
+| Kubernetes Manifests | Generate Kubernetes manifests for a Node.js microservice with 3 replicas and a LoadBalancer service |
+| SRE Dashboards | Generate Prometheus alert rules and Grafana dashboards for a microservice with 99.9% SLO |
+| Hardening Policies | Generate Kyverno policies for a production Kubernetes cluster based on CIS Benchmarks |
+| Dev Container | Scaffold a dev container for Python + Go development with Terraform, kubectl, and k9s |
+
+---
+
+## Learn More About DevOps-OS Philosophy
+
+**[Process-First SDLC Philosophy →]({{< relref "/docs/getting-started/process-first" >}})**
+
+Understand *why* each generator exists and how it maps to software development best practices.
 
 See the [Process-First guide]({{< relref "/docs/getting-started/process-first" >}}) for the full reference.
 

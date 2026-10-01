@@ -24,6 +24,14 @@
 
 ---
 
+## 📊 How It Works
+
+<div align="center">
+  <img src="./assets/devops-os-mcp-hero.svg" alt="DevOps-OS MCP Architecture" width="100%" max-width="1200px"/>
+</div>
+
+---
+
 ## ✨ What is DevOps-OS?
 
 DevOps-OS is an open-source DevOps automation platform that scaffolds production-ready CI/CD pipelines, Kubernetes configurations, and SRE observability configs — in seconds, through an AI chat prompt using the MCP server.
@@ -258,26 +266,13 @@ The pre-configured dev container gives you a consistent multi-language environme
 
 </details>
 
+Generate a dev container configuration by asking Claude:
 
-Dev container generation now uses two supported paths:
-
-- `python -m cli.devopsos init` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
-- `python -m cli.devopsos scaffold devcontainer` generates the legacy two-file `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json`.
-
-The old checked-in repo-local `.devcontainer` stack has been archived under `.legacy/devcontainer/`.
-
-Generate a dev container configuration from the CLI instead of editing JSON by hand:
-
-```bash
-# Generate devcontainer.json and devcontainer.env.json for a Python + Go project
-python -m cli.devopsos scaffold devcontainer \
-  --languages python,go \
-  --cicd-tools docker,terraform,kubectl \
-  --kubernetes-tools k9s,flux \
-  --devops-tools prometheus,grafana
+```
+"Generate a dev container (devcontainer.json) for a Python + Go project with Terraform, kubectl, and k9s for Kubernetes development."
 ```
 
-For generated projects, you can customize the generated `.devcontainer/devcontainer.env.json` directly to enable or disable any language or tool, then rebuild or reopen in VS Code.
+The MCP server will generate all necessary dev container configuration files for your project.
 
 ---
 
@@ -291,15 +286,6 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 | [🔧 MCP Setup & Configuration](hugo-docs/content/docs/ai-integration/mcp-setup.md) | Install, configure, deploy with Docker, ChatGPT setup, troubleshooting |
 | [🧠 AI Skills with OpenAI/Anthropic](skills/README.md) | Integrate with API function calling (alternative to MCP) |
 
-### 📖 CLI Reference (For automation & scripting)
-
-| Guide | Description |
-|-------|-------------|
-| [🚀 Getting Started](docs/GETTING-STARTED.md) | Step-by-step guide for CLI usage |
-| [📖 CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location |
-| [🖥️ CLI Test Report](docs/CLI-TEST-REPORT.md) | v0.4.0 CLI test results — 62 tests, all passing |
-| [⚡ Quick Start Reference](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all features |
-
 ### 🏗️ Generators & Configuration
 
 | Guide | Description |
@@ -310,7 +296,7 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 | [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
 | [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
 | [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
-| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and CLI examples for the hardening scaffold |
+| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and examples for the hardening scaffold |
 | [🧪 Unit Test Scaffold](docs/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
 | [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
 
@@ -318,7 +304,6 @@ For generated projects, you can customize the generated `.devcontainer/devcontai
 
 | Guide | Description |
 |-------|-------------|
-| [📦 Dev Container Setup](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
 | [🤖 MCP Server Architecture](mcp_server/README.md) | Technical details about the MCP implementation |
 
 ---

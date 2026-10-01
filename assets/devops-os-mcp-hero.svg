@@ -1,0 +1,102 @@
+<svg viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0e27;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a1f3a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="400" fill="url(#bgGradient)"/>
+  
+  <!-- Left side: AI assistants -->
+  <g id="left-section">
+    <!-- Claude -->
+    <rect x="40" y="80" width="140" height="120" rx="8" fill="#7c3aed" opacity="0.2"/>
+    <text x="110" y="120" font-size="40" font-weight="bold" fill="#7c3aed" text-anchor="middle">🤖</text>
+    <text x="110" y="160" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">Claude</text>
+    <text x="110" y="180" font-size="11" fill="#d1d5db" text-anchor="middle">Desktop & API</text>
+    
+    <!-- ChatGPT -->
+    <rect x="200" y="80" width="140" height="120" rx="8" fill="#412991" opacity="0.2"/>
+    <text x="270" y="120" font-size="40" font-weight="bold" fill="#a78bfa" text-anchor="middle">🌐</text>
+    <text x="270" y="160" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">ChatGPT</text>
+    <text x="270" y="180" font-size="11" fill="#d1d5db" text-anchor="middle">OpenAI Plugin</text>
+    
+    <!-- Other MCP Clients -->
+    <rect x="360" y="80" width="140" height="120" rx="8" fill="#3b82f6" opacity="0.2"/>
+    <text x="430" y="120" font-size="40" font-weight="bold" fill="#60a5fa" text-anchor="middle">⚡</text>
+    <text x="430" y="160" font-size="14" font-weight="600" fill="#fff" text-anchor="middle">MCP Clients</text>
+    <text x="430" y="180" font-size="11" fill="#d1d5db" text-anchor="middle">Cursor, VS Code</text>
+  </g>
+  
+  <!-- Center: Arrows pointing down -->
+  <g id="arrows">
+    <path d="M 110 210 L 110 240" stroke="#7c3aed" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+    <path d="M 270 210 L 270 240" stroke="#a78bfa" stroke-width="2" fill="none" marker-end="url(#arrowhead2)"/>
+    <path d="M 430 210 L 430 240" stroke="#60a5fa" stroke-width="2" fill="none" marker-end="url(#arrowhead3)"/>
+    
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+        <polygon points="0 0, 10 5, 0 10" fill="#7c3aed"/>
+      </marker>
+      <marker id="arrowhead2" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+        <polygon points="0 0, 10 5, 0 10" fill="#a78bfa"/>
+      </marker>
+      <marker id="arrowhead3" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+        <polygon points="0 0, 10 5, 0 10" fill="#60a5fa"/>
+      </marker>
+    </defs>
+  </g>
+  
+  <!-- Center: MCP Server Core -->
+  <g id="center-core">
+    <rect x="80" y="260" width="700" height="100" rx="12" fill="url(#accentGradient)" opacity="0.15" stroke="url(#accentGradient)" stroke-width="2"/>
+    <text x="430" y="290" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">🚀 DevOps-OS MCP Server</text>
+    <text x="430" y="318" font-size="12" fill="#d1d5db" text-anchor="middle">Generate CI/CD, K8s, SRE, Hardening configs via natural language</text>
+  </g>
+  
+  <!-- Right side: Output generators -->
+  <g id="right-section">
+    <!-- CI/CD -->
+    <rect x="820" y="30" width="150" height="80" rx="6" fill="#f59e0b" opacity="0.2"/>
+    <text x="895" y="55" font-size="28" font-weight="bold" fill="#fbbf24" text-anchor="middle">⚙️</text>
+    <text x="895" y="80" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">CI/CD Pipelines</text>
+    <text x="895" y="95" font-size="10" fill="#d1d5db" text-anchor="middle">GHA · GitLab · Jenkins</text>
+    
+    <!-- Kubernetes -->
+    <rect x="820" y="130" width="150" height="80" rx="6" fill="#06b6d4" opacity="0.2"/>
+    <text x="895" y="155" font-size="28" font-weight="bold" fill="#22d3ee" text-anchor="middle">☸️</text>
+    <text x="895" y="180" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">Kubernetes</text>
+    <text x="895" y="195" font-size="10" fill="#d1d5db" text-anchor="middle">ArgoCD · Flux · Helm</text>
+    
+    <!-- Hardening -->
+    <rect x="820" y="230" width="150" height="80" rx="6" fill="#ef4444" opacity="0.2"/>
+    <text x="895" y="255" font-size="28" font-weight="bold" fill="#f87171" text-anchor="middle">🔐</text>
+    <text x="895" y="280" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">Hardening</text>
+    <text x="895" y="295" font-size="10" fill="#d1d5db" text-anchor="middle">Kyverno · InSpec · CIS</text>
+    
+    <!-- SRE/Observability -->
+    <rect x="820" y="330" width="150" height="80" rx="6" fill="#10b981" opacity="0.2"/>
+    <text x="895" y="355" font-size="28" font-weight="bold" fill="#34d399" text-anchor="middle">📊</text>
+    <text x="895" y="380" font-size="12" font-weight="600" fill="#fff" text-anchor="middle">SRE/Observability</text>
+    <text x="895" y="395" font-size="10" fill="#d1d5db" text-anchor="middle">Prometheus · Grafana</text>
+  </g>
+  
+  <!-- Arrows from core to outputs -->
+  <g id="output-arrows">
+    <path d="M 780 295 L 820 75" stroke="#fbbf24" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+    <path d="M 780 305 L 820 175" stroke="#22d3ee" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+    <path d="M 780 310 L 820 275" stroke="#f87171" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+    <path d="M 780 315 L 820 375" stroke="#34d399" stroke-width="2" fill="none" stroke-dasharray="5,5"/>
+  </g>
+  
+  <!-- Title at top right -->
+  <text x="1080" y="40" font-size="24" font-weight="700" fill="#fff" text-anchor="end">DevOps-OS</text>
+  <text x="1080" y="65" font-size="13" fill="#a78bfa" text-anchor="end">AI-Powered Infrastructure</text>
+</svg>
