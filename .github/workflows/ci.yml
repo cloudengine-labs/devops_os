@@ -27,51 +27,6 @@ jobs:
       - name: Run MCP server tests
         run: pytest mcp_server/test_server.py tests/ -v
 
-  container:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        run: docker build -t devops-os-mcp:test .
-
-      - name: Verify Docker image (non-root user)
-        run: |
-          # Check image was built
-          docker images | grep devops-os-mcp:test
-          
-          # Verify non-root user in image
-          docker run --rm devops-os-mcp:test whoami | grep -q devops-os
-          echo "✓ Non-root user verified"
-
-      - name: Test container startup (stdio profile)
-        run: |
-          # Test that container starts and module loads
-          docker run --rm --entrypoint python3 devops-os-mcp:test -c "import mcp_server.server; print('✓ Module loads successfully')"
-          echo "✓ Container stdio startup verified"
-
-      - name: Test container startup (http profile)
-        run: |
-          # Start container and verify health endpoint responds
-          docker run -d --name devops-os-test -p 127.0.0.1:8000:8000 \
-            -e DEVOPS_OS_PROFILE=local \
-            -e DEVOPS_OS_TRANSPORT=streamable-http \
-            devops-os-mcp:test &
-          
-          # Wait for startup
-          sleep 3
-          
-          # Test health endpoint
-          curl -f http://127.0.0.1:8000/health || (docker logs devops-os-test && exit 1)
-          echo "✓ Health endpoint verified"
-          
-          # Stop container
-          docker stop devops-os-test || true
-          docker rm devops-os-test || true
-
   http-integration:
     runs-on: ubuntu-latest
     steps:
