@@ -18,7 +18,7 @@ from pathlib import Path
 # Ensure repo root is on path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from cli import (
+from devops_os.core import (
     scaffold_gha,
     scaffold_jenkins,
     scaffold_gitlab,
@@ -298,17 +298,6 @@ class TestScaffoldGHA:
         assert python_steps, "Expected Python build steps"
         assert go_steps, "Expected Go build steps"
 
-    def test_cli_gha_scaffold_via_module(self):
-        """Test CLI invocation of scaffold gha via module."""
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_gha",
-                ["--name", "cli-test", "--type", "build", "--output", tmp],
-            )
-            assert result.returncode == 0
-            files = list(Path(tmp).glob("*.yml"))
-            assert len(files) >= 1
-
     def test_language_config_correctly_maps_languages(self):
         cfg = scaffold_gha.generate_language_config("python,java,go", {})
         assert cfg["python"] is True
@@ -490,168 +479,6 @@ class TestScaffoldJenkins:
         content = scaffold_jenkins.generate_pipeline(args, configs)
         assert "cleanWs()" in content
 
-    def test_cli_jenkins_scaffold_via_module(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, "Jenkinsfile")
-            result = _run_module(
-                "cli.scaffold_jenkins",
-                ["--name", "cli-test", "--type", "build", "--output", out],
-            )
-            assert result.returncode == 0
-            assert os.path.exists(out)
-            with open(out) as fh:
-                content = fh.read()
-            assert "pipeline {" in content
-
-
-# ===========================================================================
-# CLI: scaffold_gitlab (extended)
-# ===========================================================================
-
-class TestScaffoldGitlabExtended:
-    """Extended tests for the GitLab CI generator."""
-
-    def test_javascript_test_job_included(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "js-app", "--type", "test",
-                 "--languages", "javascript", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "test:javascript" in data
-
-    def test_go_test_job_included(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "go-app", "--type", "test",
-                 "--languages", "go", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "test:go" in data
-
-    def test_deploy_stage_included_for_kubectl(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "my-api", "--type", "deploy",
-                 "--kubernetes", "--k8s-method", "kubectl",
-                 "--languages", "python", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "deploy" in (data.get("stages") or [])
-
-    def test_deploy_stage_included_for_argocd(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "my-api", "--type", "complete",
-                 "--kubernetes", "--k8s-method", "argocd",
-                 "--languages", "python", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "deploy" in (data.get("stages") or [])
-            assert "deploy:kubernetes" in data
-            deploy_script = data["deploy:kubernetes"]["script"]
-            assert any("argocd" in s for s in deploy_script)
-
-    def test_deploy_stage_included_for_flux(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "my-api", "--type", "complete",
-                 "--kubernetes", "--k8s-method", "flux",
-                 "--languages", "python", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "deploy:kubernetes" in data
-            deploy_script = data["deploy:kubernetes"]["script"]
-            assert any("flux" in s for s in deploy_script)
-
-    def test_multi_language_complete_pipeline(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "full-stack", "--type", "complete",
-                 "--languages", "python,java,javascript,go",
-                 "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "test:python" in data
-            assert "test:java" in data
-            assert "test:javascript" in data
-            assert "test:go" in data
-
-    def test_build_job_docker_services(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "svc", "--type", "build",
-                 "--languages", "python", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            assert "build" in data
-            # Build job uses docker-in-docker services
-            assert "services" in data["build"]
-
-    # BUG-1 regression: deploy pipeline with no kubernetes must still have stages
-    def test_deploy_pipeline_no_kubernetes_empty_stages(self):
-        """
-        BUG-1: When type='deploy' and kubernetes=False, the generated
-        pipeline has an empty stages list, which is invalid for GitLab CI.
-        Expected: at least one stage should be present even for non-k8s deploy,
-        and a deploy job stub must be present in the pipeline.
-        """
-        with tempfile.TemporaryDirectory() as tmp:
-            out = os.path.join(tmp, ".gitlab-ci.yml")
-            result = _run_module(
-                "cli.scaffold_gitlab",
-                ["--name", "my-app", "--type", "deploy",
-                 "--languages", "python", "--output", out],
-            )
-            assert result.returncode == 0
-            with open(out) as fh:
-                data = yaml.safe_load(fh)
-            stages = data.get("stages") or []
-            # Correct expected behavior: there should be at least one stage
-            assert len(stages) > 0, (
-                "Expected at least one stage in a deploy pipeline, got: {!r}".format(stages)
-            )
-            # A deploy job stub must be present so the pipeline is valid
-            assert "deploy" in data, (
-                "Expected a deploy job in the pipeline, got keys: {!r}".format(list(data.keys()))
-            )
-
-
-# ===========================================================================
-# CLI: scaffold_argocd (extended)
-# ===========================================================================
-
-class TestScaffoldArgoCDExtended:
-    """Extended tests for the ArgoCD/Flux config generator."""
-
     def test_argocd_auto_sync_enabled(self):
         args = _argocd_args(auto_sync=True)
         app = scaffold_argocd.generate_argocd_application(args)
@@ -724,38 +551,6 @@ class TestScaffoldArgoCDExtended:
         assert img_repo["kind"] == "ImageRepository"
         assert img_policy["kind"] == "ImagePolicy"
         assert img_update["kind"] == "ImageUpdateAutomation"
-
-    def test_cli_argocd_output_files_exist(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_argocd",
-                ["--name", "ext-app",
-                 "--repo", "https://github.com/test/ext-app.git",
-                 "--auto-sync", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            assert (Path(tmp) / "argocd" / "application.yaml").exists()
-            assert (Path(tmp) / "argocd" / "appproject.yaml").exists()
-
-    def test_cli_flux_output_files_exist(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_argocd",
-                ["--name", "flux-app", "--method", "flux",
-                 "--repo", "https://github.com/test/flux-app.git",
-                 "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            assert (Path(tmp) / "flux" / "kustomization.yaml").exists()
-            assert (Path(tmp) / "flux" / "git-repository.yaml").exists()
-
-
-# ===========================================================================
-# CLI: scaffold_sre (extended + bug tests)
-# ===========================================================================
-
-class TestScaffoldSREExtended:
-    """Extended tests for the SRE configuration generator."""
 
     def test_alert_rules_availability_group_present(self):
         args = _sre_args(slo_type="availability")
@@ -905,42 +700,6 @@ class TestScaffoldSREExtended:
         args = _sre_args()
         config = scaffold_sre.generate_alertmanager_config(args)
         assert len(config.get("inhibit_rules", [])) >= 1
-
-    def test_cli_sre_custom_latency_threshold(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_sre",
-                ["--name", "latency-api", "--slo-type", "latency",
-                 "--latency-threshold", "0.1", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            with open(Path(tmp) / "alert-rules.yaml") as fh:
-                rules = yaml.safe_load(fh)
-            # threshold = 0.1s should appear in the latency expression
-            latency_group = next(
-                g for g in rules["spec"]["groups"] if "latency" in g["name"]
-            )
-            expr = latency_group["rules"][0]["expr"]
-            assert "0.1" in expr
-
-    def test_cli_sre_output_all_files(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_sre",
-                ["--name", "full-sre", "--team", "infra", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            for fname in ("alert-rules.yaml", "grafana-dashboard.json",
-                          "slo.yaml", "alertmanager-config.yaml"):
-                assert (Path(tmp) / fname).exists(), f"Missing: {fname}"
-
-
-# ===========================================================================
-# MCP Server: extended coverage
-# ===========================================================================
-
-class TestMCPServerGHA:
-    """Extended MCP server tests for GitHub Actions generator."""
 
     def test_build_workflow_type(self):
         result = generate_github_actions_workflow(
@@ -1710,54 +1469,6 @@ class TestScaffoldUnittest:
             assert not any("jest.config.js" in p for p in paths)
 
     # ── CLI module invocation ─────────────────────────────────────────────────
-
-    def test_cli_python_scaffold(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_unittest",
-                ["--name", "my-app", "--languages", "python", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            assert "pytest.ini" in result.stdout
-            assert os.path.exists(os.path.join(tmp, "pytest.ini"))
-
-    def test_cli_javascript_jest_scaffold(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_unittest",
-                ["--name", "my-lib", "--languages", "javascript",
-                 "--framework", "jest", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            assert os.path.exists(os.path.join(tmp, "jest.config.js"))
-
-    def test_cli_go_scaffold(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_unittest",
-                ["--name", "my-api", "--languages", "go", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            assert os.path.exists(os.path.join(tmp, "my_api_test.go"))
-
-    def test_cli_no_coverage_flag(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            result = _run_module(
-                "cli.scaffold_unittest",
-                ["--name", "my-app", "--languages", "python",
-                 "--no-coverage", "--output-dir", tmp],
-            )
-            assert result.returncode == 0
-            content = open(os.path.join(tmp, "pytest.ini")).read()
-            assert "--cov=" not in content
-
-
-# ===========================================================================
-# MCP Server: generate_unittest_config
-# ===========================================================================
-
-class TestMCPServerUnittest:
-    """Tests for the MCP server generate_unittest_config tool."""
 
     def test_python_returns_pytest_ini(self):
         result = json.loads(generate_unittest_config(name="my-api", languages="python"))

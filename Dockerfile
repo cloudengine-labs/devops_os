@@ -12,15 +12,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy application source and requirements
 COPY mcp_server/requirements.txt mcp_server/requirements.txt
-COPY cli/requirements.txt cli/requirements.txt
-RUN mkdir -p /build/cli /build/mcp_server
+RUN mkdir -p /build/mcp_server
 
 # Install Python dependencies into virtual environment
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install -r mcp_server/requirements.txt && \
-    pip install -r cli/requirements.txt
+    pip install -r mcp_server/requirements.txt
 
 # Stage 2: Runtime
 FROM python:3.12-slim
@@ -52,8 +50,8 @@ COPY --from=builder --chown=devops-os:devops-os /opt/venv /opt/venv
 
 # Copy application code
 WORKDIR /app
+COPY --chown=devops-os:devops-os devops_os /app/devops_os
 COPY --chown=devops-os:devops-os mcp_server /app/mcp_server
-COPY --chown=devops-os:devops-os cli /app/cli
 COPY --chown=devops-os:devops-os scripts /app/scripts
 COPY --chown=devops-os:devops-os docs /app/docs
 

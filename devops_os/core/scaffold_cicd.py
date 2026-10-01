@@ -7,8 +7,8 @@ Uses the scaffold_gha and scaffold_jenkins modules directly — no subprocess
 calls, no external script files required.
 
 Usage:
-    python -m cli.scaffold_cicd [options]
-    python -m cli.devopsos scaffold cicd [options]
+    from devops_os.core import scaffold_cicd
+    scaffold_cicd.generate_all_configs(...)
 """
 
 import os
@@ -114,7 +114,7 @@ def parse_arguments():
 
 def run_github_generator(args) -> bool:
     """Generate GitHub Actions workflow using the scaffold_gha module."""
-    import cli.scaffold_gha as scaffold_gha  # noqa: PLC0415 (local import to avoid circular)
+    import devops_os.core.scaffold_gha as scaffold_gha  # noqa: PLC0415 (local import to avoid circular)
 
     print("Generating GitHub Actions workflow...")
 
@@ -146,7 +146,7 @@ def run_github_generator(args) -> bool:
 
 def run_jenkins_generator(args) -> bool:
     """Generate Jenkins pipeline using the scaffold_jenkins module."""
-    import cli.scaffold_jenkins as scaffold_jenkins  # noqa: PLC0415
+    import devops_os.core.scaffold_jenkins as scaffold_jenkins  # noqa: PLC0415
 
     print("Generating Jenkins pipeline...")
 

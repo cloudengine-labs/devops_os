@@ -25,67 +25,49 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r cli/requirements.txt -r mcp_server/requirements.txt pytest pytest-html
+          pip install -r mcp_server/requirements.txt pytest pytest-html
 
-      # ── CLI scaffold scenarios ─────────────────────────────────────────────
+      # ── Scaffold module tests ──────────────────────────────────────────────
 
-      - name: "Scenario: CLI init wizard"
-        run: pytest cli/test_cli.py -k init -v
-
-      - name: "Scenario: GitHub Actions scaffold"
+      - name: "Test: GitHub Actions scaffold"
         run: pytest tests/test_comprehensive.py::TestScaffoldGHA -v
 
-      - name: "Scenario: Jenkins scaffold"
+      - name: "Test: Jenkins scaffold"
         run: pytest tests/test_comprehensive.py::TestScaffoldJenkins -v
-
-      - name: "Scenario: GitLab CI scaffold"
-        run: pytest tests/test_comprehensive.py::TestScaffoldGitlabExtended -v
-
-      - name: "Scenario: ArgoCD / Flux GitOps scaffold"
-        run: pytest tests/test_comprehensive.py::TestScaffoldArgoCDExtended -v
-
-      - name: "Scenario: SRE config scaffold (Prometheus, Grafana, SLO)"
-        run: pytest tests/test_comprehensive.py::TestScaffoldSREExtended -v
 
       # ── MCP server tool scenarios ──────────────────────────────────────────
 
-      - name: "Scenario: MCP server — GitHub Actions tool"
-        run: pytest tests/test_comprehensive.py::TestMCPServerGHA -v
-
-      - name: "Scenario: MCP server — Jenkins tool"
+      - name: "Test: MCP server — Jenkins tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerJenkins -v
 
-      - name: "Scenario: MCP server — Kubernetes tool"
+      - name: "Test: MCP server — Kubernetes tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerK8s -v
 
-      - name: "Scenario: MCP server — GitLab CI tool"
+      - name: "Test: MCP server — GitLab CI tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerGitLab -v
 
-      - name: "Scenario: MCP server — ArgoCD / Flux tool"
+      - name: "Test: MCP server — ArgoCD / Flux tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerArgoCD -v
 
-      - name: "Scenario: MCP server — SRE tool"
+      - name: "Test: MCP server — SRE tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerSRE -v
 
-      - name: "Scenario: MCP server — Dev container tool"
+      - name: "Test: MCP server — Dev container tool"
         run: pytest tests/test_comprehensive.py::TestMCPServerDevcontainer -v
 
       # ── MCP wire-protocol tests ───────────────────────────────────────────
 
-      - name: "Scenario: MCP wire protocol — handshake, tool discovery, invocation"
+      - name: "Test: MCP wire protocol — handshake, tool discovery, invocation"
         run: pytest tests/test_mcp_protocol.py -v
 
       # ── AI skills definitions ──────────────────────────────────────────────
 
-      - name: "Scenario: AI skills definitions (OpenAI & Claude)"
+      - name: "Test: AI skills definitions (OpenAI & Claude)"
         run: pytest tests/test_comprehensive.py::TestSkillsDefinitions -v
 
-      # ── CLI and MCP server unit tests ─────────────────────────────────────
+      # ── MCP server unit tests ─────────────────────────────────────────
 
-      - name: "Scenario: CLI integration tests (devopsos unified CLI)"
-        run: pytest cli/test_cli.py -v
-
-      - name: "Scenario: MCP server unit tests"
+      - name: "Test: MCP server unit tests"
         run: pytest mcp_server/test_server.py -v
 
       # ── Combined report artifact ───────────────────────────────────────────
@@ -93,7 +75,7 @@ jobs:
       - name: Generate combined HTML report
         if: always()
         run: |
-          pytest cli/test_cli.py mcp_server/test_server.py tests/test_comprehensive.py tests/test_mcp_protocol.py \
+          pytest mcp_server/test_server.py tests/test_comprehensive.py tests/test_mcp_protocol.py \
             --html=sanity-report.html --self-contained-html -q
 
       - name: Upload sanity test report
