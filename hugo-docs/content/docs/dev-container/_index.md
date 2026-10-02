@@ -7,14 +7,12 @@ weight: 60
 
 DevOps-OS provides a pre-configured VS Code Dev Container that gives you a consistent, multi-language development environment with all CI/CD tools included.
 
-The repository's old checked-in `.devcontainer` stack has been archived under `.legacy/devcontainer/`. Generate project-local `.devcontainer/` files with the CLI instead.
-
 ---
 
 ## Quick Start
 
 ```bash
-python -m cli.devopsos scaffold devcontainer \
+python -m devops_os.core.scaffold_devcontainer \
   --languages python,go \
   --cicd-tools docker,kubectl,helm \
   --kubernetes-tools k9s,argocd_cli,flux
@@ -24,7 +22,7 @@ python -m cli.devopsos scaffold devcontainer \
 
 Then open VS Code and run **"Dev Containers: Reopen in Container"** from the Command Palette.
 
-Run `python -m cli.devopsos scaffold devcontainer --help` to see all available options.
+Run `python -m devops_os.core.scaffold_devcontainer --help` to see all available options.
 
 ---
 
@@ -65,7 +63,7 @@ All options can be set via environment variables prefixed `DEVOPS_OS_DEVCONTAINE
 ## Full-stack Example
 
 ```bash
-python -m cli.devopsos scaffold devcontainer \
+python -m devops_os.core.scaffold_devcontainer \
   --languages python,java,javascript \
   --cicd-tools docker,terraform,kubectl,helm \
   --kubernetes-tools k9s,kustomize,argocd_cli,flux \
@@ -125,7 +123,7 @@ Copy the generated `.devcontainer/` directory to your project:
 
 ```bash
 # In the devops_os repo:
-python -m cli.devopsos scaffold devcontainer \
+python -m devops_os.core.scaffold_devcontainer \
   --languages python,go \
   --output-dir /path/to/my-project
 
@@ -163,4 +161,4 @@ code .
 
 1. Check the tool is `true` in `devcontainer.env.json`
 2. Rebuild the container: **"Dev Containers: Rebuild Container"**
-3. Regenerate the devcontainer files with `python -m cli.devopsos scaffold devcontainer ...` if you changed the selected tools
+3. Regenerate the devcontainer files with `python -m devops_os.core.scaffold_devcontainer ...` if you changed the selected tools
