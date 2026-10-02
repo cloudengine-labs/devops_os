@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Code analysis: SonarQube, ESLint, Pylint, Checkstyle, PMD
   - DevOps platforms: Prometheus, Grafana, ELK Stack, Nexus
 - **Version Management System** (`mcp_server/version_manager.py`):
-  - Centralized version database for 20+ programming languages and tools
+  - Centralized version database for 12 programming languages and tools
   - Environment variable-based version configuration (`DEVOPS_OS_VERSION_*`)
   - Version status tracking (latest, LTS, stable, deprecated, EOL)
   - Security-aware update recommendations and vulnerability detection
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `check_security_issues()` - Identify security vulnerabilities by urgency level
 - **Comprehensive Version Management Documentation**:
   - New guide: `hugo-docs/content/docs/dev-container/version-management.md` (11,440 bytes)
-  - Version database with 20+ tools and LTS information
+  - Version database with 12 tools and LTS information
   - Security level definitions (critical, high, medium, low)
   - Environment variable configuration examples
   - MCP tool usage examples and workflows

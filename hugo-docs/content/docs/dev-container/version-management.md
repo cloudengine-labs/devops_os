@@ -407,7 +407,7 @@ The version manager validates versions against the known version database:
 Example validation:
 ```bash
 update_versions('{"python": "3.15"}')  # Invalid - not in database
-# Response: {"success": false, "error": "Version 3.15 not found for python"}
+# Response: {"success": false, "errors": [{"tool": "python", "message": "Failed to update python"}]}
 
 update_versions('{"python": "3.13"}')  # Valid
 # Response: {"success": true, ...}
