@@ -35,6 +35,7 @@ from mcp_server.config import Config
 from mcp_server.validators import ValidationError, validate_tool_inputs
 from mcp_server.logging import get_logger, CorrelationContext
 from mcp_server.auth import create_token_verifier
+from mcp_server.response_enhancer import ResponseEnhancer
 
 # Use structured logger instead of standard logging
 logger = get_logger(__name__)
@@ -117,6 +118,7 @@ def _build_jenkins_args(
 # Global config and server instances (set during create_mcp_server)
 _config: Config | None = None
 _mcp: FastMCP | None = None
+_response_enhancer: ResponseEnhancer | None = None
 
 
 def create_mcp_server(config: Config | None = None) -> FastMCP:
@@ -128,12 +130,13 @@ def create_mcp_server(config: Config | None = None) -> FastMCP:
     Returns:
         Configured FastMCP server instance
     """
-    global _config, _mcp
+    global _config, _mcp, _response_enhancer
 
     if config is None:
         config = Config.from_env()
     
     _config = config
+    _response_enhancer = ResponseEnhancer(config)
     
     # Configure logging
     logging.basicConfig(
@@ -141,6 +144,9 @@ def create_mcp_server(config: Config | None = None) -> FastMCP:
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     logger.info(f"Configuration loaded: transport={config.transport}, profile={config.profile}")
+    logger.info(f"Prompt suggestions: enabled={config.enable_suggestions}, "
+                f"threshold={config.suggestion_confidence_threshold}, "
+                f"max_per_response={config.max_suggestions_per_response}")
 
     # Create MCP server with configuration
     _mcp = FastMCP(
@@ -170,6 +176,20 @@ def get_config() -> Config:
     if _config is None:
         raise RuntimeError("Server not yet initialized. Call create_mcp_server() first.")
     return _config
+
+
+def get_response_enhancer() -> ResponseEnhancer:
+    """Get the response enhancer instance.
+
+    Returns:
+        ResponseEnhancer instance
+
+    Raises:
+        RuntimeError: If server not yet created
+    """
+    if _response_enhancer is None:
+        raise RuntimeError("Server not yet initialized. Call create_mcp_server() first.")
+    return _response_enhancer
 
 
 def _register_tools(mcp: FastMCP) -> None:
@@ -209,6 +229,7 @@ def generate_github_actions_workflow(
     k8s_method: str = "kubectl",
     branches: str = "main",
     matrix: bool = False,
+    user_context: str = "",
 ) -> str:
     """Generate a GitHub Actions CI/CD workflow YAML.
 
@@ -223,9 +244,11 @@ def generate_github_actions_workflow(
         k8s_method: 'kubectl' or 'kustomize' (default: 'kubectl')
         branches: Trigger branch(es) (default: 'main')
         matrix: Enable job matrix for multi-version testing (default: False)
+        user_context: Original user prompt/context (optional, used for suggestions)
 
     Returns:
-        GitHub Actions workflow YAML as string
+        GitHub Actions workflow YAML as string, optionally with prompt suggestions
+        in JSON format if suggestions are enabled
 
     Raises:
         ValueError: If inputs are invalid
@@ -261,7 +284,20 @@ def generate_github_actions_workflow(
 
         import yaml
         workflow_content = scaffold_gha.generate_workflow(args, {}, configs)
-        return yaml.dump(workflow_content, sort_keys=False, Dumper=_NoAliasDumper)
+        tool_output = yaml.dump(workflow_content, sort_keys=False, Dumper=_NoAliasDumper)
+        
+        # Enhance response with prompt suggestions
+        try:
+            enhancer = get_response_enhancer()
+            prompt_for_analysis = user_context or f"{languages} {workflow_type} workflow"
+            return enhancer.enhance_response(
+                tool_name="generate_github_actions_workflow",
+                tool_output=tool_output,
+                user_prompt=prompt_for_analysis,
+            )
+        except RuntimeError:
+            # Server not initialized yet (e.g., direct testing), return raw output
+            return tool_output
 
 
 # ---------------------------------------------------------------------------
@@ -276,6 +312,7 @@ def generate_jenkins_pipeline(
     kubernetes: bool = False,
     k8s_method: str = "kubectl",
     parameters: bool = False,
+    user_context: str = "",
 ) -> str:
     """Generate a Jenkins Declarative Pipeline (Jenkinsfile) as a string.
 
@@ -289,9 +326,11 @@ def generate_jenkins_pipeline(
         kubernetes: Include Kubernetes deployment stage (default: False)
         k8s_method: 'kubectl', 'kustomize', 'argocd', or 'flux' (default: 'kubectl')
         parameters: Add runtime parameters to pipeline (default: False)
+        user_context: Original user prompt/context (optional, used for suggestions)
 
     Returns:
-        Generated Jenkinsfile content as string
+        Generated Jenkinsfile content as string, optionally with prompt suggestions
+        in JSON format if suggestions are enabled
 
     Raises:
         ValueError: If inputs are invalid
@@ -325,7 +364,19 @@ def generate_jenkins_pipeline(
         pipeline_content = scaffold_jenkins.generate_pipeline(args, configs)
         with open(out_path, "w") as fh:
             fh.write(pipeline_content)
-        return pipeline_content
+        
+        # Enhance response with prompt suggestions
+        try:
+            enhancer = get_response_enhancer()
+            prompt_for_analysis = user_context or f"{languages} {pipeline_type} Jenkins pipeline"
+            return enhancer.enhance_response(
+                tool_name="generate_jenkins_pipeline",
+                tool_output=pipeline_content,
+                user_prompt=prompt_for_analysis,
+            )
+        except RuntimeError:
+            # Server not initialized yet (e.g., direct testing), return raw output
+            return pipeline_content
 
 
 # ---------------------------------------------------------------------------
@@ -341,11 +392,13 @@ def generate_k8s_config(
     namespace: str = "default",
     deployment_method: str = "kubectl",
     expose_service: bool = True,
+    user_context: str = "",
 ) -> str:
     """Generate Kubernetes deployment manifests.
 
     Creates a Kubernetes Deployment with optional Service for a containerized
     application. Supports kubectl, kustomize, Argo CD, and Flux deployment.
+    Includes prompt suggestions for follow-up actions.
 
     Args:
         app_name: Application name for Kubernetes resources (lowercase, alphanumeric + dashes)
@@ -355,6 +408,7 @@ def generate_k8s_config(
         namespace: Kubernetes namespace (lowercase, alphanumeric + dashes, default: default)
         deployment_method: 'kubectl', 'kustomize', 'argocd', or 'flux'
         expose_service: Create ClusterIP Service (default: True)
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         Kubernetes YAML manifests as multi-document string
@@ -430,7 +484,20 @@ def generate_k8s_config(
             "# kustomization.yaml\n" + yaml.dump(kustomization, sort_keys=False)
         )
 
-    return "---\n".join(manifests)
+    tool_output = "---\n".join(manifests)
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"{deployment_method} deployment for {app_name}"
+        return enhancer.enhance_response(
+            tool_name="generate_k8s_config",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 # ---------------------------------------------------------------------------
@@ -446,11 +513,12 @@ def scaffold_devcontainer(
     node_version: str = "20",
     java_version: str = "17",
     go_version: str = "1.21",
+    user_context: str = "",
 ) -> str:
     """Generate a devcontainer.json and devcontainer.env.json configuration.
 
     Creates a development container configuration for the specified languages,
-    CI/CD tools, and Kubernetes tools.
+    CI/CD tools, and Kubernetes tools. Includes prompt suggestions for customization.
 
     Args:
         languages: Comma-separated languages (python, java, javascript, typescript,
@@ -463,6 +531,7 @@ def scaffold_devcontainer(
         node_version: Node.js version (default: 20)
         java_version: Java JDK version (default: 17)
         go_version: Go version (default: 1.21)
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         JSON string with 'devcontainer_json' and 'devcontainer_env_json' keys
@@ -537,13 +606,26 @@ def scaffold_devcontainer(
             "/usr/local/bin/k8s-config-generator"
         )
 
-    return json.dumps(
+    tool_output = json.dumps(
         {
             "devcontainer_json": json.dumps(devcontainer_json, indent=2),
             "devcontainer_env_json": json.dumps(env_json, indent=2),
         },
         indent=2,
     )
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"devcontainer with {languages}, {cicd_tools}, {kubernetes_tools}"
+        return enhancer.enhance_response(
+            tool_name="scaffold_devcontainer",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 
@@ -559,11 +641,13 @@ def generate_gitlab_ci_pipeline(
     kubernetes: bool = False,
     k8s_method: str = "kubectl",
     branches: str = "main",
+    user_context: str = "",
 ) -> str:
     """Generate a GitLab CI pipeline (.gitlab-ci.yml) as a YAML string.
 
     Creates a GitLab CI/CD pipeline for Python, JavaScript, Go, Java, or
     multi-language projects with optional Kubernetes deployment.
+    Includes prompt suggestions for pipeline enhancements.
 
     Args:
         name: Application name for variable APP_NAME and image tags
@@ -572,6 +656,7 @@ def generate_gitlab_ci_pipeline(
         kubernetes: Include Kubernetes deployment stage (default: False)
         k8s_method: 'kubectl', 'kustomize', 'argocd', or 'flux' (default: kubectl)
         branches: Comma-separated trigger branches (default: main)
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         Generated .gitlab-ci.yml content as YAML string
@@ -598,7 +683,20 @@ def generate_gitlab_ci_pipeline(
     )
 
     pipeline = scaffold_gitlab.generate_pipeline(args, {})
-    return yaml.dump(pipeline, sort_keys=False, default_flow_style=False)
+    tool_output = yaml.dump(pipeline, sort_keys=False, default_flow_style=False)
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"{languages} {pipeline_type} GitLab CI pipeline"
+        return enhancer.enhance_response(
+            tool_name="generate_gitlab_ci_pipeline",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 # ---------------------------------------------------------------------------
@@ -618,10 +716,12 @@ def generate_argocd_config(
     rollouts: bool = False,
     allow_any_source_repo: bool = False,
     image: str = "ghcr.io/myorg/my-app",
+    user_context: str = "",
 ) -> str:
     """Generate ArgoCD Application + AppProject CRs, or Flux Kustomization resources.
 
     Creates GitOps configurations for Argo CD or Flux CD based on Git repositories.
+    Includes prompt suggestions for GitOps workflow enhancements.
 
     Args:
         name: Application name (lowercase, alphanumeric + dashes)
@@ -635,6 +735,7 @@ def generate_argocd_config(
         rollouts: Add Argo Rollouts canary Rollout (default: False)
         allow_any_source_repo: Allow AppProject sourceRepos wildcard (default: False)
         image: Container image for Flux image automation
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         JSON string with generated YAML documents keyed by filename
@@ -672,7 +773,20 @@ def generate_argocd_config(
         docs["flux/kustomization.yaml"] = _yaml.dump(
             scaffold_argocd.generate_flux_kustomization(args), sort_keys=False)
 
-    return json.dumps(docs, indent=2)
+    tool_output = json.dumps(docs, indent=2)
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"{method} GitOps configuration for {name}"
+        return enhancer.enhance_response(
+            tool_name="generate_argocd_config",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 # ---------------------------------------------------------------------------
@@ -688,10 +802,12 @@ def generate_sre_configs(
     slo_target: float = 99.9,
     latency_threshold: float = 0.5,
     slack_channel: str = "#alerts",
+    user_context: str = "",
 ) -> str:
     """Generate SRE configuration files: Prometheus alerts, Grafana dashboards, and SLOs.
 
     Creates observability and reliability configurations for a Kubernetes service.
+    Includes prompt suggestions for SRE workflow improvements.
 
     Args:
         name: Service name (lowercase, alphanumeric + dashes)
@@ -701,6 +817,7 @@ def generate_sre_configs(
         slo_target: SLO target percentage, 50.0-99.99 (default: 99.9)
         latency_threshold: Latency SLI threshold in seconds (default: 0.5)
         slack_channel: Slack channel for alert routing (default: #alerts)
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         JSON string with keys: alert_rules_yaml, grafana_dashboard_json, slo_yaml, alertmanager_config_yaml
@@ -729,7 +846,7 @@ def generate_sre_configs(
         output_dir=".",
     )
 
-    return json.dumps(
+    tool_output = json.dumps(
         {
             "alert_rules_yaml": _yaml.dump(
                 scaffold_sre.generate_alert_rules(args), sort_keys=False),
@@ -742,6 +859,19 @@ def generate_sre_configs(
         },
         indent=2,
     )
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"SRE configuration for {name} with {slo_type} SLO"
+        return enhancer.enhance_response(
+            tool_name="generate_sre_configs",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 
@@ -755,17 +885,19 @@ def generate_unittest_config(
     languages: str = "python",
     framework: str = "",
     coverage: bool = True,
+    user_context: str = "",
 ) -> str:
     """Generate unit testing configuration and sample test files.
 
     Creates testing setup files for Python (pytest), JavaScript/TypeScript
-    (Jest/Mocha/Vitest), and Go (go test).
+    (Jest/Mocha/Vitest), and Go (go test). Includes prompt suggestions for test improvements.
 
     Args:
         name: Project name (lowercase, alphanumeric + dashes)
         languages: Comma-separated languages (python, javascript, typescript, go)
         framework: Testing framework override (empty = auto-select per language)
         coverage: Include coverage configuration (default: True)
+        user_context: Optional context for generating prompt suggestions
 
     Returns:
         JSON string with file names as keys and generated file contents as values
@@ -816,7 +948,20 @@ def generate_unittest_config(
             result[f"{pkg}_test.go"] = scaffold_unittest.generate_go_test_sample(name)
             result["Makefile.test"] = scaffold_unittest.generate_go_makefile(name, coverage)
 
-    return json.dumps(result, indent=2)
+    tool_output = json.dumps(result, indent=2)
+    
+    # Enhance response with prompt suggestions
+    try:
+        enhancer = get_response_enhancer()
+        prompt_for_analysis = user_context or f"unit testing configuration for {languages}"
+        return enhancer.enhance_response(
+            tool_name="generate_unittest_config",
+            tool_output=tool_output,
+            user_prompt=prompt_for_analysis,
+        )
+    except RuntimeError:
+        # Server not initialized yet, return raw output
+        return tool_output
 
 
 # Register tools on the backward-compatibility instance
