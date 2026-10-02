@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **MCP Dev Container Module** (`mcp_server/devcontainer_mcp.py`) with comprehensive language and tool support:
+  - Multi-language support: Python, Java, Go, Node.js, Rust, Ruby, C/C++, PHP, C#, Kotlin, TypeScript, JavaScript
+  - CI/CD tools: Docker, Podman, GitHub Actions, Jenkins, GitLab CI, Terraform, Kubectl, Helm
+  - Kubernetes tools: K9s, Kustomize, ArgoCD, Flux, KinD, Minikube, OpenShift CLI
+  - Build systems: Maven, Gradle, Make, CMake, Ant
+  - Code analysis: SonarQube, ESLint, Pylint, Checkstyle, PMD
+  - DevOps platforms: Prometheus, Grafana, ELK Stack, Nexus
+- Enhanced Hugo documentation:
+  - New MCP Dev Container Setup guide (`hugo-docs/content/docs/dev-container/mcp-setup.md`)
+  - New Language-Specific Guides (`hugo-docs/content/docs/dev-container/language-guides.md`)
+  - Updated main Dev Container documentation with MCP references
+- Intelligent VS Code extension recommendations based on selected tools
+- Automatic port forwarding configuration for services
+- Support for multiple programming language versions
+- AI-driven dev container configuration generation via MCP
+
+### Removed
+- Legacy dev container implementation (`.legacy/devcontainer/`)
+- References to archived implementations from documentation
+
+### Changed
+- Updated `scaffold_devcontainer` MCP tool to use new `devcontainer_mcp` module
+- Enhanced MCP tool with additional parameters for build tools, code analysis, and DevOps tools
+- Updated Python, Node.js, Java, and Go version defaults to latest stable:
+  - Python: 3.12 (was 3.11)
+  - Node.js: 22 (was 20)
+  - Java: 21 (was 17)
+  - Go: 1.25.0 (was 1.21)
+- Updated README.md repository structure documentation (removed .legacy reference)
+- Updated .devcontainer/README.md to reflect new MCP module structure
+
+---
+
 ## [0.4.7] - 2026-07-08
 
 ### Changed
