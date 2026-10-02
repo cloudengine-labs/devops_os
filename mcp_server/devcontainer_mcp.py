@@ -690,7 +690,7 @@ def update_versions(versions_json: str) -> Dict[str, Any]:
 
     try:
         # Parse JSON input
-        updates = json.loads(versions_json) if versions_json.startswith("{") else {}
+        updates = json.loads(versions_json)
 
         if not updates:
             return {"success": False, "error": "Invalid JSON format or empty updates"}

@@ -305,7 +305,7 @@ class VersionManager:
                 # Find latest safe version
                 latest_safe = None
                 for v in info["all_versions"]:
-                    if v["security"] in ["stable", "deprecated"]:
+                    if v["security"] == "stable":
                         if latest_safe is None or pkg_version.parse(
                             self._normalize_version(v["version"])
                         ) > pkg_version.parse(self._normalize_version(latest_safe["version"])):

@@ -99,9 +99,9 @@ def example_4_security_audit():
     """Example 4: Security audit - find vulnerable versions."""
     print_section("Example 4: Security Issues Detection")
     
-    # Simulate having older versions by directly updating
-    vm = VersionManager()
-    vm.versions["python"] = "3.8"  # EOL, critical security
+    import os
+    # Simulate having older versions by setting environment variable
+    os.environ["DEVOPS_OS_VERSION_PYTHON"] = "3.8"  # EOL, critical security
     
     result = check_security_issues("python,java")
     result_dict = json.loads(result) if isinstance(result, str) else result
@@ -117,6 +117,9 @@ def example_4_security_audit():
                 print(f"  ⚠️  {tool}: {info.get('current')} → "
                       f"{info.get('recommended')} "
                       f"({info.get('reason')})")
+    
+    # Clean up
+    del os.environ["DEVOPS_OS_VERSION_PYTHON"]
 
 
 def example_5_update_workflow():
