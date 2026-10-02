@@ -34,6 +34,7 @@ Get DevOps-OS running as an MCP server with **Claude Desktop in 5 minutes**:
 For detailed setup with **authentication, HTTP endpoints, and production deployment**:
 
 2. **[MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}})** — Complete reference guide with troubleshooting
+3. **[Environment Variables Reference]({{< relref "/docs/ai-integration/environment-variables" >}})** — Comprehensive guide for all 18 configuration variables
 
 ### ChatGPT Custom GPT (Easiest for Teams)
 

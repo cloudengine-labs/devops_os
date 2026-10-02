@@ -23,13 +23,22 @@ Both projects share the same **core scaffold modules**. Choose based on your use
 
 ## Where to start
 
-> [!NOTE]
-> **New users:** Read [Getting Started - Easy Path]({{< relref "/docs/getting-started/easy-getting-started" >}}) first — copy-paste setup in 3 commands, then start generating configs with AI.
+### Choose your path:
+
+**👶 Beginner (New to DevOps)?**
+> Start with [Beginner's Guide]({{< relref "/docs/getting-started/beginners-guide" >}}) — explains concepts in plain English with real-world analogies. No jargon!
+
+**⚡ Developer (Know your tech stack)?**
+> Jump to [Easy Getting Started]({{< relref "/docs/getting-started/easy-getting-started" >}}) — copy-paste 3 commands + start generating
+
+**🔧 DevOps Professional?**
+> Go straight to [MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}}) — detailed setup with all options
 
 ## Documentation sections
 
 | Section | What you'll find |
 |---------|-----------------|
+| [Beginner's Guide]({{< relref "/docs/getting-started/beginners-guide" >}}) | **Start here if new:** Plain English explanations, real-world analogies, common questions |
 | [Easy Getting Started]({{< relref "/docs/getting-started/easy-getting-started" >}}) | **Fastest way:** Copy-paste 3 commands + restart Claude |
 | [Getting Started]({{< relref "/docs/getting-started" >}}) | Detailed walkthrough: install, configure, generate |
 | [MCP Quick Start]({{< relref "/docs/getting-started/mcp-quickstart" >}}) | 5-minute guide for Claude Desktop |

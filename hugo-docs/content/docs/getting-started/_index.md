@@ -42,6 +42,12 @@ You get production-ready YAML in seconds.
 
 ---
 
+## 👋 New to DevOps-OS? Start Here
+
+**Not familiar with DevOps terms?** Read the **[Beginner's Guide]({{< relref "/docs/getting-started/beginners-guide" >}})** first — it explains concepts in plain English with real-world analogies.
+
+---
+
 ## Prerequisites
 
 | Requirement | Why |
