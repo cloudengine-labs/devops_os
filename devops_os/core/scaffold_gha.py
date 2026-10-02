@@ -1045,8 +1045,9 @@ def generate_workflow(args, values, configs):
     elif args.type == "reusable" or args.reusable:
         return generate_reusable_workflow(args, values, configs)
     else:
-        print(f"Error: Unknown workflow type '{args.type}'")
-        sys.exit(1)
+        raise ValueError(
+            f"Unknown workflow type '{args.type}'. Valid types: {WORKFLOW_TYPES}"
+        )
 
 def main():
     """Main function."""

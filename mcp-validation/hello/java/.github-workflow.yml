@@ -1,0 +1,15 @@
+name: hello-java Build
+'on':
+  push: {branches: [main]}
+  pull_request: {branches: [main]}
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build with Maven
+        run: if [ -f pom.xml ]; then mvn -B package --file pom.xml; fi
+      - name: Build with Gradle
+        run: if [ -f build.gradle ]; then ./gradlew build; fi
+      - uses: actions/upload-artifact@v3
+        with: { name: build-artifacts, path: dist/, retention-days: 1 }

@@ -251,12 +251,12 @@ def generate_github_actions_workflow(
 ) -> str:
     """Generate a GitHub Actions CI/CD workflow YAML.
 
-    Creates a complete or basic GitHub Actions workflow for Python, JavaScript,
+    Creates a GitHub Actions workflow for Python, JavaScript,
     Go, Java, or multi-language projects with optional Kubernetes deployment.
 
     Args:
         name: Application/workflow name (lowercase, alphanumeric + dashes)
-        workflow_type: 'basic' or 'complete' (default: 'complete')
+        workflow_type: 'build', 'test', 'deploy', 'complete', or 'reusable' (default: 'complete')
         languages: Comma-separated languages (python, javascript, go, java, rust)
         kubernetes: Enable Kubernetes deployment stage (default: False)
         k8s_method: 'kubectl' or 'kustomize' (default: 'kubectl')
@@ -272,7 +272,12 @@ def generate_github_actions_workflow(
         ValueError: If inputs are invalid
     """
     try:
-        validate_tool_inputs("generate_github_actions_workflow", name=name, languages=languages)
+        validate_tool_inputs(
+            "generate_github_actions_workflow",
+            name=name,
+            languages=languages,
+            workflow_type=workflow_type,
+        )
     except ValidationError as e:
         raise ValueError(str(e)) from e
     

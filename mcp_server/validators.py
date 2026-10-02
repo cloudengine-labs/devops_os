@@ -304,6 +304,12 @@ def validate_tool_inputs(tool_name: str, **kwargs) -> dict[str, Any]:
             validated["name"] = validate_k8s_identifier(validated["name"], "name")
         if "languages" in validated:
             validated["languages"] = validate_languages(validated["languages"])
+        if "workflow_type" in validated:
+            validated["workflow_type"] = validate_choice(
+                validated["workflow_type"],
+                ["build", "test", "deploy", "complete", "reusable"],
+                "workflow_type",
+            )
 
     # Tool: generate_jenkins_pipeline
     elif tool_name == "generate_jenkins_pipeline":
