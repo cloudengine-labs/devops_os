@@ -4,6 +4,12 @@ DevOps-OS exposes its pipeline automation capabilities as **AI tool/function def
 that can be loaded into Claude (via the Anthropic API) or ChatGPT / Custom GPTs
 (via OpenAI function calling or GPT Actions).
 
+> **📖 New:** Comprehensive skills documentation is now available!
+> - **[Skills Documentation Index](../docs/SKILLS-DOCUMENTATION-INDEX.md)** — Start here for quick navigation
+> - **[Skills Usage Guide](../docs/SKILLS-USAGE-GUIDE.md)** — How to use skills with Claude and ChatGPT
+> - **[Skills Architecture](../docs/SKILLS-ARCHITECTURE.md)** — Technical deep dive for developers
+> - **[Skills Developer Guide](../docs/SKILLS-DEVELOPER-GUIDE.md)** — Extend and customize skills
+
 ## Available Skills / Tools
 
 | Tool | What it generates |
@@ -15,6 +21,7 @@ that can be loaded into Claude (via the Anthropic API) or ChatGPT / Custom GPTs
 | `generate_gitlab_ci_pipeline` | GitLab CI/CD pipeline configuration (`.gitlab-ci.yml`) |
 | `generate_argocd_config` | Argo CD application/project configuration manifests |
 | `generate_sre_configs` | SRE / observability configs (e.g., alerting/monitoring rules) |
+| `generate_unittest_config` | Unit test configs for pytest, Jest, Vitest, Mocha, Go |
 
 ---
 
