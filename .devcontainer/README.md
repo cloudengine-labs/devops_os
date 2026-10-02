@@ -1,18 +1,12 @@
 # Devcontainer Status
 
-The checked-in repo-local devcontainer stack has been retired.
-
 Active generation paths:
 
-- `python -m cli.devopsos init` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
-- `python -m cli.devopsos scaffold devcontainer` generates the legacy two-file `.devcontainer/devcontainer.json` and `.devcontainer/devcontainer.env.json`.
+- `python -m devops_os.core.scaffold_devcontainer` on a fresh target generates `.devcontainer/Dockerfile`, `.devcontainer/devcontainer.json`, and `.devcontainer/devcontainer.env.json` from templates.
+- MCP server exposes `scaffold_devcontainer` tool for AI assistants (Claude, ChatGPT, Cursor)
 
 Active source files:
 
-- `cli/devcontainer_templates.py`
-- `cli/templates/devcontainer/`
-- `cli/scaffold_devcontainer.py`
-
-Archived legacy implementation:
-
-- `.legacy/devcontainer/`
+- `devops_os/core/devcontainer_templates.py`
+- `devops_os/core/scaffold_devcontainer.py`
+- `mcp_server/server.py` (MCP tool integration)

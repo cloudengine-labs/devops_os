@@ -223,11 +223,10 @@ Ask your AI assistant:
 ```text
 devops_os/
 ├── .devcontainer/      # Dev container configuration
-├── .legacy/            # Archived implementations
 ├── .github/workflows/  # CI and test workflows
 ├── devops_os/core/     # Core scaffold modules (GitHub Actions, Jenkins, GitLab, ArgoCD, SRE, etc.)
-├── kubernetes/         # Kubernetes manifest generator
 ├── mcp_server/         # MCP server for AI assistant integration (Claude, ChatGPT)
+├── kubernetes/         # Kubernetes manifest generator
 ├── skills/             # Claude & OpenAI tool/function definitions
 ├── docs/               # Detailed guides
 ├── tests/              # Comprehensive test suite

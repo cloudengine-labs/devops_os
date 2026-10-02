@@ -11,6 +11,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **MCP Dev Container Module** (`mcp_server/devcontainer_mcp.py`) with comprehensive language and tool support:
+  - Multi-language support: Python, Java, Go, Node.js, Rust, Ruby, C/C++, PHP, C#, Kotlin, TypeScript, JavaScript
+  - CI/CD tools: Docker, Podman, GitHub Actions, Jenkins, GitLab CI, Terraform, Kubectl, Helm
+  - Kubernetes tools: K9s, Kustomize, ArgoCD, Flux, KinD, Minikube, OpenShift CLI
+  - Build systems: Maven, Gradle, Make, CMake, Ant
+  - Code analysis: SonarQube, ESLint, Pylint, Checkstyle, PMD
+  - DevOps platforms: Prometheus, Grafana, ELK Stack, Nexus
+- **Version Management System** (`mcp_server/version_manager.py`):
+  - Centralized version database for 12 programming languages and tools
+  - Environment variable-based version configuration (`DEVOPS_OS_VERSION_*`)
+  - Version status tracking (latest, LTS, stable, deprecated, EOL)
+  - Security-aware update recommendations and vulnerability detection
+  - Version parsing, comparison, and constraint validation
+  - `.env` file persistence and environment variable management
+- **New MCP Tools for Version Management**:
+  - `get_version_config()` - Retrieve current version configuration
+  - `check_version_updates()` - Check available updates with security status
+  - `suggest_versions()` - Get recommended versions (latest or LTS)
+  - `update_versions()` - Update tool versions in environment
+  - `check_security_issues()` - Identify security vulnerabilities by urgency level
+- **Comprehensive Version Management Documentation**:
+  - New guide: `hugo-docs/content/docs/dev-container/version-management.md` (11,440 bytes)
+  - Version database with 12 tools and LTS information
+  - Security level definitions (critical, high, medium, low)
+  - Environment variable configuration examples
+  - MCP tool usage examples and workflows
+  - Team version management best practices
+- Enhanced Hugo documentation:
+  - New MCP Dev Container Setup guide (`hugo-docs/content/docs/dev-container/mcp-setup.md`)
+  - New Language-Specific Guides (`hugo-docs/content/docs/dev-container/language-guides.md`)
+  - New Version Management guide with security recommendations
+  - Updated main Dev Container documentation with version management and MCP references
+- Intelligent VS Code extension recommendations based on selected tools
+- Automatic port forwarding configuration for services
+- Support for multiple programming language versions
+- AI-driven dev container configuration generation via MCP
+
+### Removed
+- Legacy dev container implementation (`.legacy/devcontainer/`)
+- References to archived implementations from documentation
+
+### Changed
+- Updated `scaffold_devcontainer` MCP tool to use new `devcontainer_mcp` module
+- Enhanced MCP tool with additional parameters for build tools, code analysis, and DevOps tools
+- Updated Python, Node.js, Java, and Go version defaults to latest stable:
+  - Python: 3.12 (was 3.11)
+  - Node.js: 22 (was 20)
+  - Java: 21 (was 17)
+  - Go: 1.25.0 (was 1.21)
+- Updated README.md repository structure documentation (removed .legacy reference)
+- Updated .devcontainer/README.md to reflect new MCP module structure
+- Enhanced version management with security-aware recommendations and LTS support
+
+---
+
 ## [0.4.7] - 2026-07-08
 
 ### Changed
