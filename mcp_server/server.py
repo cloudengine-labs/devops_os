@@ -527,32 +527,45 @@ def scaffold_devcontainer(
     languages: str = "python",
     cicd_tools: str = "docker,github_actions",
     kubernetes_tools: str = "k9s,kustomize",
-    python_version: str = "3.11",
-    node_version: str = "20",
-    java_version: str = "17",
-    go_version: str = "1.21",
+    build_tools: str = "",
+    code_analysis_tools: str = "",
+    devops_tools: str = "",
+    python_version: str = "3.12",
+    node_version: str = "22",
+    java_version: str = "21",
+    go_version: str = "1.25.0",
+    ruby_version: str = "3.3",
+    rust_version: str = "latest",
     user_context: str = "",
 ) -> str:
     """Generate a devcontainer.json and devcontainer.env.json configuration.
 
-    Creates a development container configuration for the specified languages,
-    CI/CD tools, and Kubernetes tools. Includes prompt suggestions for customization.
+    Creates a production-ready development container configuration for multiple programming
+    languages, CI/CD tools, Kubernetes utilities, build systems, and DevOps automation tools.
+    Includes intelligent VS Code extension recommendations and port forwarding setup.
 
     Args:
-        languages: Comma-separated languages (python, java, javascript, typescript,
-                   go, rust, csharp, php, kotlin, c, cpp, ruby)
-        cicd_tools: Comma-separated CI/CD tools (docker, terraform, kubectl, helm,
-                    github_actions, jenkins)
-        kubernetes_tools: Comma-separated K8s tools (k9s, kustomize, argocd_cli,
-                          lens, kubeseal, flux, kind, minikube, openshift_cli)
-        python_version: Python version (default: 3.11)
-        node_version: Node.js version (default: 20)
-        java_version: Java JDK version (default: 17)
-        go_version: Go version (default: 1.21)
+        languages: Comma-separated languages (python, java, javascript, node, typescript,
+                   go, rust, ruby, csharp, php, kotlin, c, cpp)
+        cicd_tools: Comma-separated CI/CD tools (docker, podman, terraform, kubectl, helm,
+                    github_actions, jenkins, gitlab)
+        kubernetes_tools: Comma-separated K8s tools (k9s, kustomize, argocd_cli, flux,
+                          lens, kubeseal, kind, minikube, openshift_cli)
+        build_tools: Comma-separated build tools (maven, gradle, make, cmake, ant)
+        code_analysis_tools: Comma-separated analysis tools (sonarqube, eslint, pylint,
+                             checkstyle, pmd)
+        devops_tools: Comma-separated DevOps tools (prometheus, grafana, elk, nexus)
+        python_version: Python version (default: 3.12)
+        node_version: Node.js version (default: 22)
+        java_version: Java JDK version (default: 21)
+        go_version: Go version (default: 1.25.0)
+        ruby_version: Ruby version (default: 3.3)
+        rust_version: Rust version (default: latest)
         user_context: Optional context for generating prompt suggestions
 
     Returns:
-        JSON string with 'devcontainer_json' and 'devcontainer_env_json' keys
+        JSON string with 'devcontainer_json' and 'devcontainer_env_json' keys,
+        optionally with prompt suggestions for further customization.
 
     Raises:
         ValueError: If inputs are invalid
@@ -562,72 +575,29 @@ def scaffold_devcontainer(
             validate_tool_inputs("scaffold_devcontainer", languages=languages)
     except ValidationError as e:
         raise ValueError(str(e)) from e
-    lang_list = [l.strip() for l in languages.split(",") if l.strip()]
-    cicd_list = [t.strip() for t in cicd_tools.split(",") if t.strip()]
-    k8s_list = [t.strip() for t in kubernetes_tools.split(",") if t.strip()]
-
-    all_languages = ["python", "java", "javascript", "go", "rust", "csharp", "php",
-                     "typescript", "kotlin", "c", "cpp", "ruby"]
-    all_cicd = ["docker", "terraform", "kubectl", "helm", "github_actions", "jenkins"]
-    all_k8s = ["k9s", "kustomize", "argocd_cli", "lens", "kubeseal", "flux",
-               "kind", "minikube", "openshift_cli"]
-
-    env_json: dict[str, Any] = {
-        "languages": {lang: lang in lang_list for lang in all_languages},
-        "cicd": {tool: tool in cicd_list for tool in all_cicd},
-        "kubernetes": {tool: tool in k8s_list for tool in all_k8s},
-        "versions": {
-            "python": python_version,
-            "java": java_version,
-            "node": node_version,
-            "go": go_version,
-        },
-    }
-
-    extensions = [
-        "ms-python.python",
-        "ms-azuretools.vscode-docker",
-        "redhat.vscode-yaml",
-    ]
-    if "java" in lang_list:
-        extensions += ["redhat.java", "vscjava.vscode-java-debug"]
-    if "javascript" in lang_list or "typescript" in lang_list:
-        extensions.append("dbaeumer.vscode-eslint")
-    if "go" in lang_list:
-        extensions.append("golang.go")
-    if "terraform" in cicd_list:
-        extensions.append("hashicorp.terraform")
-    if k8s_list:
-        extensions.append("ms-kubernetes-tools.vscode-kubernetes-tools")
-
-    devcontainer_json = {
-        "name": "DevOps-OS",
-        "build": {
-            "dockerfile": "Dockerfile",
-            "context": ".",
-            "args": {
-                f"INSTALL_{lang.upper()}": str(lang in lang_list).lower()
-                for lang in all_languages
-            },
-        },
-        "runArgs": ["--init", "--privileged"],
-        "overrideCommand": False,
-        "customizations": {"vscode": {"extensions": extensions}},
-        "mounts": [
-            "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
-        ],
-    }
-    if k8s_list:
-        devcontainer_json["postCreateCommand"] = (
-            "chmod +x /workspaces/.devcontainer/k8s-config-generator.py "
-            "&& ln -sf /workspaces/.devcontainer/k8s-config-generator.py "
-            "/usr/local/bin/k8s-config-generator"
-        )
+    
+    # Use new MCP devcontainer module
+    from mcp_server.devcontainer_mcp import generate_devcontainer_config
+    
+    config = generate_devcontainer_config(
+        languages=languages,
+        cicd_tools=cicd_tools,
+        kubernetes_tools=kubernetes_tools,
+        build_tools=build_tools,
+        code_analysis_tools=code_analysis_tools,
+        devops_tools=devops_tools,
+        python_version=python_version,
+        java_version=java_version,
+        node_version=node_version,
+        go_version=go_version,
+        ruby_version=ruby_version,
+        rust_version=rust_version,
+    )
 
     tool_output = json.dumps(
         {
-            "devcontainer_json": json.dumps(devcontainer_json, indent=2),
-            "devcontainer_env_json": json.dumps(env_json, indent=2),
+            "devcontainer_json": json.dumps(config["devcontainer_json"], indent=2),
+            "devcontainer_env_json": json.dumps(config["devcontainer_env_json"], indent=2),
         },
         indent=2,
     )
@@ -635,7 +605,10 @@ def scaffold_devcontainer(
     # Enhance response with prompt suggestions
     try:
         enhancer = get_response_enhancer()
-        prompt_for_analysis = user_context or f"devcontainer with {languages}, {cicd_tools}, {kubernetes_tools}"
+        prompt_for_analysis = user_context or (
+            f"devcontainer with languages: {languages}, "
+            f"CI/CD tools: {cicd_tools}, Kubernetes tools: {kubernetes_tools}"
+        )
         return enhancer.enhance_response(
             tool_name="scaffold_devcontainer",
             tool_output=tool_output,
