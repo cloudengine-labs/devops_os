@@ -283,6 +283,19 @@ curl -X POST http://your-server:8000/mcp \
 
 ## ChatGPT Setup: Custom GPT
 
+For a comprehensive guide to deploying DevOps-OS with ChatGPT and creating a Custom GPT, see:
+
+**[ChatGPT Custom GPT Integration Guide]({{< relref "/docs/ai-integration/chatgpt-setup" >}})**
+
+This guide includes:
+- Deploying DevOps-OS as an HTTP server
+- Creating a Custom GPT in the ChatGPT interface
+- Configuring authentication
+- Testing and troubleshooting
+- Team sharing and best practices
+
+Below is a quick summary of the Custom GPT approach:
+
 ### Step 1: Deploy to Public HTTPS
 
 Your DevOps-OS HTTP server must be accessible from the internet over HTTPS.
@@ -562,6 +575,8 @@ ValidationError: name must be 1-63 characters
 ## Next Steps
 
 - [AI Integration Overview]({{< relref "/docs/ai-integration" >}})
+- [ChatGPT Custom GPT Setup]({{< relref "/docs/ai-integration/chatgpt-setup" >}}) — Deploy DevOps-OS with ChatGPT
+- [OpenAI Codex Integration]({{< relref "/docs/ai-integration/openai-codex-setup" >}}) — Use Codex for direct code generation
 - [MCP Quick Start (5 minutes)]({{< relref "/docs/getting-started/mcp-quickstart" >}})
 - [Authentication Setup Details]({{< relref "/docs/ai-integration/mcp-setup#remote-setup-authenticated-access" >}})
 - [Troubleshooting & FAQ]({{< relref "/docs/ai-integration/mcp-setup#troubleshooting" >}})

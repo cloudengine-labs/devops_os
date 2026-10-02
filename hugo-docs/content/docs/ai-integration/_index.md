@@ -23,19 +23,29 @@ DevOps-OS exposes all its pipeline automation tools as an **MCP (Model Context P
 
 ---
 
-## MCP Server
+## Integration Guides
 
-### Quick Start
+### Claude + MCP (Recommended for Local Development)
 
-Get DevOps-OS running as an MCP server in **Claude Desktop in 5 minutes**:
+Get DevOps-OS running as an MCP server with **Claude Desktop in 5 minutes**:
 
-1. **[MCP Quick Start Guide]({{< relref "/docs/getting-started/mcp-quickstart" >}})** — Clone, install, configure, and generate
+1. **[MCP Quick Start]({{< relref "/docs/getting-started/mcp-quickstart" >}})** — Clone, install, configure, and generate
 
-### Detailed Setup
-
-For detailed setup including **ChatGPT, HTTP endpoints, authentication, and production deployment**:
+For detailed setup with **authentication, HTTP endpoints, and production deployment**:
 
 2. **[MCP Setup & Configuration]({{< relref "/docs/ai-integration/mcp-setup" >}})** — Complete reference guide with troubleshooting
+
+### ChatGPT Custom GPT (Easiest for Teams)
+
+Create a shared DevOps assistant for your entire team:
+
+3. **[ChatGPT Custom GPT Setup]({{< relref "/docs/ai-integration/chatgpt-setup" >}})** — Deploy DevOps-OS HTTP server and create a Custom GPT
+
+### OpenAI Codex (For Direct API Integration)
+
+Use Codex for direct code generation without web UI:
+
+4. **[OpenAI Codex Integration]({{< relref "/docs/ai-integration/openai-codex-setup" >}})** — Direct API integration with Codex models
 
 ### Installation
 
@@ -166,6 +176,10 @@ for choice in response.choices:
             print(f"Args: {tc.function.arguments}")
 ```
 
+For comprehensive guidance on OpenAI integration, see:
+
+**[OpenAI Codex Integration Guide]({{< relref "/docs/ai-integration/openai-codex-setup" >}})** — Direct API integration with examples and troubleshooting
+
 ---
 
 ## Custom GPT / GPT Actions
@@ -176,6 +190,10 @@ Use `skills/openai_functions.json` as the OpenAPI schema for a Custom GPT Action
 2. Paste the contents of `skills/openai_functions.json`
 3. Set the server URL to your deployed MCP server endpoint
 4. Save and test the GPT
+
+For detailed instructions on creating and configuring a Custom GPT, see:
+
+**[ChatGPT Custom GPT Integration Guide]({{< relref "/docs/ai-integration/chatgpt-setup" >}})** — Complete setup, deployment, and team sharing guide
 
 ---
 
