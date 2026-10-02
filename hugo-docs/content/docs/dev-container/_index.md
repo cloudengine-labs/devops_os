@@ -5,7 +5,7 @@ weight: 60
 
 # Dev Container Setup
 
-DevOps-OS provides a pre-configured VS Code Dev Container that gives you a consistent, multi-language development environment with all CI/CD tools included.
+DevOps-OS provides a pre-configured VS Code Dev Container that gives you a consistent, multi-language development environment with all CI/CD tools included. Configure programming language and tool versions via environment variables with security-aware recommendations.
 
 ---
 
@@ -36,16 +36,15 @@ Run `python -m devops_os.core.scaffold_devcontainer --help` to see all available
 | `--build-tools TOOLS` | _(none)_ | Build tools: `gradle`, `maven`, `ant`, `make`, `cmake` |
 | `--code-analysis TOOLS` | _(none)_ | Analysis tools: `sonarqube`, `checkstyle`, `pmd`, `eslint`, `pylint` |
 | `--devops-tools TOOLS` | _(none)_ | DevOps tools: `nexus`, `prometheus`, `grafana`, `elk`, `jenkins` |
-| `--python-version VER` | `3.11` | Python version |
-| `--java-version VER` | `17` | Java JDK version |
-| `--node-version VER` | `20` | Node.js version |
-| `--go-version VER` | `1.21` | Go version |
+| `--python-version VER` | `3.12` | Python version (via `DEVOPS_OS_VERSION_PYTHON` env var) |
+| `--java-version VER` | `21` | Java JDK version (via `DEVOPS_OS_VERSION_JAVA` env var) |
+| `--node-version VER` | `22` | Node.js version (via `DEVOPS_OS_VERSION_NODE` env var) |
+| `--go-version VER` | `1.25.0` | Go version (via `DEVOPS_OS_VERSION_GO` env var) |
 | `--output-dir DIR` | `.` | Root directory; files written to `<dir>/.devcontainer/` |
 
-All options can be set via environment variables prefixed `DEVOPS_OS_DEVCONTAINER_`.
+All options can be set via environment variables prefixed `DEVOPS_OS_DEVCONTAINER_` or `DEVOPS_OS_VERSION_` for version configuration.
 
 ---
-
 ## Generated Files
 
 ```
@@ -72,10 +71,46 @@ python -m devops_os.core.scaffold_devcontainer \
 ```
 
 This generates a dev container with:
-- Python 3.12, Java 17, Node.js 20
+- Python 3.12, Java 21, Node.js 22
 - Docker, Terraform, kubectl, Helm
 - K9s, Kustomize, ArgoCD CLI, Flux CD
 - Prometheus (port 9090) and Grafana (port 3000) forwarded
+
+---
+
+## Version Management
+
+All tool and language versions are managed via environment variables with security-aware recommendations. Learn more in the [Version Management Guide](version-management/).
+
+### Quick Version Update
+
+Set versions via environment variables:
+
+```bash
+export DEVOPS_OS_VERSION_PYTHON=3.13
+export DEVOPS_OS_VERSION_GO=1.25.0
+export DEVOPS_OS_VERSION_NODE=22
+```
+
+Or use the `.env` file approach:
+
+```env
+# .env
+DEVOPS_OS_VERSION_PYTHON=3.12
+DEVOPS_OS_VERSION_JAVA=21
+DEVOPS_OS_VERSION_GO=1.25.0
+DEVOPS_OS_VERSION_NODE=22
+DEVOPS_OS_VERSION_DOCKER=27.0.0
+```
+
+### Check for Security Updates
+
+Use MCP tools to check for security issues and get recommendations:
+
+```bash
+check_security_issues(tools="python,java,docker")
+suggest_versions(prefer_lts=true)
+```
 
 ---
 
@@ -105,10 +140,10 @@ Edit the generated `.devcontainer/devcontainer.env.json` directly:
     "flux": true
   },
   "versions": {
-    "python": "3.11",
-    "java": "17",
-    "node": "20",
-    "go": "1.21"
+    "python": "3.12",
+    "java": "21",
+    "node": "22",
+    "go": "1.25.0"
   }
 }
 ```
@@ -162,3 +197,18 @@ code .
 1. Check the tool is `true` in `devcontainer.env.json`
 2. Rebuild the container: **"Dev Containers: Rebuild Container"**
 3. Regenerate the devcontainer files with `python -m devops_os.core.scaffold_devcontainer ...` if you changed the selected tools
+
+### Version environment variables not taking effect
+
+1. Export variables before building: `export DEVOPS_OS_VERSION_PYTHON=3.13`
+2. Source your `.env` file: `source .env`
+3. Rebuild the container to apply new versions
+4. Check [Version Management](version-management/) guide for detailed configuration options
+
+---
+
+## Related Documentation
+
+- [Version Management](version-management/) - Manage tool versions and security updates
+- [MCP Setup](mcp-setup/) - Configure MCP tools for dev containers
+- [Language Guides](language-guides/) - Language-specific setup and examples

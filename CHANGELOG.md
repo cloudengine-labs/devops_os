@@ -21,10 +21,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Build systems: Maven, Gradle, Make, CMake, Ant
   - Code analysis: SonarQube, ESLint, Pylint, Checkstyle, PMD
   - DevOps platforms: Prometheus, Grafana, ELK Stack, Nexus
+- **Version Management System** (`mcp_server/version_manager.py`):
+  - Centralized version database for 20+ programming languages and tools
+  - Environment variable-based version configuration (`DEVOPS_OS_VERSION_*`)
+  - Version status tracking (latest, LTS, stable, deprecated, EOL)
+  - Security-aware update recommendations and vulnerability detection
+  - Version parsing, comparison, and constraint validation
+  - `.env` file persistence and environment variable management
+- **New MCP Tools for Version Management**:
+  - `get_version_config()` - Retrieve current version configuration
+  - `check_version_updates()` - Check available updates with security status
+  - `suggest_versions()` - Get recommended versions (latest or LTS)
+  - `update_versions()` - Update tool versions in environment
+  - `check_security_issues()` - Identify security vulnerabilities by urgency level
+- **Comprehensive Version Management Documentation**:
+  - New guide: `hugo-docs/content/docs/dev-container/version-management.md` (11,440 bytes)
+  - Version database with 20+ tools and LTS information
+  - Security level definitions (critical, high, medium, low)
+  - Environment variable configuration examples
+  - MCP tool usage examples and workflows
+  - Team version management best practices
 - Enhanced Hugo documentation:
   - New MCP Dev Container Setup guide (`hugo-docs/content/docs/dev-container/mcp-setup.md`)
   - New Language-Specific Guides (`hugo-docs/content/docs/dev-container/language-guides.md`)
-  - Updated main Dev Container documentation with MCP references
+  - New Version Management guide with security recommendations
+  - Updated main Dev Container documentation with version management and MCP references
 - Intelligent VS Code extension recommendations based on selected tools
 - Automatic port forwarding configuration for services
 - Support for multiple programming language versions
@@ -44,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Go: 1.25.0 (was 1.21)
 - Updated README.md repository structure documentation (removed .legacy reference)
 - Updated .devcontainer/README.md to reflect new MCP module structure
+- Enhanced version management with security-aware recommendations and LTS support
 
 ---
 
