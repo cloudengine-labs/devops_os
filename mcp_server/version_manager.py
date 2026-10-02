@@ -256,7 +256,7 @@ class VersionManager:
             "default": db["default"],
             "latest": db["latest"],
             "lts": db["lts"],
-            "info": current_info or {"version": current_version, "status": "unknown"},
+            "info": current_info or {"version": current_version, "status": "unknown", "security": "unknown"},
             "all_versions": db["supported"],
         }
 
