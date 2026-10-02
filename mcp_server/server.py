@@ -36,6 +36,7 @@ from mcp_server.validators import ValidationError, validate_tool_inputs
 from mcp_server.logging import get_logger, CorrelationContext
 from mcp_server.auth import create_token_verifier
 from mcp_server.response_enhancer import ResponseEnhancer
+from mcp_server.concurrency import ConcurrencyManager
 
 # Use structured logger instead of standard logging
 logger = get_logger(__name__)
@@ -119,6 +120,7 @@ def _build_jenkins_args(
 _config: Config | None = None
 _mcp: FastMCP | None = None
 _response_enhancer: ResponseEnhancer | None = None
+_concurrency_manager: ConcurrencyManager | None = None
 
 
 def create_mcp_server(config: Config | None = None) -> FastMCP:
@@ -130,13 +132,14 @@ def create_mcp_server(config: Config | None = None) -> FastMCP:
     Returns:
         Configured FastMCP server instance
     """
-    global _config, _mcp, _response_enhancer
+    global _config, _mcp, _response_enhancer, _concurrency_manager
 
     if config is None:
         config = Config.from_env()
     
     _config = config
     _response_enhancer = ResponseEnhancer(config)
+    _concurrency_manager = ConcurrencyManager(config.max_concurrent_calls)
     
     # Configure logging
     logging.basicConfig(
@@ -144,6 +147,7 @@ def create_mcp_server(config: Config | None = None) -> FastMCP:
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     logger.info(f"Configuration loaded: transport={config.transport}, profile={config.profile}")
+    logger.info(f"Concurrency limit: max_concurrent_calls={config.max_concurrent_calls}")
     logger.info(f"Prompt suggestions: enabled={config.enable_suggestions}, "
                 f"threshold={config.suggestion_confidence_threshold}, "
                 f"max_per_response={config.max_suggestions_per_response}")
@@ -190,6 +194,20 @@ def get_response_enhancer() -> ResponseEnhancer:
     if _response_enhancer is None:
         raise RuntimeError("Server not yet initialized. Call create_mcp_server() first.")
     return _response_enhancer
+
+
+def get_concurrency_manager() -> ConcurrencyManager:
+    """Get the concurrency manager instance.
+
+    Returns:
+        ConcurrencyManager instance
+
+    Raises:
+        RuntimeError: If server not yet created
+    """
+    if _concurrency_manager is None:
+        raise RuntimeError("Server not yet initialized. Call create_mcp_server() first.")
+    return _concurrency_manager
 
 
 def _register_tools(mcp: FastMCP) -> None:

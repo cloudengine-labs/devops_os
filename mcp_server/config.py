@@ -22,6 +22,7 @@ class Config:
     - DEVOPS_OS_REQUEST_SIZE_MB: Max request body size in MB (default: 10)
     - DEVOPS_OS_RESPONSE_SIZE_MB: Max response body size in MB (default: 50)
     - DEVOPS_OS_EXECUTION_TIMEOUT: Tool execution timeout in seconds (default: 30)
+    - DEVOPS_OS_MAX_CONCURRENT_CALLS: Max concurrent tool executions (default: 10, range: 1-100)
     - DEVOPS_OS_PROFILE: Deployment profile 'local' (no auth) or 'remote' (auth required)
                          (default: 'local')
     - DEVOPS_OS_JWT_ISSUER: JWT issuer URL (required in remote profile)
@@ -49,6 +50,7 @@ class Config:
 
     # Execution configuration
     execution_timeout: int = 30  # seconds
+    max_concurrent_calls: int = 10  # concurrent tool executions
     log_level: str = "INFO"
 
     # Deployment profile (local or remote)
@@ -102,6 +104,12 @@ class Config:
                 f"Execution timeout must be 1-600 seconds, got {self.execution_timeout}"
             )
 
+        # Validate concurrent calls (1-100)
+        if not 1 <= self.max_concurrent_calls <= 100:
+            raise ValueError(
+                f"DEVOPS_OS_MAX_CONCURRENT_CALLS must be 1-100, got {self.max_concurrent_calls}"
+            )
+
     @staticmethod
     def from_env() -> "Config":
         """Load configuration from environment variables.
@@ -131,6 +139,7 @@ class Config:
         request_size_mb = int(os.getenv("DEVOPS_OS_REQUEST_SIZE_MB", "10"))
         response_size_mb = int(os.getenv("DEVOPS_OS_RESPONSE_SIZE_MB", "50"))
         execution_timeout = int(os.getenv("DEVOPS_OS_EXECUTION_TIMEOUT", "30"))
+        max_concurrent_calls = int(os.getenv("DEVOPS_OS_MAX_CONCURRENT_CALLS", "10"))
 
         jwt_issuer = os.getenv("DEVOPS_OS_JWT_ISSUER")
         jwt_audience = os.getenv("DEVOPS_OS_JWT_AUDIENCE")
@@ -170,6 +179,7 @@ class Config:
             request_size_mb=request_size_mb,
             response_size_mb=response_size_mb,
             execution_timeout=execution_timeout,
+            max_concurrent_calls=max_concurrent_calls,
             log_level=log_level,
             profile=profile,
             jwt_issuer=jwt_issuer,

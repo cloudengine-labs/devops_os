@@ -22,6 +22,7 @@ Complete reference for all environment variables that control DevOps-OS MCP serv
 | `DEVOPS_OS_REQUEST_SIZE_MB` | `10` | int | Max request size |
 | `DEVOPS_OS_RESPONSE_SIZE_MB` | `50` | int | Max response size |
 | `DEVOPS_OS_EXECUTION_TIMEOUT` | `30` | int | Tool timeout (seconds) |
+| `DEVOPS_OS_MAX_CONCURRENT_CALLS` | `10` | int | Max concurrent tool executions |
 | `DEVOPS_OS_JWT_ISSUER` | None | string | JWT issuer URL |
 | `DEVOPS_OS_JWT_AUDIENCE` | None | string | JWT audience |
 | `DEVOPS_OS_JWT_JWKS_URL` | Auto-derived | string | JWKS endpoint URL |
@@ -367,6 +368,74 @@ export DEVOPS_OS_EXECUTION_TIMEOUT=120
 - Strict SLA requirements
 - Limited server resources
 - Quick response needed
+
+---
+
+### `DEVOPS_OS_MAX_CONCURRENT_CALLS`
+
+**Type**: Integer  
+**Default**: `10`  
+**Valid Range**: 1-100
+
+Limits the maximum number of tool executions that can run concurrently. Prevents resource exhaustion and enforces SLA compliance in production.
+
+**Use Cases**:
+- `1` - Strictly sequential execution (debugging, very limited resources)
+- `5` - Conservative limit (small servers, cost control)
+- `10` - Default, balanced for most scenarios
+- `20` - High-capacity servers
+- `50+` - Large-scale deployments with ample resources
+
+**Example**:
+```bash
+# Default: 10 concurrent calls
+export DEVOPS_OS_MAX_CONCURRENT_CALLS=10
+
+# Limit to 5 for small server
+export DEVOPS_OS_MAX_CONCURRENT_CALLS=5
+
+# Allow 20 for high-capacity deployment
+export DEVOPS_OS_MAX_CONCURRENT_CALLS=20
+
+# Strict sequential (no concurrency)
+export DEVOPS_OS_MAX_CONCURRENT_CALLS=1
+```
+
+**When to Lower (1-5)**:
+- Limited server CPU/memory
+- Cost-constrained deployments
+- Strict resource quotas
+- Shared infrastructure
+- Testing/debugging
+
+**When to Keep Default (10)**:
+- Standard deployments
+- Most production scenarios
+- Balanced performance
+
+**When to Increase (20+)**:
+- High-capacity cloud deployments (e.g., Kubernetes)
+- High traffic expected
+- Ample CPU/memory available
+- Auto-scaling infrastructure
+- Premium tier deployments
+
+**Production Safety**:
+- Set based on available server resources
+- Monitor CPU/memory under load
+- Start conservative, increase if needed
+- Each tool uses ~50-200MB during execution
+- Consider: `max_concurrent_calls × avg_tool_memory ≤ available_memory`
+
+**Example Resource Calculation**:
+```
+Server: 4 CPU, 8GB RAM
+Average tool memory: 100MB
+Recommended max_concurrent_calls = (8GB × 0.75) / 100MB ≈ 60
+But also consider CPU: 4 cores suggests 8-16 concurrent is reasonable
+Conservative choice: 10
+Aggressive choice: 20
+```
 
 ---
 
@@ -747,6 +816,7 @@ python -m mcp_server.server
 | `DEVOPS_OS_REQUEST_SIZE_MB` | Integer 1-1024 | Must be 1-1024 |
 | `DEVOPS_OS_RESPONSE_SIZE_MB` | Integer 1-1024 | Must be 1-1024 |
 | `DEVOPS_OS_EXECUTION_TIMEOUT` | Integer 1-600 | Must be 1-600 seconds |
+| `DEVOPS_OS_MAX_CONCURRENT_CALLS` | Integer 1-100 | Must be 1-100 |
 | `DEVOPS_OS_LOG_LEVEL` | Valid Python log level | Must be valid level |
 | `DEVOPS_OS_SUGGESTION_CONFIDENCE_THRESHOLD` | `high`, `medium`, or `low` | Invalid threshold |
 | `DEVOPS_OS_MAX_SUGGESTIONS_PER_RESPONSE` | Integer 1-10 | Must be 1-10 |
