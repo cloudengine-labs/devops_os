@@ -175,6 +175,65 @@ See [MCP Setup & Configuration - Troubleshooting](hugo-docs/content/docs/ai-inte
 
 ---
 
+## 💡 Prompt Improvement Suggestions
+
+DevOps-OS MCP now includes an intelligent **prompt suggestion system** that analyzes your prompts and recommends improvements to get better configurations.
+
+### How It Works
+
+When you ask Claude to generate a config:
+
+> **You:** "Generate a Kubernetes deployment"
+
+Claude receives:
+1. **Generated manifest** - Your requested YAML/config
+2. **Suggestions** - Recommendations to improve your prompt:
+   - "Consider specifying a namespace (e.g., production, staging, development)"
+   - "Specify the number of replicas for high availability and load balancing"
+
+### Example Suggestions
+
+```json
+{
+  "prompt_suggestions": [
+    {
+      "suggestion_text": "Specify a namespace for proper resource isolation",
+      "suggestion_category": "context",
+      "confidence": "high",
+      "example_improvement": "Generate Kubernetes deployment in the payments namespace..."
+    }
+  ]
+}
+```
+
+### Disable Suggestions (Optional)
+
+If you prefer just the raw output:
+
+```bash
+export DEVOPS_OS_ENABLE_SUGGESTIONS=false
+python -m mcp_server.server
+```
+
+### Configuration
+
+Customize suggestion behavior:
+
+```bash
+# Only show high-confidence suggestions
+export DEVOPS_OS_SUGGESTION_CONFIDENCE_THRESHOLD=high
+
+# Show up to 3 suggestions per response
+export DEVOPS_OS_MAX_SUGGESTIONS_PER_RESPONSE=3
+
+# Disable example improved prompts
+export DEVOPS_OS_INCLUDE_EXAMPLES_IN_SUGGESTIONS=false
+```
+
+👉 **Full details:** See [Prompt Improvement Suggestions Guide](PROMPT_SUGGESTIONS.md)
+
+---
+
 ## 📚 Next Steps
 
 - **[MCP Quick Start](hugo-docs/content/docs/getting-started/mcp-quickstart.md)** — 5-minute guide for Claude Desktop
