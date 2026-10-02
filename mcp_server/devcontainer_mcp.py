@@ -587,9 +587,9 @@ def get_version_config(tools: str = "") -> Dict[str, Any]:
     Returns:
         Dictionary with current versions and configuration
     """
-    from mcp_server.version_manager import VersionManager
+    from mcp_server.version_manager import VersionManager, VERSION_DATABASE
 
-    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    tool_list = parse_comma_separated(tools) if tools else list(VERSION_DATABASE.keys())
     vm = VersionManager()
 
     result = {
@@ -621,9 +621,9 @@ def get_version_updates(tools: str = "") -> Dict[str, Any]:
     Returns:
         Dictionary with available updates and security recommendations
     """
-    from mcp_server.version_manager import VersionManager
+    from mcp_server.version_manager import VersionManager, VERSION_DATABASE
 
-    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    tool_list = parse_comma_separated(tools) if tools else list(VERSION_DATABASE.keys())
     vm = VersionManager()
 
     updates = vm.check_version_updates(tool_list)
@@ -651,9 +651,9 @@ def suggest_versions(tools: str = "", prefer_lts: bool = False) -> Dict[str, Any
     Returns:
         Dictionary with version suggestions and reasoning
     """
-    from mcp_server.version_manager import VersionManager
+    from mcp_server.version_manager import VersionManager, VERSION_DATABASE
 
-    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    tool_list = parse_comma_separated(tools) if tools else list(VERSION_DATABASE.keys())
     vm = VersionManager()
 
     suggestions = vm.suggest_versions(tool_list, prefer_lts)
@@ -693,7 +693,7 @@ def update_versions(versions_json: str) -> Dict[str, Any]:
         updates = json.loads(versions_json)
 
         if not updates:
-            return {"success": False, "error": "Invalid JSON format or empty updates"}
+            return {"success": False, "error": "No updates provided: the versions dictionary is empty"}
 
         # Apply updates
         results = apply_version_updates(updates)
@@ -733,9 +733,9 @@ def check_security_issues(tools: str = "") -> Dict[str, Any]:
     Returns:
         Dictionary with security assessment and recommendations
     """
-    from mcp_server.version_manager import VersionManager
+    from mcp_server.version_manager import VersionManager, VERSION_DATABASE
 
-    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    tool_list = parse_comma_separated(tools) if tools else list(VERSION_DATABASE.keys())
     vm = VersionManager()
 
     security_updates = vm.get_security_updates(tool_list)
