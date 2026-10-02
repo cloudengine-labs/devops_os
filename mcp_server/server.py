@@ -1224,7 +1224,16 @@ if __name__ == "__main__":
     try:
         # Load configuration from environment (or use defaults for stdio)
         config = Config.from_env()
-        
+
+        # Initialize runtime globals (response enhancer, concurrency manager)
+        # used by tool handlers. create_mcp_server() is not called here because
+        # it builds a separate FastMCP instance registered with only 8 of the
+        # 13 tools; the module-level `mcp` / `http_mcp` instances below already
+        # carry the full tool set.
+        _config = config
+        _response_enhancer = ResponseEnhancer(config)
+        _concurrency_manager = ConcurrencyManager(config.max_concurrent_calls)
+
         # Log startup configuration (redacted)
         logger.log_startup(
             transport=config.transport,

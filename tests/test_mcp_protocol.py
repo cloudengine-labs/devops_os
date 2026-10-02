@@ -292,6 +292,20 @@ class TestMCPProtocolToolInvocation:
         assert text, f"tools/call '{tool_name}' returned empty text"
         return text
 
+    def _call_tool_json(self, tool_name: str, arguments: Optional[Dict] = None) -> Dict:
+        """Invoke a tool and return its artifact bundle as a dict.
+
+        Transparently unwraps the prompt-suggestions envelope
+        (``{"tool_output": "<json>", "prompt_analysis": ..., ...}``) when the
+        server attaches one, so tests assert on the actual generated bundle
+        either way.
+        """
+        text = self._call_tool(tool_name, arguments)
+        data = json.loads(text)
+        if isinstance(data, dict) and "tool_output" in data:
+            return json.loads(data["tool_output"])
+        return data
+
     # ---- GitHub Actions ------------------------------------------------
 
     def test_call_generate_github_actions_workflow(self):
@@ -361,11 +375,10 @@ class TestMCPProtocolToolInvocation:
         Application and an AppProject manifest, proving JSON envelope wrapping
         through the MCP protocol is intact.
         """
-        text = self._call_tool(
+        data = self._call_tool_json(
             "generate_argocd_config",
             {"app_name": "my-app", "repo_url": "https://github.com/org/repo"},
         )
-        data = json.loads(text)
         assert "argocd/application.yaml" in data, "application.yaml missing from ArgoCD bundle"
         assert "argocd/appproject.yaml" in data, "appproject.yaml missing from ArgoCD bundle"
         assert "Application" in data["argocd/application.yaml"]
@@ -378,11 +391,10 @@ class TestMCPProtocolToolInvocation:
         a Grafana dashboard JSON, and an SLO manifest — three separate artifact
         types in one call.
         """
-        text = self._call_tool(
+        data = self._call_tool_json(
             "generate_sre_configs",
             {"name": "payment-service", "slo_type": "availability", "slo_target": 99.9},
         )
-        data = json.loads(text)
         assert "alert_rules_yaml" in data, "Prometheus alert rules missing from SRE bundle"
         assert "grafana_dashboard_json" in data, "Grafana dashboard missing from SRE bundle"
         assert "slo_yaml" in data, "SLO manifest missing from SRE bundle"
@@ -396,11 +408,10 @@ class TestMCPProtocolToolInvocation:
         devcontainer.json and devcontainer.env.json files, confirming the
         JSON-in-JSON envelope survives the MCP wire protocol.
         """
-        text = self._call_tool(
+        data = self._call_tool_json(
             "scaffold_devcontainer",
             {"languages": "python,go", "cicd_tools": "docker,github_actions"},
         )
-        data = json.loads(text)
         assert "devcontainer_json" in data, "devcontainer.json missing from bundle"
         assert "devcontainer_env_json" in data, "devcontainer.env.json missing from bundle"
 
@@ -411,11 +422,10 @@ class TestMCPProtocolToolInvocation:
         Proves: the unittest scaffold tool returns pytest configuration for
         a Python project over the MCP wire protocol.
         """
-        text = self._call_tool(
+        data = self._call_tool_json(
             "generate_unittest_config",
             {"name": "data-pipeline", "languages": "python"},
         )
-        data = json.loads(text)
         assert any("pytest" in k or "conftest" in k or "pyproject" in k for k in data), (
             f"No pytest config file found in unittest output keys: {list(data.keys())}"
         )
