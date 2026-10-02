@@ -573,3 +573,203 @@ def get_available_tools() -> Dict[str, Any]:
         "code_analysis_tools": list(CODE_ANALYSIS_TOOLS.keys()),
         "devops_tools": list(DEVOPS_TOOLS.keys()),
     }
+
+
+def get_version_config(tools: str = "") -> Dict[str, Any]:
+    """
+    Get current version configuration for specified tools.
+
+    Uses environment variables or defaults from version_manager.
+
+    Args:
+        tools: Comma-separated list of tool names, or empty for all available tools
+
+    Returns:
+        Dictionary with current versions and configuration
+    """
+    from mcp_server.version_manager import VersionManager
+
+    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    vm = VersionManager()
+
+    result = {
+        "current_versions": vm.get_versions(tool_list),
+        "tools_info": {},
+    }
+
+    for tool in tool_list:
+        info = vm.get_version_info(tool)
+        if info:
+            result["tools_info"][tool] = {
+                "current": info["current"],
+                "default": info["default"],
+                "latest": info["latest"],
+                "lts": info["lts"],
+                "status": info["info"]["status"],
+            }
+
+    return result
+
+
+def get_version_updates(tools: str = "") -> Dict[str, Any]:
+    """
+    Check for available version updates with security awareness.
+
+    Args:
+        tools: Comma-separated list of tool names, or empty for all available tools
+
+    Returns:
+        Dictionary with available updates and security recommendations
+    """
+    from mcp_server.version_manager import VersionManager
+
+    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    vm = VersionManager()
+
+    updates = vm.check_version_updates(tool_list)
+    security_updates = vm.get_security_updates(tool_list)
+
+    return {
+        "available_updates": updates,
+        "security_updates": security_updates,
+        "summary": {
+            "tools_checked": len(tool_list),
+            "updates_available": sum(1 for u in updates.values() if u.get("can_update")),
+            "security_issues": len(security_updates),
+        },
+    }
+
+
+def suggest_versions(tools: str = "", prefer_lts: bool = False) -> Dict[str, Any]:
+    """
+    Get version suggestions based on latest releases and LTS availability.
+
+    Args:
+        tools: Comma-separated list of tool names, or empty for all available tools
+        prefer_lts: If True, suggest LTS versions; otherwise suggest latest stable
+
+    Returns:
+        Dictionary with version suggestions and reasoning
+    """
+    from mcp_server.version_manager import VersionManager
+
+    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    vm = VersionManager()
+
+    suggestions = vm.suggest_versions(tool_list, prefer_lts)
+    current = vm.get_versions(tool_list)
+
+    return {
+        "suggested_versions": suggestions,
+        "current_versions": current,
+        "strategy": "lts" if prefer_lts else "latest-stable",
+        "recommendations": [
+            {
+                "tool": tool,
+                "current": current.get(tool),
+                "suggested": suggestions.get(tool),
+                "rationale": f"{'Use stable LTS' if prefer_lts else 'Latest stable'} version for {tool}",
+            }
+            for tool in tool_list
+            if tool in suggestions
+        ],
+    }
+
+
+def update_versions(versions_json: str) -> Dict[str, Any]:
+    """
+    Update tool versions from a JSON dictionary or env var format.
+
+    Args:
+        versions_json: JSON string with version updates (e.g., '{"python": "3.13", "go": "1.25.0"}')
+
+    Returns:
+        Dictionary with update results and any errors
+    """
+    from mcp_server.version_manager import VersionManager, apply_version_updates
+
+    try:
+        # Parse JSON input
+        updates = json.loads(versions_json) if versions_json.startswith("{") else {}
+
+        if not updates:
+            return {"success": False, "error": "Invalid JSON format or empty updates"}
+
+        # Apply updates
+        results = apply_version_updates(updates)
+
+        # Get new versions
+        vm = VersionManager()
+        new_versions = vm.get_versions(list(updates.keys()))
+
+        return {
+            "success": all(results.values()),
+            "updates": {
+                tool: {"requested": version, "success": results.get(tool, False)}
+                for tool, version in updates.items()
+            },
+            "new_versions": new_versions,
+            "errors": [
+                {"tool": tool, "message": f"Failed to update {tool}"}
+                for tool, success in results.items()
+                if not success
+            ],
+        }
+    except json.JSONDecodeError:
+        return {"success": False, "error": "Invalid JSON format"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def check_security_issues(tools: str = "") -> Dict[str, Any]:
+    """
+    Check for security issues in current tool versions.
+
+    Identifies outdated or vulnerable versions that should be updated.
+
+    Args:
+        tools: Comma-separated list of tool names, or empty for all available tools
+
+    Returns:
+        Dictionary with security assessment and recommendations
+    """
+    from mcp_server.version_manager import VersionManager
+
+    tool_list = parse_comma_separated(tools) if tools else list(LANGUAGE_CONFIGS.keys())
+    vm = VersionManager()
+
+    security_updates = vm.get_security_updates(tool_list)
+    current = vm.get_versions(tool_list)
+
+    # Categorize by urgency
+    critical = {}
+    high = {}
+    medium = {}
+    low = {}
+
+    for tool, update_info in security_updates.items():
+        urgency = update_info.get("urgency", "low")
+        if urgency == "critical":
+            critical[tool] = update_info
+        elif urgency == "high":
+            high[tool] = update_info
+        elif urgency == "medium":
+            medium[tool] = update_info
+        else:
+            low[tool] = update_info
+
+    return {
+        "security_assessment": {
+            "critical": critical,
+            "high": high,
+            "medium": medium,
+            "low": low,
+        },
+        "summary": {
+            "tools_checked": len(tool_list),
+            "with_issues": len(security_updates),
+            "critical_count": len(critical),
+            "high_count": len(high),
+        },
+        "current_versions": current,
+    }
