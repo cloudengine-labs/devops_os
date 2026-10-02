@@ -373,22 +373,22 @@ docker run --env-file .env -p 8000:8000 devops-os-mcp:latest
 
 ## Configuration Reference
 
-### Environment Variables
+### Key Environment Variables
 
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| `DEVOPS_OS_PROFILE` | `local` (dev) or `remote` (production) | `local` | `remote` |
-| `DEVOPS_OS_TRANSPORT` | `stdio` or `streamable-http` | `stdio` | `streamable-http` |
-| `DEVOPS_OS_HOST` | Bind address for HTTP server | `127.0.0.1` | `0.0.0.0` |
-| `DEVOPS_OS_PORT` | Bind port for HTTP server | `8000` | `8000` |
-| `DEVOPS_OS_MCP_ENDPOINT` | MCP protocol endpoint path | `/mcp` | `/tools/mcp` |
-| `DEVOPS_OS_REQUEST_TIMEOUT` | Request timeout in seconds | `300` | `120` |
-| `DEVOPS_OS_MAX_CONCURRENT_CALLS` | Max concurrent tool calls | `10` | `5` |
-| `DEVOPS_OS_LOG_LEVEL` | Log verbosity | `INFO` | `DEBUG` |
-| `DEVOPS_OS_JWT_ISSUER` | JWT issuer URL (remote only) | None | `https://auth.example.com/` |
-| `DEVOPS_OS_JWT_AUDIENCE` | JWT audience (remote only) | None | `devops-os-service` |
-| `DEVOPS_OS_JWT_JWKS_URL` | JWKS endpoint URL | Auto-derived | `https://auth.example.com/.well-known/jwks.json` |
-| `DEVOPS_OS_JWT_ALGORITHMS` | Allowed JWT algorithms | `RS256,ES256` | `RS256` |
+> **For a comprehensive reference of all 18 environment variables, see the [Environment Variables Reference Guide](environment-variables.md)**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DEVOPS_OS_PROFILE` | Deployment mode: `local` (dev) or `remote` (production) | `local` |
+| `DEVOPS_OS_TRANSPORT` | Communication protocol: `stdio` or `streamable-http` | `stdio` |
+| `DEVOPS_OS_HOST` | HTTP bind address (HTTP transport only) | `127.0.0.1` |
+| `DEVOPS_OS_PORT` | HTTP bind port (HTTP transport only) | `8000` |
+| `DEVOPS_OS_MCP_ENDPOINT` | HTTP endpoint path for MCP protocol | `/mcp` |
+| `DEVOPS_OS_EXECUTION_TIMEOUT` | Tool execution timeout in seconds | `30` |
+| `DEVOPS_OS_LOG_LEVEL` | Logging verbosity: `DEBUG`, `INFO`, `WARNING`, `ERROR` | `INFO` |
+| `DEVOPS_OS_JWT_ISSUER` | JWT issuer URL (required for remote profile) | None |
+| `DEVOPS_OS_JWT_AUDIENCE` | JWT audience claim (required for remote profile) | None |
+| `DEVOPS_OS_ENABLE_SUGGESTIONS` | Enable prompt improvement suggestions | `true` |
 
 ### Configuration Profiles
 
@@ -563,8 +563,8 @@ ValidationError: name must be 1-63 characters
 
 - [AI Integration Overview]({{< relref "/docs/ai-integration" >}})
 - [MCP Quick Start (5 minutes)]({{< relref "/docs/getting-started/mcp-quickstart" >}})
+- [Environment Variables Reference]({{< relref "/docs/ai-integration/environment-variables" >}}) — All 18 configuration options
 - [Authentication Setup Details]({{< relref "/docs/ai-integration/mcp-setup#remote-setup-authenticated-access" >}})
-- [Troubleshooting & FAQ]({{< relref "/docs/ai-integration/mcp-setup#troubleshooting" >}})
 - [CLI Reference]({{< relref "/docs/reference" >}})
 
 ---

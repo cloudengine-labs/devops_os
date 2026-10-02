@@ -238,6 +238,7 @@ export DEVOPS_OS_INCLUDE_EXAMPLES_IN_SUGGESTIONS=false
 
 - **[MCP Quick Start](hugo-docs/content/docs/getting-started/mcp-quickstart.md)** — 5-minute guide for Claude Desktop
 - **[MCP Setup Guide](hugo-docs/content/docs/ai-integration/mcp-setup.md)** — Detailed configuration for all transports
+- **[Environment Variables Reference](hugo-docs/content/docs/ai-integration/environment-variables.md)** — Complete guide to all 18 configuration variables
 - **[CLI Commands](hugo-docs/content/docs/getting-started/_index.md)** — Run generators from command line instead
 - **[Full Documentation](https://devops-os.io/)** — All features and guides
 
