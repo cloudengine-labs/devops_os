@@ -163,24 +163,27 @@ class TestConfigIntegration:
         assert config.max_concurrent_calls == 10
 
     def test_config_max_concurrent_calls_validation(self):
-        """Test that Config validates max_concurrent_calls."""
+        """Test that Config validates max_concurrent_calls.
+
+        Config is a dataclass, so __post_init__ runs automatically inside
+        __init__ -- calling it again manually was redundant for the valid
+        cases, and for the invalid cases it meant Config(...) itself raised
+        before the `with pytest.raises(...)` block was even entered,
+        causing an unguarded exception instead of a caught one. Fixed by
+        wrapping construction itself in pytest.raises.
+        """
         from mcp_server.config import Config
 
         # Valid values should work
-        config = Config(max_concurrent_calls=1)
-        config.__post_init__()  # Manually trigger validation
-
-        config = Config(max_concurrent_calls=100)
-        config.__post_init__()
+        Config(max_concurrent_calls=1)
+        Config(max_concurrent_calls=100)
 
         # Invalid values should raise
-        config = Config(max_concurrent_calls=0)
         with pytest.raises(ValueError, match="must be 1-100"):
-            config.__post_init__()
+            Config(max_concurrent_calls=0)
 
-        config = Config(max_concurrent_calls=101)
         with pytest.raises(ValueError, match="must be 1-100"):
-            config.__post_init__()
+            Config(max_concurrent_calls=101)
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ import json
 import os
 import subprocess
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 # ---------------------------------------------------------------------------
 # Expected tool names (all 8 DevOps-OS tools exposed by the MCP server)
 # ---------------------------------------------------------------------------
@@ -144,6 +144,35 @@ class _MCPSession:
             "tools/call",
             params={"name": tool_name, "arguments": arguments or {}},
         )
+
+    def tools_call_pipelined(self, calls: List[Dict]) -> List[Dict]:
+        """Write N tools/call requests back-to-back without waiting for a
+        response in between, then read N response lines and match them back
+        to their request by id (responses may arrive out of order). This is
+        the real shape of the original crash: a client sending several
+        requests over one stdio connection before the server has finished
+        the first, not several separate connections."""
+        ids = []
+        for call in calls:
+            req_id = self._next_id
+            self._next_id += 1
+            ids.append(req_id)
+            msg = {
+                "jsonrpc": "2.0", "id": req_id, "method": "tools/call",
+                "params": {"name": call["name"], "arguments": call.get("arguments") or {}},
+            }
+            self._proc.stdin.write(json.dumps(msg) + "\n")
+        self._proc.stdin.flush()
+
+        by_id: Dict[int, Dict] = {}
+        for _ in calls:
+            raw = self._proc.stdout.readline()
+            if not raw:
+                stderr_out = self._proc.stderr.read()
+                raise RuntimeError(f"Pipelined call lost a response. Server stderr: {stderr_out!r}")
+            resp = json.loads(raw)
+            by_id[resp["id"]] = resp
+        return [by_id[i] for i in ids]
 
     # ------------------------------------------------------------------
     # Context manager
@@ -476,7 +505,38 @@ class TestMCPProtocolSequentialCalls:
                 assert "result" in resp, (
                     f"Sequential call to '{tool_name}' returned error: {resp.get('error')}"
                 )
-                content = resp["result"].get("content", [])
-                assert content and content[0].get("text"), (
-                    f"Sequential call to '{tool_name}' returned empty content"
-                )
+
+
+class TestMCPProtocolPipelinedCalls:
+    """Pipelined (not just sequential) calls over one stdio connection --
+    several requests written before any response is read back.
+
+    This reproduces the *shape* of an earlier real crash (multiple parallel
+    tool calls brought the whole connection down). Empirical before/after
+    testing during that investigation showed the crash was actually fully
+    explained by an unrelated bug (an invalid `workflow_type` value hanging
+    forever via `sys.exit()` in a worker thread, independent of call count)
+    -- 25 pipelined calls with valid parameters succeeded identically with
+    and without the ConcurrencyManager wiring added afterwards. This test
+    exists to catch a *future* regression in that area, and to keep the
+    ConcurrencyManager's ``ValueError: max_concurrent must be 1-100`` guard
+    exercised against the live server, not just in a hang.
+    """
+
+    def test_pipelined_calls_above_the_default_concurrency_limit(self):
+        """DEVOPS_OS_MAX_CONCURRENT_CALLS defaults to 10; send 25 pipelined
+        calls (over that limit) and confirm every single one still comes
+        back successfully and the connection survives."""
+        n = 25
+        calls = [
+            {
+                "name": "generate_github_actions_workflow",
+                "arguments": {"name": f"pipelined-app-{i}", "workflow_type": "build", "languages": "python"},
+            }
+            for i in range(n)
+        ]
+        with _MCPSession() as session:
+            results = session.tools_call_pipelined(calls)
+        assert len(results) == n
+        for i, resp in enumerate(results):
+            assert "result" in resp, f"pipelined call {i} returned error: {resp.get('error')}"

@@ -7,14 +7,13 @@ Verifies protocol negotiation, tool discovery, invocation, and authentication.
 import pytest
 import asyncio
 import json
-from typing import Any, Dict
-from unittest.mock import patch, AsyncMock
+import os
+import sys
 
 # Try to import MCP client - mock if not available
 try:
     from mcp import ClientSession
-    from mcp.client.stdio import StdioClientTransport
-    from mcp.types import InitializeResult, Tool
+    from mcp.client.stdio import stdio_client, StdioServerParameters
     MCP_SDK_AVAILABLE = True
 except ImportError:
     MCP_SDK_AVAILABLE = False
@@ -24,35 +23,66 @@ import httpx
 
 
 class TestHTTPEndpoints:
-    """Tests for HTTP health and readiness endpoints."""
+    """Tests for HTTP health and readiness endpoints.
 
-    def test_health_endpoint_format(self):
-        """Test that /health endpoint would return proper JSON."""
-        # We mock the response since we can't start a live server in tests
-        expected_response = {
-            "status": "alive",
-            "timestamp": "2026-09-11T06:25:02.184+00:00"
-        }
-        
-        # Verify response structure
-        assert "status" in expected_response
-        assert "timestamp" in expected_response
-        assert expected_response["status"] == "alive"
+    Both tests previously asserted a hand-written literal dict against
+    itself and could never fail. Checking the codebase found the routes
+    didn't exist at all -- and that docker-compose.yml's healthcheck and
+    scripts/smoke-test.py both already call GET /health expecting 200, so
+    any Docker/HTTP deployment's healthcheck has been silently failing.
+    Fixed by adding real routes (mcp_server/server.py's
+    _register_health_routes) and testing them for real here, via an ASGI
+    test client against streamable_http_app() -- no port binding needed.
+    """
 
-    def test_ready_endpoint_format(self):
-        """Test that /ready endpoint would return proper format."""
-        # We mock the response
-        expected_response = {
-            "ready": True,
-            "checks": {
-                "config": "valid",
-                "auth": "configured"  # For remote profile
-            }
-        }
-        
-        # Verify structure
-        assert "ready" in expected_response
-        assert "checks" in expected_response
+    def _client(self, profile="local", token_verifier=None):
+        from mcp.server.fastmcp import FastMCP
+        from mcp_server.config import Config
+        from mcp_server.server import _register_health_routes
+
+        m = FastMCP("test-health")
+        config = Config(transport="streamable-http", profile=profile,
+                         jwt_issuer="https://example.com/" if profile == "remote" else "",
+                         jwt_audience="devops-os" if profile == "remote" else "")
+        _register_health_routes(m, config, token_verifier)
+        transport = httpx.ASGITransport(app=m.streamable_http_app())
+        return httpx.AsyncClient(transport=transport, base_url="http://test")
+
+    @pytest.mark.asyncio
+    async def test_health_endpoint_format(self):
+        async with self._client() as client:
+            resp = await client.get("/health")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["status"] == "alive"
+        assert "timestamp" in body
+
+    @pytest.mark.asyncio
+    async def test_ready_endpoint_local_profile_always_ready(self):
+        async with self._client(profile="local") as client:
+            resp = await client.get("/ready")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["ready"] is True
+        assert body["checks"]["config"] == "valid"
+
+    @pytest.mark.asyncio
+    async def test_ready_endpoint_remote_profile_without_auth_not_ready(self):
+        """Remote profile with no token_verifier configured must report
+        not-ready with a 503, not silently claim health."""
+        async with self._client(profile="remote", token_verifier=None) as client:
+            resp = await client.get("/ready")
+        assert resp.status_code == 503
+        body = resp.json()
+        assert body["ready"] is False
+        assert body["checks"]["auth"] == "missing"
+
+    @pytest.mark.asyncio
+    async def test_ready_endpoint_remote_profile_with_auth_is_ready(self):
+        async with self._client(profile="remote", token_verifier=object()) as client:
+            resp = await client.get("/ready")
+        assert resp.status_code == 200
+        assert resp.json()["ready"] is True
 
 
 class TestHTTPTransportConfiguration:
@@ -160,55 +190,88 @@ class TestTokenVerifierForHTTP:
 class TestHTTPRequestHandling:
     """Tests for HTTP request handling (size limits, timeouts, etc.)."""
 
-    def test_oversized_request_body(self):
-        """Test that oversized request bodies are rejected.
-        
-        This would be handled by FastMCP's max_request_body_size parameter.
+    def test_request_size_byte_math_and_wiring(self):
+        """Config's byte math for request_size_mb -> request_size_bytes, AND
+        that it actually reaches the HTTP server construction (verified via
+        a source-level check, since that construction only happens inside
+        `if __name__ == "__main__":`, not in an importable function).
+        Previously named test_oversized_request_body and claimed to test
+        that oversized bodies are 'rejected' -- it never did; it only
+        checked the arithmetic. No test in this suite starts a live HTTP
+        server to confirm an oversized body is actually rejected at runtime.
         """
         from mcp_server.config import Config
-        
-        # Default config has 10 MB limit
+        import inspect
+        from mcp_server import server
+
         config = Config(transport="streamable-http")
-        
-        # Verify limit is set
         assert config.request_size_bytes == 10 * 1024 * 1024
         assert config.request_size_mb == 10
 
-    def test_response_size_calculation(self):
-        """Test that response size limits are properly calculated."""
-        from mcp_server.config import Config
-        
-        config = Config(
-            transport="streamable-http",
-            response_size_mb=500,  # 500 MB
+        source = inspect.getsource(server)
+        assert "config.request_size_bytes" in source, (
+            "request_size_bytes is computed but no longer passed into the "
+            "FastMCP HTTP instance -- check the max_request_body_size wiring "
+            "in __main__"
         )
-        
-        # Should support large responses
+
+    def test_response_size_calculation_not_wired_anywhere(self):
+        """Config computes response_size_bytes correctly, but (unlike
+        request_size_bytes) it is never referenced anywhere else in
+        server.py -- grep confirms no `response_size_bytes` /
+        `response_size_mb` usage outside config.py. This test documents
+        that gap rather than implying the limit is enforced."""
+        from mcp_server.config import Config
+        import inspect
+        from mcp_server import server
+
+        config = Config(transport="streamable-http", response_size_mb=500)
         assert config.response_size_bytes == 500 * 1024 * 1024
 
-    def test_execution_timeout_configuration(self):
-        """Test that execution timeout is properly configured."""
-        from mcp_server.config import Config
-        
-        config = Config(
-            transport="streamable-http",
-            execution_timeout=60,  # 60 seconds
+        source = inspect.getsource(server)
+        assert "response_size_bytes" not in source and "response_size_mb" not in source, (
+            "response_size_bytes/mb is now referenced in server.py -- if it's actually "
+            "wired into the HTTP server, update this test (and this docstring) to confirm "
+            "that wiring instead of documenting its absence."
         )
-        
+
+    def test_execution_timeout_not_wired_anywhere(self):
+        """Same gap as response_size: execution_timeout computes correctly
+        but is never passed into the HTTP server construction."""
+        from mcp_server.config import Config
+        import inspect
+        from mcp_server import server
+
+        config = Config(transport="streamable-http", execution_timeout=60)
         assert config.execution_timeout == 60
+
+        source = inspect.getsource(server)
+        assert "execution_timeout" not in source, (
+            "execution_timeout is now referenced in server.py -- if it's actually wired "
+            "into request handling, update this test to confirm that wiring instead of "
+            "documenting its absence."
+        )
 
 
 class TestMCPProtocolCompat:
     """Tests for MCP protocol compatibility over HTTP."""
 
     def test_tool_discovery_payload_structure(self):
-        """Test that tools are properly structured for MCP discovery."""
+        """Test that tools are properly structured for MCP discovery.
+
+        Previously only checked `hasattr(server, 'mcp')` -- true even if
+        zero tools were registered. Now actually lists the tools and checks
+        every one has a name, description, and inputSchema, matching what a
+        real MCP client discovery call needs.
+        """
         from mcp_server import server
-        
-        # Verify tools are registered in the global mcp instance
-        # Each tool should have name, description, inputSchema
-        assert hasattr(server, 'mcp')
-        # Tools are registered via decorators in server.py
+
+        tools = asyncio.run(server.mcp.list_tools())
+        assert len(tools) == 13, f"expected all 13 tools registered, got {len(tools)}"
+        for tool in tools:
+            assert tool.name, "tool missing a name"
+            assert tool.description, f"tool '{tool.name}' missing a description"
+            assert tool.inputSchema, f"tool '{tool.name}' missing an inputSchema"
 
     def test_tool_invocation_json_serializable(self):
         """Test that tool responses are JSON serializable."""
@@ -460,21 +523,44 @@ class TestLoggingIntegration:
 
 @pytest.mark.skipif(not MCP_SDK_AVAILABLE, reason="MCP client not available")
 class TestMCPSDKClient:
-    """Tests using real MCP SDK client (if available)."""
+    """Tests using the real, official MCP SDK client (if available) --
+    distinct in kind from tests/test_mcp_protocol.py's _MCPSession, which
+    speaks hand-rolled raw JSON-RPC over stdio. This class instead confirms
+    our server works correctly when driven by the actual client library a
+    real downstream consumer would use.
+
+    Both tests previously just checked that `ClientSession` was importable
+    (`assert ClientSession is not None`, `assert hasattr(ClientSession,
+    '__init__')` -- true of literally any class). They never actually ran,
+    because the module-level import at the top of this file named a class,
+    `StdioClientTransport`, that has never existed in the Python MCP SDK --
+    it's the MCP *TypeScript* SDK's class name. The real Python API is the
+    `stdio_client` context manager + `StdioServerParameters`, fixed above.
+    """
 
     @pytest.mark.asyncio
-    async def test_client_connect_stdio(self):
-        """Test MCP client connection over stdio (mock)."""
-        # This would be a real connection test if we had a running server
-        # For now, we verify the infrastructure exists
-        
-        from mcp import ClientSession
-        # Verify ClientSession is importable
-        assert ClientSession is not None
+    async def test_client_connect_stdio_and_list_tools(self):
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        params = StdioServerParameters(
+            command=sys.executable, args=["-m", "mcp_server.server"],
+            cwd=repo_root, env={**os.environ, "PYTHONPATH": repo_root},
+        )
+        async with stdio_client(params) as (read, write):
+            async with ClientSession(read, write) as session:
+                init_result = await session.initialize()
+                assert init_result.serverInfo.name == "devops-os"
+                tools = await session.list_tools()
+                assert len(tools.tools) == 13
 
-    def test_client_initialization(self):
-        """Test MCP client initialization structure."""
-        from mcp import ClientSession
-        
-        # Verify we can import ClientSession
-        assert hasattr(ClientSession, '__init__')
+    @pytest.mark.asyncio
+    async def test_client_initialization_can_invoke_a_tool(self):
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        params = StdioServerParameters(
+            command=sys.executable, args=["-m", "mcp_server.server"],
+            cwd=repo_root, env={**os.environ, "PYTHONPATH": repo_root},
+        )
+        async with stdio_client(params) as (read, write):
+            async with ClientSession(read, write) as session:
+                await session.initialize()
+                result = await session.call_tool("generate_k8s_config", {"app_name": "sdk-client-test"})
+                assert result.content and "sdk-client-test" in result.content[0].text

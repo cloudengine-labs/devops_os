@@ -122,18 +122,28 @@ class TestJenkinsAndGitLabScenarios:
     workflow_type). That asymmetry is itself a finding, tested here."""
 
     @pytest.mark.parametrize("bad_type", ["bogus", "", "BUILD"])
-    def test_jenkins_pipeline_type_is_never_validated(self, bad_type):
-        """Invalid/rejected (expected gap): pipeline_type has no validator
-        entry in validators.py. This currently does NOT raise -- documenting
-        the actual (risky) behavior rather than assuming parity with GHA."""
-        result = generate_jenkins_pipeline(name="hello-java", pipeline_type=bad_type, languages="java")
-        assert isinstance(result, str)  # does not raise; see findings below
+    def test_jenkins_pipeline_type_rejected(self, bad_type):
+        """Invalid/rejected: Bug fix -- pipeline_type previously had no
+        validator entry at all (silently produced an incomplete pipeline
+        missing whichever stage didn't match). Now rejected explicitly."""
+        with pytest.raises(ValueError):
+            generate_jenkins_pipeline(name="hello-java", pipeline_type=bad_type, languages="java")
 
     @pytest.mark.parametrize("bad_type", ["bogus", "", "BUILD"])
-    def test_gitlab_pipeline_type_is_never_validated(self, bad_type):
-        """Same gap, GitLab CI path."""
-        result = generate_gitlab_ci_pipeline(name="hello-python", pipeline_type=bad_type, languages="python")
-        assert isinstance(result, str)
+    def test_gitlab_pipeline_type_rejected(self, bad_type):
+        """Same fix, GitLab CI path."""
+        with pytest.raises(ValueError):
+            generate_gitlab_ci_pipeline(name="hello-python", pipeline_type=bad_type, languages="python")
+
+    @pytest.mark.parametrize("valid_type", ["build", "test", "deploy", "complete", "parameterized"])
+    def test_jenkins_all_valid_pipeline_types_accepted(self, valid_type):
+        result = generate_jenkins_pipeline(name="hello-java", pipeline_type=valid_type, languages="java")
+        assert "pipeline" in result.lower()
+
+    @pytest.mark.parametrize("valid_type", ["build", "test", "deploy", "complete"])
+    def test_gitlab_all_valid_pipeline_types_accepted(self, valid_type):
+        result = generate_gitlab_ci_pipeline(name="hello-python", pipeline_type=valid_type, languages="python")
+        assert isinstance(result, str) and len(result) > 0
 
     def test_happy_path_jenkins_hello_java(self):
         result = generate_jenkins_pipeline(name="hello-java", pipeline_type="build", languages="java")

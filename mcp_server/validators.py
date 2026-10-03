@@ -317,6 +317,12 @@ def validate_tool_inputs(tool_name: str, **kwargs) -> dict[str, Any]:
             validated["name"] = validate_k8s_identifier(validated["name"], "name")
         if "languages" in validated:
             validated["languages"] = validate_languages(validated["languages"])
+        if "pipeline_type" in validated:
+            validated["pipeline_type"] = validate_choice(
+                validated["pipeline_type"],
+                ["build", "test", "deploy", "complete", "parameterized"],
+                "pipeline_type",
+            )
 
     # Tool: generate_gitlab_ci_pipeline
     elif tool_name == "generate_gitlab_ci_pipeline":
@@ -324,6 +330,12 @@ def validate_tool_inputs(tool_name: str, **kwargs) -> dict[str, Any]:
             validated["name"] = validate_k8s_identifier(validated["name"], "name")
         if "languages" in validated:
             validated["languages"] = validate_languages(validated["languages"])
+        if "pipeline_type" in validated:
+            validated["pipeline_type"] = validate_choice(
+                validated["pipeline_type"],
+                ["build", "test", "deploy", "complete"],
+                "pipeline_type",
+            )
 
     # Tool: generate_k8s_config
     elif tool_name == "generate_k8s_config":

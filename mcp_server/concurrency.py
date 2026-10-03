@@ -6,6 +6,8 @@ constraints and SLA compliance are important.
 """
 
 import asyncio
+import threading
+from contextlib import contextmanager
 from typing import Callable, Any, TypeVar
 from functools import wraps
 
@@ -36,8 +38,28 @@ class ConcurrencyManager:
         
         self.max_concurrent = max_concurrent
         self._semaphore = asyncio.Semaphore(max_concurrent)
+        self._sync_semaphore = threading.Semaphore(max_concurrent)
         self._active_calls = 0
-    
+        self._lock = threading.Lock()
+
+    @contextmanager
+    def limit_sync(self):
+        """Block until a slot is free, then hold it for the duration of the
+        `with` block. The sync counterpart to `execute_with_limit`, for the
+        13 MCP tool handlers, which are plain synchronous functions (FastMCP
+        runs them in a thread pool, so an `asyncio.Semaphore` alone cannot
+        bound them -- it only coordinates within a single event loop).
+        """
+        self._sync_semaphore.acquire()
+        with self._lock:
+            self._active_calls += 1
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._active_calls -= 1
+            self._sync_semaphore.release()
+
     async def execute_with_limit(self, coro: Any) -> Any:
         """Execute a coroutine with concurrency limit.
         

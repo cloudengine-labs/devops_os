@@ -39,10 +39,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r mcp_server/requirements.txt pytest httpx
+          pip install -r mcp_server/requirements.txt pytest pytest-asyncio httpx
 
       - name: Run HTTP integration tests
-        run: pytest mcp_server/test_http.py -v -k "not asyncio"
+        run: pytest mcp_server/test_http.py -v
         continue-on-error: true
 
       - name: Run smoke test (stdio)

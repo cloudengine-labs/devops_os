@@ -22,6 +22,7 @@ import json
 import tempfile
 import argparse
 import logging
+from functools import wraps
 from pathlib import Path
 from typing import Any
 
@@ -210,6 +211,26 @@ def get_concurrency_manager() -> ConcurrencyManager:
     return _concurrency_manager
 
 
+def concurrency_limited(func):
+    """Bound how many calls to this tool run at once, via the live
+    ConcurrencyManager (DEVOPS_OS_MAX_CONCURRENT_CALLS, default 10).
+
+    Falls back to running unbounded when no manager is initialized (e.g.
+    direct unit-level calls in tests, which never run create_mcp_server()
+    or the __main__ entrypoint) -- matches the same lazy-lookup, fail-open
+    pattern already used by get_response_enhancer()'s callers.
+    """
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            manager = get_concurrency_manager()
+        except RuntimeError:
+            return func(*args, **kwargs)
+        with manager.limit_sync():
+            return func(*args, **kwargs)
+    return wrapper
+
+
 def _register_tools(mcp: FastMCP) -> None:
     """Register all tools on the given FastMCP instance."""
     mcp.tool()(generate_github_actions_workflow)
@@ -220,6 +241,39 @@ def _register_tools(mcp: FastMCP) -> None:
     mcp.tool()(generate_sre_configs)
     mcp.tool()(scaffold_devcontainer)
     mcp.tool()(generate_unittest_config)
+
+
+def _register_health_routes(http_mcp: FastMCP, config: "Config", token_verifier=None) -> None:
+    """Register GET /health and GET /ready on an HTTP-transport FastMCP
+    instance. Only meaningful for sse/streamable-http -- stdio has no HTTP
+    server to probe.
+
+    docker-compose.yml's healthcheck and scripts/smoke-test.py both already
+    call GET /health expecting 200; that route never existed, so any
+    Docker/HTTP deployment's healthcheck has been failing silently.
+    Extracted into its own function (rather than inlined in __main__) so it
+    can be exercised directly against a throwaway FastMCP instance in
+    tests, via streamable_http_app() + an ASGI test client, without binding
+    a real port.
+    """
+    from datetime import datetime, timezone
+    from starlette.requests import Request
+    from starlette.responses import JSONResponse
+
+    @http_mcp.custom_route("/health", methods=["GET"])
+    async def health_check(request: Request) -> JSONResponse:
+        return JSONResponse({
+            "status": "alive",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        })
+
+    @http_mcp.custom_route("/ready", methods=["GET"])
+    async def readiness_check(request: Request) -> JSONResponse:
+        checks = {"config": "valid" if config is not None else "missing"}
+        if config is not None and config.profile == "remote":
+            checks["auth"] = "configured" if token_verifier is not None else "missing"
+        ready = all(v in ("valid", "configured") for v in checks.values())
+        return JSONResponse({"ready": ready, "checks": checks}, status_code=200 if ready else 503)
 
 
 # Initialize MCP server for backward compatibility with direct imports
@@ -239,6 +293,7 @@ mcp = FastMCP(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_github_actions_workflow(
     name: str = "my-app",
     workflow_type: str = "complete",
@@ -328,6 +383,7 @@ def generate_github_actions_workflow(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_jenkins_pipeline(
     name: str = "my-app",
     pipeline_type: str = "complete",
@@ -359,7 +415,9 @@ def generate_jenkins_pipeline(
         ValueError: If inputs are invalid
     """
     try:
-        validate_tool_inputs("generate_jenkins_pipeline", name=name, languages=languages)
+        validate_tool_inputs(
+            "generate_jenkins_pipeline", name=name, languages=languages, pipeline_type=pipeline_type,
+        )
     except ValidationError as e:
         raise ValueError(str(e)) from e
     from devops_os.core import scaffold_jenkins
@@ -407,6 +465,7 @@ def generate_jenkins_pipeline(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_k8s_config(
     app_name: str = "my-app",
     image: str = "myregistry/my-app:latest",
@@ -528,6 +587,7 @@ def generate_k8s_config(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def scaffold_devcontainer(
     languages: str = "python",
     cicd_tools: str = "docker,github_actions",
@@ -629,6 +689,7 @@ def scaffold_devcontainer(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def get_version_config(tools: str = "") -> str:
     """Get current version configuration for dev container tools.
 
@@ -674,6 +735,7 @@ def get_version_config(tools: str = "") -> str:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def check_version_updates(tools: str = "") -> str:
     """Check for available version updates and security issues.
 
@@ -730,6 +792,7 @@ def check_version_updates(tools: str = "") -> str:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def suggest_versions(tools: str = "", prefer_lts: bool = False) -> str:
     """Get recommended versions for tools based on release strategy.
 
@@ -782,6 +845,7 @@ def suggest_versions(tools: str = "", prefer_lts: bool = False) -> str:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def update_versions(versions_json: str) -> str:
     """Update tool versions in environment variables.
 
@@ -829,6 +893,7 @@ def update_versions(versions_json: str) -> str:
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def check_security_issues(tools: str = "") -> str:
     """Check for security issues in current tool versions.
 
@@ -880,6 +945,7 @@ def check_security_issues(tools: str = "") -> str:
 
 
 @mcp.tool()
+@concurrency_limited
 def generate_gitlab_ci_pipeline(
     name: str = "my-app",
     pipeline_type: str = "complete",
@@ -911,7 +977,9 @@ def generate_gitlab_ci_pipeline(
         ValueError: If inputs are invalid
     """
     try:
-        validate_tool_inputs("generate_gitlab_ci_pipeline", name=name, languages=languages)
+        validate_tool_inputs(
+            "generate_gitlab_ci_pipeline", name=name, languages=languages, pipeline_type=pipeline_type,
+        )
     except ValidationError as e:
         raise ValueError(str(e)) from e
     from devops_os.core import scaffold_gitlab
@@ -950,6 +1018,7 @@ def generate_gitlab_ci_pipeline(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_argocd_config(
     name: str = "my-app",
     method: str = "argocd",
@@ -1042,6 +1111,7 @@ def generate_argocd_config(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_sre_configs(
     name: str = "my-app",
     team: str = "platform",
@@ -1128,6 +1198,7 @@ def generate_sre_configs(
 # ---------------------------------------------------------------------------
 
 @mcp.tool()
+@concurrency_limited
 def generate_unittest_config(
     name: str = "my-app",
     languages: str = "python",
@@ -1280,10 +1351,11 @@ if __name__ == "__main__":
                 http_mcp_kwargs["token_verifier"] = token_verifier
             
             http_mcp = FastMCP(**http_mcp_kwargs)
-            
+
             # Register all tools on the HTTP instance
             _register_tools(http_mcp)
-            
+            _register_health_routes(http_mcp, config, token_verifier)
+
             # Run with the selected transport
             http_mcp.run(
                 transport=config.transport,
