@@ -990,7 +990,9 @@ def generate_argocd_config(
         ValueError: If inputs are invalid
     """
     try:
-        validate_tool_inputs("generate_argocd_config", name=name, namespace=namespace)
+        validate_tool_inputs(
+            "generate_argocd_config", name=name, namespace=namespace, repo=repo, image=image,
+        )
     except ValidationError as e:
         raise ValueError(str(e)) from e
     from devops_os.core import scaffold_argocd
