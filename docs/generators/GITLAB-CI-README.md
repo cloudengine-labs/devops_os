@@ -135,7 +135,7 @@ Set these in **GitLab → Settings → CI/CD → Variables**:
 
 ## Related Guides
 
-- [Getting Started](GETTING-STARTED.md)
+- [Getting Started](../getting-started/GETTING-STARTED.md)
 - [GitHub Actions Generator](GITHUB-ACTIONS-README.md)
 - [ArgoCD / Flux Config](ARGOCD-README.md)
 - [Jenkins Pipeline Generator](JENKINS-PIPELINE-README.md)

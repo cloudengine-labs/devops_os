@@ -391,5 +391,5 @@ docker run -d \
 ## Next Steps
 
 - See [HTTP-SETUP.md](HTTP-SETUP.md) for server configuration
-- See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for solutions to common problems
+- See [TROUBLESHOOTING.md](../getting-started/TROUBLESHOOTING.md) for solutions to common problems
 - See [CLIENT-SETUP.md](CLIENT-SETUP.md) for client examples

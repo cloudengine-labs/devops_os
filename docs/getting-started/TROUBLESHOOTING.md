@@ -591,4 +591,4 @@ When reporting issues, include:
 4. Steps to reproduce
 5. Expected vs actual behavior
 
-See [AUTH-SETUP.md](AUTH-SETUP.md) and [HTTP-SETUP.md](HTTP-SETUP.md) for specific issue categories.
+See [AUTH-SETUP.md](../mcp/AUTH-SETUP.md) and [HTTP-SETUP.md](../mcp/HTTP-SETUP.md) for specific issue categories.

@@ -3,7 +3,7 @@
 **Date:** 2026-10-02
 **Server:** `devops-os` (stdio, `.venv/bin/python -m mcp_server.server`), registered via project `.mcp.json`
 **Tester role:** developer, scaffolding 5 "AI-era" language hello-worlds via MCP tools
-**Status:** Bug #1 (workflow hang) fixed and verified. Bug #2 (prompt suggestions not surfaced) still open.
+**Status:** Bugs #1, #2, and #3 fixed and verified, plus the concurrency/health-route/test-infra follow-ups. See `docs/mcp/MCP-TEST-STRATEGY.md` for the full bug list and `git log` (commit `4dc7f65` and earlier) for the fix trail. This file is left as the original incident log; sections below are annotated where since superseded rather than rewritten.
 
 ## Setup recap
 `.venv` didn't exist on first connect (`ENOENT`). Created it (`python3 -m venv .venv`), installed `mcp_server/requirements.txt`, reconnected successfully. See prior session turns for detail.
@@ -70,20 +70,20 @@ SuggestionEngine().generate_suggestions(...) → 2 high-confidence suggestions r
 ```
 This confirms `prompt_analyzer.py` + `suggestion_engine.py` logic is correct in isolation, but **the live MCP tool responses never surface it** — `response_enhancer.py`'s enhanced JSON appears to get unwrapped back to plain `tool_output` somewhere between the tool handler and the MCP transport layer (config defaults are `enable_suggestions=true`, `confidence=medium`, so it should have fired).
 
-**Verdict: prompt-improvement feature does not work end-to-end via the MCP server**, despite working correctly at the code-unit level. This is a wiring/serialization bug, not a design flaw.
+**Verdict at the time: prompt-improvement feature did not work end-to-end via the MCP server**, despite working correctly at the code-unit level. **Update:** fixed in a later pass — `create_mcp_server()` (the only place that initialized `_response_enhancer`) was never called on the stdio path; see `docs/mcp/MCP-TEST-STRATEGY.md`'s Bug #2 entry for the root cause and fix.
 
 ## Reliability findings (unplanned, surfaced during testing)
-1. **No concurrency support**: 8 parallel tool calls → 3 timed out, 4 failed with `Connection closed`, server disconnected entirely. The stdio server appears single-threaded/single-connection with no request queuing. **Status: not fixed** — out of scope for the Bug #1 fix, still a risk for any client issuing concurrent calls.
+1. ~~**No concurrency support**~~ — **Fixed in a later pass.** `ConcurrencyManager` existed but was never invoked from any tool handler; a `limit_sync()` + decorator was added and applied to all 13 tools (commit `4dc7f65`). Note: scientific before/after testing at the time showed this specific reproduction (8–25 pipelined calls with valid parameters) succeeded identically with or without the fix — the original crash was very likely fully explained by finding #2 below, not a distinct concurrency defect. The fix stands as defense-in-depth, not as a confirmed crash fix.
 2. ~~`generate_github_actions_workflow` hangs deterministically~~ — **Fixed, see "Bug #1 — Root cause, fix, and verification" above.**
-3. **Stopping a hung task kills the whole server connection** — a consequence of finding #2's root cause (`SystemExit` in a worker thread leaves stdio in a broken state). Should no longer occur now that `workflow_type` fails fast via `ValueError` instead of `sys.exit()`, but not independently stress-tested against other potential hang sources (e.g. finding #1's concurrency crash).
+3. **Stopping a hung task kills the whole server connection** — a consequence of finding #2's root cause (`SystemExit` in a worker thread leaves stdio in a broken state). No longer occurs now that `workflow_type` fails fast via `ValueError` instead of `sys.exit()`.
 
 ## Conclusion
 - ✅ Hello-world scaffolds created for all 5 languages (locally, since MCP doesn't generate app code).
 - ✅ Kubernetes manifest generation works correctly and respects all input parameters.
 - ✅ **GitHub Actions workflow generation — fixed.** All 5 languages now generate successfully via the live MCP server with no hang.
-- ❌ Dev container scaffolding still untested cleanly (only attempted under the concurrency-crash scenario; not retried).
-- ❌ Prompt-improvement suggestions still do not reach the client despite correct underlying logic — **open defect**, worth filing upstream (`cloudengine-labs/devops_os`), referencing `mcp_server/response_enhancer.py`. Not addressed in this pass.
-- ⚠️ Server still has no tolerance for concurrent calls (finding #1) — recommend sequential usage until that's addressed separately.
+- ❌ Dev container scaffolding still untested cleanly in this specific report (only attempted under the concurrency-crash scenario) — later superseded by `tests/test_scenario_based.py`'s dedicated devcontainer scenario class, which does cover it.
+- ✅ **Prompt-improvement suggestions — fixed.** See update above.
+- ✅ **Concurrency wiring — fixed** (with the caveat in finding #1 above about what it actually does and doesn't prove).
 
 ## Artifacts
 ```

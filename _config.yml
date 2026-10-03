@@ -23,11 +23,11 @@ highlighter: rouge
 # Navigation
 header_pages:
   - README.md
-  - docs/DEVOPS-OS-QUICKSTART.md
-  - docs/CICD-GENERATORS-README.md
-  - docs/GITHUB-ACTIONS-README.md
-  - docs/JENKINS-PIPELINE-README.md
-  - docs/KUBERNETES-DEPLOYMENT-README.md
+  - docs/getting-started/DEVOPS-OS-QUICKSTART.md
+  - docs/generators/CICD-GENERATORS-README.md
+  - docs/generators/GITHUB-ACTIONS-README.md
+  - docs/generators/JENKINS-PIPELINE-README.md
+  - docs/generators/KUBERNETES-DEPLOYMENT-README.md
   - mcp_server/README.md
   - skills/README.md
 

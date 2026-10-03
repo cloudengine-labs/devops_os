@@ -254,7 +254,7 @@ Install the DevOps-OS MCP server, connect it to Claude or ChatGPT, and ask:
 > "Using the DevOps-OS tools, scaffold a process-first CI/CD setup for a Python microservice
 > with GitOps delivery and SRE observability."
 
-See [mcp_server/README.md](../mcp_server/README.md) for setup instructions.
+See [mcp_server/README.md](../../mcp_server/README.md) for setup instructions.
 
 ---
 
@@ -275,9 +275,9 @@ See [mcp_server/README.md](../mcp_server/README.md) for setup instructions.
 |-------|---------|
 | Full CLI reference | [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md) |
 | Getting started (first pipeline in 5 min) | [GETTING-STARTED.md](GETTING-STARTED.md) |
-| GitHub Actions deep dive | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
-| GitLab CI deep dive | [GITLAB-CI-README.md](GITLAB-CI-README.md) |
-| Jenkins deep dive | [JENKINS-PIPELINE-README.md](JENKINS-PIPELINE-README.md) |
-| ArgoCD / Flux deep dive | [ARGOCD-README.md](ARGOCD-README.md) |
-| SRE configuration deep dive | [SRE-CONFIGURATION-README.md](SRE-CONFIGURATION-README.md) |
-| MCP server (AI integration) | [../mcp_server/README.md](../mcp_server/README.md) |
+| GitHub Actions deep dive | [GITHUB-ACTIONS-README.md](../generators/GITHUB-ACTIONS-README.md) |
+| GitLab CI deep dive | [GITLAB-CI-README.md](../generators/GITLAB-CI-README.md) |
+| Jenkins deep dive | [JENKINS-PIPELINE-README.md](../generators/JENKINS-PIPELINE-README.md) |
+| ArgoCD / Flux deep dive | [ARGOCD-README.md](../generators/ARGOCD-README.md) |
+| SRE configuration deep dive | [SRE-CONFIGURATION-README.md](../generators/SRE-CONFIGURATION-README.md) |
+| MCP server (AI integration) | [../mcp_server/README.md](../../mcp_server/README.md) |

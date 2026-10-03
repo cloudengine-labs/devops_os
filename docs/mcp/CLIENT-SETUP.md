@@ -527,4 +527,4 @@ python3 scripts/smoke-test.py \
 - See [HTTP-SETUP.md](HTTP-SETUP.md) for server configuration
 - See [AUTH-SETUP.md](AUTH-SETUP.md) for authentication setup
 - See [LOGGING.md](LOGGING.md) for debugging with logs
-- See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues
+- See [TROUBLESHOOTING.md](../getting-started/TROUBLESHOOTING.md) for common issues

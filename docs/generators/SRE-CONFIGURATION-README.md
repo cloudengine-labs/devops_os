@@ -154,6 +154,6 @@ Libraries that auto-instrument these metrics:
 
 ## Related Guides
 
-- [Getting Started](GETTING-STARTED.md)
+- [Getting Started](../getting-started/GETTING-STARTED.md)
 - [Kubernetes Deployment](KUBERNETES-DEPLOYMENT-README.md)
 - [ArgoCD / Flux Config](ARGOCD-README.md)

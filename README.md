@@ -302,15 +302,15 @@ The MCP server will generate all necessary dev container configuration files for
 
 | Guide | Description |
 |-------|-------------|
-| [🔄 Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
-| [⚙️ GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
-| [🦊 GitLab CI Generator](docs/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
-| [🔧 Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
-| [🔄 ArgoCD / Flux GitOps](docs/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
-| [📊 SRE Configuration](docs/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
-| [🔐 Infrastructure Hardening](docs/devops-os-hardening-sprint.md) | Standards, output layout, and examples for the hardening scaffold |
-| [🧪 Unit Test Scaffold](docs/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
-| [☸️ Kubernetes Deployments](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
+| [🔄 Process-First Philosophy](docs/getting-started/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips |
+| [⚙️ GitHub Actions Generator](docs/generators/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
+| [🦊 GitLab CI Generator](docs/generators/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
+| [🔧 Jenkins Pipeline Generator](docs/generators/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
+| [🔄 ArgoCD / Flux GitOps](docs/generators/ARGOCD-README.md) | Generate ArgoCD Applications and Flux Kustomizations |
+| [📊 SRE Configuration](docs/generators/SRE-CONFIGURATION-README.md) | Prometheus rules, Grafana dashboards, SLO manifests |
+| [🔐 Infrastructure Hardening](docs/generators/devops-os-hardening-sprint.md) | Standards, output layout, and examples for the hardening scaffold |
+| [🧪 Unit Test Scaffold](docs/getting-started/CLI-COMMANDS-REFERENCE.md#devopsos-scaffold-unittest--unit-test-scaffold-generator) | Generate pytest, Jest, Vitest, Mocha, or Go test configs |
+| [☸️ Kubernetes Deployments](docs/generators/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configs |
 
 ### 🛠️ Development & Deployment
 

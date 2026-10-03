@@ -167,4 +167,4 @@ python -m pytest cli/test_cli.py -v
 python -m pytest cli/test_cli.py -v --tb=short
 ```
 
-> See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full test philosophy and how to add new tests.
+> See [CONTRIBUTING.md](../../CONTRIBUTING.md) for the full test philosophy and how to add new tests.

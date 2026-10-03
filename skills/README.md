@@ -5,10 +5,10 @@ that can be loaded into Claude (via the Anthropic API) or ChatGPT / Custom GPTs
 (via OpenAI function calling or GPT Actions).
 
 > **📖 New:** Comprehensive skills documentation is now available!
-> - **[Skills Documentation Index](../docs/SKILLS-DOCUMENTATION-INDEX.md)** — Start here for quick navigation
-> - **[Skills Usage Guide](../docs/SKILLS-USAGE-GUIDE.md)** — How to use skills with Claude and ChatGPT
-> - **[Skills Architecture](../docs/SKILLS-ARCHITECTURE.md)** — Technical deep dive for developers
-> - **[Skills Developer Guide](../docs/SKILLS-DEVELOPER-GUIDE.md)** — Extend and customize skills
+> - **[Skills Documentation Index](../docs/skills/SKILLS-DOCUMENTATION-INDEX.md)** — Start here for quick navigation
+> - **[Skills Usage Guide](../docs/skills/SKILLS-USAGE-GUIDE.md)** — How to use skills with Claude and ChatGPT
+> - **[Skills Architecture](../docs/skills/SKILLS-ARCHITECTURE.md)** — Technical deep dive for developers
+> - **[Skills Developer Guide](../docs/skills/SKILLS-DEVELOPER-GUIDE.md)** — Extend and customize skills
 
 ## Available Skills / Tools
 

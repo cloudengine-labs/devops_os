@@ -554,7 +554,7 @@ python github-actions-generator-improved.py --name "Platform" --languages python
 
 ## Next Steps
 
-- Learn about [Creating DevOps-OS Using Dev Container](./DEVOPS-OS-README.md)
+- Learn about [Creating DevOps-OS Using Dev Container](../getting-started/DEVOPS-OS-README.md)
 - Learn about [Creating Customized GitHub Actions Templates](./GITHUB-ACTIONS-README.md)
 - Learn about [Creating Customized Jenkins Pipeline Templates](./JENKINS-PIPELINE-README.md)
 - Explore [Creating Kubernetes Deployments](./KUBERNETES-DEPLOYMENT-README.md)

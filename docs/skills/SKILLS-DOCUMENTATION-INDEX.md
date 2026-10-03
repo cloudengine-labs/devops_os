@@ -22,7 +22,7 @@ DevOps-OS **Skills** are AI-callable tool definitions that generate production-r
    - Example prompts by use case
    - Troubleshooting
 
-2. **[Getting Started MCP](../GETTING-STARTED-MCP.md)** — Quick 5-minute setup guide
+2. **[Getting Started MCP](../../GETTING-STARTED-MCP.md)** — Quick 5-minute setup guide
    - Clone and install
    - Configure Claude Desktop
    - First generation
@@ -49,12 +49,12 @@ DevOps-OS **Skills** are AI-callable tool definitions that generate production-r
 
 **Start here if you're evaluating DevOps-OS for your organization:**
 
-1. **[Process-First Philosophy](../docs/PROCESS-FIRST.md)** — Why DevOps-OS works and how it teaches best practices
+1. **[Process-First Philosophy](../getting-started/PROCESS-FIRST.md)** — Why DevOps-OS works and how it teaches best practices
    - The 5 core principles
    - How each skill encodes Process-First thinking
    - Cultural benefits of skill-based automation
 
-2. **[MCP Setup Guide](../mcp_server/README.md)** — Production deployment options
+2. **[MCP Setup Guide](../../mcp_server/README.md)** — Production deployment options
    - Multiple setup methods (CLI, Desktop, IDE, Docker)
    - HTTP/HTTPS with authentication
    - Scaling and security considerations
@@ -185,7 +185,7 @@ devops_os_mcp/
 → See [Skills Usage Guide § Output Validation](SKILLS-USAGE-GUIDE.md#validating-output)
 
 **Q: How do I deploy the MCP server to production?**
-→ See [MCP Server README § Production Deployment](../mcp_server/README.md#production-deployment)
+→ See [MCP Server README § Production Deployment](../../mcp_server/README.md#production-deployment)
 
 **Q: How can I integrate skills into my Python application?**
 → See [Skills Developer Guide § Integration Patterns](SKILLS-DEVELOPER-GUIDE.md#integration-patterns)
@@ -230,7 +230,7 @@ generate_sre_configs(
 ## 🚀 Next Steps
 
 ### For First-Time Users
-1. Follow [Getting Started MCP](../GETTING-STARTED-MCP.md) (5 minutes)
+1. Follow [Getting Started MCP](../../GETTING-STARTED-MCP.md) (5 minutes)
 2. Try first example from [Skills Usage Guide](SKILLS-USAGE-GUIDE.md#example-prompts-by-use-case)
 3. Customize for your project
 
@@ -241,7 +241,7 @@ generate_sre_configs(
 4. Submit PR to contribute back!
 
 ### For Production Deployment
-1. Read [MCP Server README](../mcp_server/README.md#quick-start--which-method-is-right-for-you)
+1. Read [MCP Server README](../../mcp_server/README.md#quick-start--which-method-is-right-for-you)
 2. Choose deployment method based on your setup
 3. Configure authentication and scaling
 4. Train teams using [Skills Usage Guide](SKILLS-USAGE-GUIDE.md)
@@ -253,7 +253,7 @@ generate_sre_configs(
 Want to add a new skill or improve documentation?
 
 1. Fork: [github.com/chefgs/devops_os_mcp](https://github.com/chefgs/devops_os_mcp)
-2. Follow: [CONTRIBUTING.md](../CONTRIBUTING.md)
+2. Follow: [CONTRIBUTING.md](../../CONTRIBUTING.md)
 3. Read: [Skills Developer Guide](SKILLS-DEVELOPER-GUIDE.md)
 4. Submit: Pull request with implementation, tests, and docs
 

@@ -136,7 +136,7 @@ flux logs --follow
 
 ## Related Guides
 
-- [Getting Started](GETTING-STARTED.md)
+- [Getting Started](../getting-started/GETTING-STARTED.md)
 - [Kubernetes Deployment](KUBERNETES-DEPLOYMENT-README.md)
 - [GitLab CI Generator](GITLAB-CI-README.md)
 - [SRE Configuration](SRE-CONFIGURATION-README.md)

@@ -248,7 +248,7 @@ If a specific tool isn't working properly:
 
 After setting up DevOps-OS, consider exploring:
 
-1. [Creating Customized GitHub Actions Templates](./GITHUB-ACTIONS-README.md)
-2. [Creating Customized Jenkins Templates](./JENKINS-PIPELINE-README.md)
-3. [Creating Kubernetes Deployments](./KUBERNETES-DEPLOYMENT-README.md)
-4. [Implementing CI/CD Pipelines for Technology Stacks](./CICD-TECH-STACK-README.md)
+1. [Creating Customized GitHub Actions Templates](../generators/GITHUB-ACTIONS-README.md)
+2. [Creating Customized Jenkins Templates](../generators/JENKINS-PIPELINE-README.md)
+3. [Creating Kubernetes Deployments](../generators/KUBERNETES-DEPLOYMENT-README.md)
+4. [Implementing CI/CD Pipelines for Technology Stacks](../generators/CICD-TECH-STACK-README.md)

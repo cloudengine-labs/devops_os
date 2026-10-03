@@ -616,7 +616,7 @@ pytest tests/test_comprehensive.py -v
 - **MCP Protocol:** [modelcontextprotocol.io](https://modelcontextprotocol.io)
 - **Anthropic Tools:** [Anthropic API Docs](https://docs.anthropic.com/claude/reference/tool-use)
 - **OpenAI Functions:** [OpenAI API Docs](https://platform.openai.com/docs/guides/function-calling)
-- **Process-First Philosophy:** See `docs/PROCESS-FIRST.md`
+- **Process-First Philosophy:** See `docs/getting-started/PROCESS-FIRST.md`
 
 ---
 

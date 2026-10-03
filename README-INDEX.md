@@ -6,18 +6,18 @@ Welcome to the DevOps-OS documentation! This set of guides will help you use and
 
 | Guide | Description |
 |-------|-------------|
-| [**CLI Commands Reference**](docs/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location for all CLI commands |
-| [Getting Started](docs/GETTING-STARTED.md) | First pipeline in 5 minutes |
-| [Quick Start Guide](docs/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
-| [Process-First Philosophy](docs/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips for beginners |
-| [GitHub Actions Generator](docs/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
-| [GitLab CI Generator](docs/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
-| [Jenkins Pipeline Generator](docs/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
-| [ArgoCD / Flux CD Generator](docs/ARGOCD-README.md) | Generate ArgoCD and Flux CD GitOps configs |
-| [SRE Configuration Generator](docs/SRE-CONFIGURATION-README.md) | Generate Prometheus, Grafana, SLO, and Alertmanager configs |
-| [Kubernetes Deployment](docs/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configurations |
-| [CI/CD for Technology Stacks](docs/CICD-TECH-STACK-README.md) | Implement CI/CD for specific technology stacks |
-| [DevOps-OS Dev Container](docs/DEVOPS-OS-README.md) | Set up and customize the dev container |
+| [**CLI Commands Reference**](docs/getting-started/CLI-COMMANDS-REFERENCE.md) | **Complete reference** — every option, input file, and output location for all CLI commands |
+| [Getting Started](docs/getting-started/GETTING-STARTED.md) | First pipeline in 5 minutes |
+| [Quick Start Guide](docs/getting-started/DEVOPS-OS-QUICKSTART.md) | Essential CLI commands for all functionality |
+| [Process-First Philosophy](docs/getting-started/PROCESS-FIRST.md) | What Process-First means, how it maps to DevOps-OS, and AI learning tips for beginners |
+| [GitHub Actions Generator](docs/generators/GITHUB-ACTIONS-README.md) | Generate and customize GitHub Actions workflows |
+| [GitLab CI Generator](docs/generators/GITLAB-CI-README.md) | Generate and customize GitLab CI pipelines |
+| [Jenkins Pipeline Generator](docs/generators/JENKINS-PIPELINE-README.md) | Generate and customize Jenkins pipelines |
+| [ArgoCD / Flux CD Generator](docs/generators/ARGOCD-README.md) | Generate ArgoCD and Flux CD GitOps configs |
+| [SRE Configuration Generator](docs/generators/SRE-CONFIGURATION-README.md) | Generate Prometheus, Grafana, SLO, and Alertmanager configs |
+| [Kubernetes Deployment](docs/generators/KUBERNETES-DEPLOYMENT-README.md) | Generate and manage Kubernetes deployment configurations |
+| [CI/CD for Technology Stacks](docs/generators/CICD-TECH-STACK-README.md) | Implement CI/CD for specific technology stacks |
+| [DevOps-OS Dev Container](docs/getting-started/DEVOPS-OS-README.md) | Set up and customize the dev container |
 
 ## CLI Generator Quick Reference
 
@@ -38,7 +38,7 @@ python -m cli.devopsos scaffold gha --help   # see all GHA options
 | `python -m cli.devopsos scaffold sre` | `sre/` directory |
 | `python -m cli.devopsos scaffold devcontainer` | `.devcontainer/` directory |
 
-See [CLI Commands Reference](docs/CLI-COMMANDS-REFERENCE.md) for the full option tables, input files, and output path details.
+See [CLI Commands Reference](docs/getting-started/CLI-COMMANDS-REFERENCE.md) for the full option tables, input files, and output path details.
 
 ## Quick Start
 
@@ -60,7 +60,7 @@ python -m cli.devopsos scaffold sre --name my-app --team platform
 # Output: sre/ directory
 ```
 
-For more examples and detailed usage, see the [Getting Started guide](docs/GETTING-STARTED.md).
+For more examples and detailed usage, see the [Getting Started guide](docs/getting-started/GETTING-STARTED.md).
 
 ## Features
 

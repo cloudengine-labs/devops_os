@@ -3,7 +3,7 @@
 **Date:** 2026-10-03
 **Scope:** all 13 tools exposed by the `devops-os` MCP server (`mcp_server/server.py`)
 **Test suite:** `tests/test_scenario_based.py` (84 tests), building on the existing `tests/` + `mcp_server/test_*.py` suite (382 tests)
-**Related:** [`mcp-validation/TEST_REPORT.md`](../mcp-validation/TEST_REPORT.md) (the incident log — how 3 of these bugs were actually found and fixed), `tests/test_mcp_protocol.py` (live wire-protocol tests this strategy reuses)
+**Related:** [`mcp-validation/TEST_REPORT.md`](../../mcp-validation/TEST_REPORT.md) (the incident log — how 3 of these bugs were actually found and fixed), `tests/test_mcp_protocol.py` (live wire-protocol tests this strategy reuses)
 
 ---
 
@@ -68,12 +68,14 @@ Three bugs, all the same root pattern: **validation logic existed in `validators
 
 None of these were found by reading code in isolation — all three were found by designing the scenario *first* ("what should happen if `workflow_type` is invalid?", "what should happen if `image` contains shell metacharacters?") and then checking whether the code actually did that, rather than reading the code and assuming the docstring or the existence of a validator function meant it was wired up.
 
-## Known gaps not fixed in this pass
+## Gaps found in this pass, status as of commit `4dc7f65`
 
-- **Jenkins/GitLab `pipeline_type` has no validation**, unlike GHA's `workflow_type`. Doesn't hang (no `sys.exit()` in that path), but accepts any string silently — a decision is needed on whether to match GHA's strictness or leave it permissive.
-- **`ConcurrencyManager` is unit-tested but never invoked** from any tool handler (`grep get_concurrency_manager` only finds its own definition) — its tests pass while providing zero actual protection, which is why parallel calls crashed the server during earlier testing. Not a scenario-test gap so much as a dead-code gap; needs a product fix (wire it into the tool-call path), not a test.
-- **HTTP transport (`sse`/`streamable-http`) has the identical Bug #2 pattern** — its branch in `__main__` also never calls `create_mcp_server()`. Not fixed here because stdio is what's actually deployed via `.mcp.json`; flagged for the same fix if HTTP is ever used in production.
-- **Several `mcp_server/test_http.py` tests are tautological** (assert a hand-built dict against itself, e.g. `test_health_endpoint_format`) — they can't fail and don't test the real endpoint. Not touched in this pass; would need an actual live HTTP server fixture to test for real.
+All four were fixed in a later pass than the one that found them — noted here so this doc doesn't silently drift out of sync with the code the way the bugs above did.
+
+- ✅ **Jenkins/GitLab `pipeline_type` validation** — added, matching GHA's `workflow_type` pattern (`mcp_server/validators.py`).
+- ✅ **`ConcurrencyManager` wiring** — added `limit_sync()` (thread-safe, since all 13 tools are sync functions) and a `concurrency_limited` decorator applied to all 13 handlers. Caveat: scientific before/after testing (stashing the fix, re-running the same 25-pipelined-call reproduction) showed it does *not* fix a reproducible crash — the original "concurrency crash" was most likely fully explained by the `workflow_type` hang (Bug #1) hitting several calls at once, not a distinct defect. The wiring is legitimate defense-in-depth for genuinely heavy load, not a confirmed fix for that specific incident.
+- ✅ **HTTP transport parity** — turned out to already be fixed as a side effect of the Bug #2 fix (the global init moved before the transport branch, not just inside the stdio arm).
+- ✅ **`test_http.py`'s tautological tests** — `/health` and `/ready` didn't just lack good tests, they didn't exist as routes at all, and `docker-compose.yml`'s healthcheck + `scripts/smoke-test.py` both already depended on them — a live, previously-undetected production bug. Implemented both routes for real (`_register_health_routes`), tested via an ASGI client. Separately, the MCP-SDK-client tests in the same file were fixed too: a dead import (`StdioClientTransport` — the TypeScript SDK's class name, never valid in Python) meant two tests had likely never executed in this repo's history.
 
 ---
 

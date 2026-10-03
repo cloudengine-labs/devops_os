@@ -223,7 +223,7 @@ python mcp_server/server.py
 Then ask Claude:
 > *"Generate a complete GitLab CI pipeline for a Python Flask API with Docker build and ArgoCD deployment."*
 
-See [mcp_server/README.md](../mcp_server/README.md) and [skills/README.md](../skills/README.md) for details.
+See [mcp_server/README.md](../../mcp_server/README.md) and [skills/README.md](../../skills/README.md) for details.
 
 ---
 
@@ -273,10 +273,10 @@ A: Copy the generated file(s) to your project repository, commit, and push. No f
 |-----------|------|
 | Understand why DevOps-OS is Process-First | [PROCESS-FIRST.md](PROCESS-FIRST.md) |
 | See every option and output path | [CLI-COMMANDS-REFERENCE.md](CLI-COMMANDS-REFERENCE.md) |
-| Deep-dive GitHub Actions options | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
-| Deep-dive GitLab CI options | [GITLAB-CI-README.md](GITLAB-CI-README.md) |
-| Deep-dive Jenkins options | [JENKINS-PIPELINE-README.md](JENKINS-PIPELINE-README.md) |
-| Learn ArgoCD integration | [ARGOCD-README.md](ARGOCD-README.md) |
-| Set up SRE monitoring configs | [SRE-CONFIGURATION-README.md](SRE-CONFIGURATION-README.md) |
+| Deep-dive GitHub Actions options | [GITHUB-ACTIONS-README.md](../generators/GITHUB-ACTIONS-README.md) |
+| Deep-dive GitLab CI options | [GITLAB-CI-README.md](../generators/GITLAB-CI-README.md) |
+| Deep-dive Jenkins options | [JENKINS-PIPELINE-README.md](../generators/JENKINS-PIPELINE-README.md) |
+| Learn ArgoCD integration | [ARGOCD-README.md](../generators/ARGOCD-README.md) |
+| Set up SRE monitoring configs | [SRE-CONFIGURATION-README.md](../generators/SRE-CONFIGURATION-README.md) |
 | Set up the dev container | [DEVOPS-OS-README.md](DEVOPS-OS-README.md) |
-| Use with Claude / ChatGPT | [mcp_server/README.md](../mcp_server/README.md) |
+| Use with Claude / ChatGPT | [mcp_server/README.md](../../mcp_server/README.md) |

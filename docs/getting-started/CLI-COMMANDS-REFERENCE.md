@@ -574,9 +574,9 @@ Accepted by `scaffold gha`, `scaffold jenkins`, and `scaffold gitlab` via `--cus
 |-------|---------|
 | Getting started (first pipeline in 5 min) | [GETTING-STARTED.md](GETTING-STARTED.md) |
 | Process-First philosophy & tooling map | [PROCESS-FIRST.md](PROCESS-FIRST.md) |
-| GitHub Actions deep dive | [GITHUB-ACTIONS-README.md](GITHUB-ACTIONS-README.md) |
-| GitLab CI deep dive | [GITLAB-CI-README.md](GITLAB-CI-README.md) |
-| Jenkins deep dive | [JENKINS-PIPELINE-README.md](JENKINS-PIPELINE-README.md) |
-| ArgoCD / Flux deep dive | [ARGOCD-README.md](ARGOCD-README.md) |
-| SRE configuration deep dive | [SRE-CONFIGURATION-README.md](SRE-CONFIGURATION-README.md) |
-| MCP server (AI integration) | [../mcp_server/README.md](../mcp_server/README.md) |
+| GitHub Actions deep dive | [GITHUB-ACTIONS-README.md](../generators/GITHUB-ACTIONS-README.md) |
+| GitLab CI deep dive | [GITLAB-CI-README.md](../generators/GITLAB-CI-README.md) |
+| Jenkins deep dive | [JENKINS-PIPELINE-README.md](../generators/JENKINS-PIPELINE-README.md) |
+| ArgoCD / Flux deep dive | [ARGOCD-README.md](../generators/ARGOCD-README.md) |
+| SRE configuration deep dive | [SRE-CONFIGURATION-README.md](../generators/SRE-CONFIGURATION-README.md) |
+| MCP server (AI integration) | [../mcp_server/README.md](../../mcp_server/README.md) |
