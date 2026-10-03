@@ -1,5 +1,5 @@
 ---
-title: "My MCP Server Development Journey with AI Coding Agents"
+title: "DevOps OS MCP Server Development Journey with AI Coding Agents"
 slug: "mcp-server-development-journey-ai-coding-agents"
 description: "Building and hardening DevOps-OS's MCP server end to end with AI coding agents — GitHub Copilot's agent mode for the initial build, a Claude Code session for the testing and bug-fixing pass — the test approach, the dev process, and the prompting techniques that actually worked."
 topic: "ai-devops"
@@ -8,7 +8,7 @@ publishedAt: "2026-10-03"
 featured: true
 ---
 
-# My MCP Server Development Journey with AI Coding Agents
+# MCP Server Development Journey with AI Coding Agents
 
 I built DevOps-OS's MCP server almost entirely with AI coding agents — not as an experiment, but because that's genuinely how I build things now. Different stages of the work called for different tools: GitHub Copilot's agent mode did the initial construction fast and mostly hands-off, and later a dedicated Claude Code session did the part construction doesn't cover — actually using the thing, finding what it got wrong, and fixing it. This post is that whole journey, not a story about switching allegiances between tools.
 
