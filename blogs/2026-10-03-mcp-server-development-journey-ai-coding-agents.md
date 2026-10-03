@@ -1,18 +1,20 @@
 ---
-title: "Building an MCP Server: My Journey from GitHub Copilot to Claude Code"
-slug: "building-mcp-server-copilot-to-claude-code-journey"
-description: "How I built DevOps-OS's MCP server with GitHub Copilot agent mode, then spent a session with Claude Code finding and fixing the bugs it shipped — the test approach, the dev process, and the prompting techniques that actually worked."
+title: "My MCP Server Development Journey with AI Coding Agents"
+slug: "mcp-server-development-journey-ai-coding-agents"
+description: "Building and hardening DevOps-OS's MCP server end to end with AI coding agents — GitHub Copilot's agent mode for the initial build, a Claude Code session for the testing and bug-fixing pass — the test approach, the dev process, and the prompting techniques that actually worked."
 topic: "ai-devops"
 tags: ["AIAgents", "MCPServer", "GitHubCopilot", "ClaudeCode", "DevOpsOS", "Testing"]
 publishedAt: "2026-10-03"
 featured: true
 ---
 
-# Building an MCP Server: My Journey from GitHub Copilot to Claude Code
+# My MCP Server Development Journey with AI Coding Agents
 
-I built DevOps-OS's MCP server the way a lot of people build things with AI agents these days: fast, mostly hands-off, and without reading every line it produced. GitHub Copilot's agent mode wrote the bulk of it — input validation, docstrings, 13 tool wrappers around the existing CLI generators. It worked. I connected it to Claude Code, asked it to generate a few configs, got real YAML back, moved on.
+I built DevOps-OS's MCP server almost entirely with AI coding agents — not as an experiment, but because that's genuinely how I build things now. Different stages of the work called for different tools: GitHub Copilot's agent mode did the initial construction fast and mostly hands-off, and later a dedicated Claude Code session did the part construction doesn't cover — actually using the thing, finding what it got wrong, and fixing it. This post is that whole journey, not a story about switching allegiances between tools.
 
-Then I spent a full session with Claude Code actually trying to *use* the thing — scaffolding real projects, testing edge cases, acting as a test architect instead of a happy-path user — and found four real bugs, one of which was a production healthcheck that had been silently broken the whole time. This post is that journey: what the server does, how the two tools played different roles in building it, the testing approach that actually surfaced problems, and the prompting techniques I'm taking away from it.
+GitHub Copilot's agent mode wrote the bulk of the server — input validation, docstrings, 13 tool wrappers around the existing CLI generators. It worked. I connected it to Claude Code, asked it to generate a few configs, got real YAML back, moved on.
+
+Then, in a separate session, I spent real time with Claude Code actually trying to *use* the thing — scaffolding real projects, testing edge cases, acting as a test architect instead of a happy-path user — and found four real bugs, one of which was a production healthcheck that had been silently broken the whole time. This post covers what the server does, what each AI agent actually contributed at its stage, the testing approach that surfaced the problems, and the prompting techniques I'm taking away from the whole thing.
 
 ## What DevOps-OS's MCP server actually is
 
@@ -20,7 +22,7 @@ DevOps-OS is a CLI that scaffolds DevOps artifacts — GitHub Actions workflows,
 
 The idea is sound and the generators themselves are solid — hundreds of existing unit tests covered the actual YAML-generation logic well. The part that broke was the *seam*: the thin layer connecting the tools to the MCP protocol, and the validation that was supposed to guard it.
 
-## Phase 1: GitHub Copilot built it fast
+## Building it: GitHub Copilot's agent mode
 
 GitHub Copilot's agent mode (I had it running on a Claude Haiku model) did the actual construction work: wrapping each CLI generator as an `@mcp.tool()` function, adding input validators, writing docstrings, even running its own baseline audit of the implementation before diving in. That audit is worth pausing on, because it's the single most interesting artifact from this whole project.
 
@@ -31,9 +33,9 @@ It named the exact failure mode that shipped one commit later. The very next com
 
 The agent had the right instinct and the wrong follow-through: it correctly predicted the risk, then didn't check its own next commit against it.
 
-## Phase 2: moving to Claude Code to actually test it
+## Testing it: a dedicated Claude Code session
 
-I moved to Claude Code for the part Copilot's agent mode hadn't done: using the server like a real developer would, under a session built for iterative debugging rather than one-shot generation. The first thing I asked for was simple — scaffold hello-world projects in five languages (Python, TypeScript, Go, Rust, Java) using the MCP tools. That's where `workflow_type="basic"` first hung the server, and where the actual debugging work started.
+A separate Claude Code session covered the part Copilot's agent mode hadn't: using the server like a real developer would, in a session built for iterative debugging rather than one-shot generation. The first thing I asked for was simple — scaffold hello-world projects in five languages (Python, TypeScript, Go, Rust, Java) using the MCP tools. That's where `workflow_type="basic"` first hung the server, and where the actual debugging work started.
 
 ## The testing approach: acting as a test architect, not a user
 
