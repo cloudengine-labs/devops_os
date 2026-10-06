@@ -27,7 +27,7 @@ from typing import Any
 # Allow running from repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.mcpserver import MCPServer
 import yaml
 
 
@@ -105,7 +105,7 @@ def _build_jenkins_args(
 # MCP Server
 # ---------------------------------------------------------------------------
 
-mcp = FastMCP(
+mcp = MCPServer(
     "devops-os",
     instructions=(
         "DevOps-OS MCP Server provides tools for generating DevOps automation "
