@@ -34,8 +34,12 @@ ENV_PREFIX = "DEVOPS_OS_HELM_"
 # ---------------------------------------------------------------------------
 
 def _validate_helm_chart_name(name):
-    """Validate that name is a valid Helm chart name (lowercase alphanumeric and hyphens)."""
-    if not re.match(r'^[a-z0-9]([-a-z0-9]*[a-z0-9])?$', name):
+    """Validate that name is a valid Helm chart name (lowercase alphanumeric and hyphens).
+    
+    Accepts single character names (a-z0-9) or names starting and ending with alphanumeric
+    with hyphens allowed in the middle.
+    """
+    if not re.match(r'^[a-z0-9]([a-z0-9-]*[a-z0-9])?$', name):
         raise ValueError(
             f"Invalid chart name: '{name}'. Chart names must start and end with a lowercase letter or digit, "
             "and contain only lowercase letters, digits, and hyphens."
@@ -456,7 +460,7 @@ vendor/
 env/
 venv/
 
-# Development files
+# Development/source code test files (not Helm test hooks in templates/tests/)
 *_test.py
 *_test.go
 *.test
