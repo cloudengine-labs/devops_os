@@ -17,6 +17,7 @@ import cli.scaffold_sre as scaffold_sre
 import cli.scaffold_devcontainer as scaffold_devcontainer
 import cli.scaffold_unittest as scaffold_unittest
 import cli.scaffold_hardening as scaffold_hardening
+import cli.scaffold_helm as scaffold_helm
 import cli.process_first as process_first
 from cli import __version__
 from cli.devcontainer_templates import (
@@ -68,6 +69,7 @@ def main(
       python -m cli.devopsos scaffold gha --help                     # GitHub Actions scaffold options
       python -m cli.devopsos scaffold gitlab --type build            # GitLab CI build pipeline
       python -m cli.devopsos scaffold argocd --app-name my-app       # Argo CD application manifest
+      python -m cli.devopsos scaffold helm --name my-app             # Helm chart scaffold
       python -m cli.devopsos scaffold jenkins --help                 # Jenkins pipeline options
       python -m cli.devopsos scaffold sre --help                     # SRE resources (SLOs, alerts, dashboards)
       python -m cli.devopsos scaffold devcontainer --help            # dev container configuration
@@ -690,6 +692,76 @@ def scaffold_hardening_cmd(
     if compliance_framework:
         flags += ["--compliance-framework", compliance_framework]
     _run_scaffold(scaffold_hardening.main, flags)
+
+
+# ── scaffold helm ────────────────────────────────────────────────────────────
+
+@scaffold_app.command("helm")
+def scaffold_helm_cmd(
+    ctx: typer.Context,
+    name: str = typer.Option("my-app", envvar="DEVOPS_OS_HELM_NAME",
+                              help="Application name"),
+    description: str = typer.Option("A Helm chart for Kubernetes", envvar="DEVOPS_OS_HELM_DESCRIPTION",
+                                     help="Chart description"),
+    chart_version: str = typer.Option("0.1.0", "--chart-version", envvar="DEVOPS_OS_HELM_CHART_VERSION",
+                                       help="Chart version"),
+    app_version: str = typer.Option("1.0.0", "--app-version", envvar="DEVOPS_OS_HELM_APP_VERSION",
+                                     help="Application version"),
+    namespace: str = typer.Option("default", envvar="DEVOPS_OS_HELM_NAMESPACE",
+                                   help="Kubernetes namespace to deploy into"),
+    image: str = typer.Option("ghcr.io/myorg/my-app", envvar="DEVOPS_OS_HELM_IMAGE",
+                               help="Container image URL"),
+    image_tag: str = typer.Option("latest", "--image-tag", envvar="DEVOPS_OS_HELM_IMAGE_TAG",
+                                   help="Container image tag"),
+    replicas: int = typer.Option(1, envvar="DEVOPS_OS_HELM_REPLICAS",
+                                  help="Number of replicas"),
+    port: int = typer.Option(8080, envvar="DEVOPS_OS_HELM_PORT",
+                              help="Container port"),
+    service_type: str = typer.Option("ClusterIP", "--service-type", envvar="DEVOPS_OS_HELM_SERVICE_TYPE",
+                                      help="Kubernetes Service type (ClusterIP, NodePort, LoadBalancer)"),
+    author: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_HELM_AUTHOR",
+                                help="Chart author"),
+    output_dir: str = typer.Option(".", "--output-dir", envvar="DEVOPS_OS_HELM_OUTPUT_DIR",
+                                    help="Root output directory"),
+):
+    """Generate a Helm chart scaffold for Kubernetes deployment.
+
+    \b
+    Output structure (default: chart/ directory):
+      chart/
+      ├── Chart.yaml               Chart metadata
+      ├── values.yaml              Default values
+      ├── templates/
+      │   ├── deployment.yaml      Kubernetes Deployment
+      │   ├── service.yaml         Kubernetes Service
+      │   ├── configmap.yaml       ConfigMap for configuration
+      │   ├── _helpers.tpl         Helm template helpers
+      │   ├── NOTES.txt            Post-deployment notes
+      │   └── .helmignore          Helm ignore patterns
+      └── README.md                Chart documentation
+
+    \b
+    Examples:
+      devopsos scaffold helm --name my-app --image ghcr.io/org/app:latest
+      devopsos scaffold helm --name api-service --replicas 3 --image-tag v2.0
+      devopsos scaffold helm --name web --service-type LoadBalancer --port 3000
+    """
+    _show_help_if_no_opts(ctx)
+    flags = [
+        "--name", name,
+        "--description", description,
+        "--chart-version", chart_version,
+        "--app-version", app_version,
+        "--namespace", namespace,
+        "--image", image,
+        "--image-tag", image_tag,
+        "--replicas", str(replicas),
+        "--port", str(port),
+        "--service-type", service_type,
+        "--author", author,
+        "--output-dir", output_dir,
+    ]
+    _run_scaffold(scaffold_helm.main, flags)
 
 
 @app.command()
