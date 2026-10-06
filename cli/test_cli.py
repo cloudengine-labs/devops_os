@@ -442,6 +442,112 @@ def test_scaffold_sre_slo_latency():
         slo_names = [s["name"] for s in doc["slos"]]
         assert "latency" in slo_names
 
+# -- Helm chart generator -----------------------------------------------
+
+def test_scaffold_helm_default():
+    """Default Helm chart generation creates all required files."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = _run_module("cli.scaffold_helm",
+                            ["--name", "test-app",
+                             "--output-dir", tmp])
+        assert result.returncode == 0
+        chart_dir = Path(tmp) / "chart"
+        assert chart_dir.exists()
+        assert (chart_dir / "Chart.yaml").exists()
+        assert (chart_dir / "values.yaml").exists()
+        assert (chart_dir / "README.md").exists()
+        assert (chart_dir / ".helmignore").exists()
+        templates_dir = chart_dir / "templates"
+        assert templates_dir.exists()
+        assert (templates_dir / "deployment.yaml").exists()
+        assert (templates_dir / "service.yaml").exists()
+        assert (templates_dir / "configmap.yaml").exists()
+        assert (templates_dir / "_helpers.tpl").exists()
+        assert (templates_dir / "NOTES.txt").exists()
+
+def test_scaffold_helm_chart_yaml():
+    """Chart.yaml contains correct metadata."""
+    with tempfile.TemporaryDirectory() as tmp:
+        _run_module("cli.scaffold_helm",
+                   ["--name", "my-app",
+                    "--chart-version", "1.2.3",
+                    "--app-version", "2.0.0",
+                    "--description", "My custom app",
+                    "--output-dir", tmp])
+        chart_path = Path(tmp) / "chart" / "Chart.yaml"
+        with open(chart_path) as fh:
+           chart = yaml.safe_load(fh)
+        assert chart["name"] == "my-app"
+        assert chart["version"] == "1.2.3"
+        assert chart["appVersion"] == "2.0.0"
+        assert chart["description"] == "My custom app"
+        assert chart["apiVersion"] == "v2"
+        assert chart["type"] == "application"
+
+def test_scaffold_helm_values_yaml():
+    """values.yaml contains correct configuration."""
+    with tempfile.TemporaryDirectory() as tmp:
+        _run_module("cli.scaffold_helm",
+                   ["--name", "my-service",
+                    "--replicas", "3",
+                    "--port", "3000",
+                    "--image", "myregistry.com/myapp",
+                    "--image-tag", "v1.2.3",
+                    "--service-type", "LoadBalancer",
+                    "--output-dir", tmp])
+        values_path = Path(tmp) / "chart" / "values.yaml"
+        with open(values_path) as fh:
+           values = yaml.safe_load(fh)
+        assert values["replicaCount"] == 3
+        assert values["service"]["targetPort"] == 3000
+        assert values["service"]["type"] == "LoadBalancer"
+        assert values["image"]["repository"] == "myregistry.com/myapp"
+        assert values["image"]["tag"] == "v1.2.3"
+        assert values["service"]["port"] == 80
+
+def test_scaffold_helm_deployment_template():
+    """Deployment template uses correct Helm template syntax."""
+    with tempfile.TemporaryDirectory() as tmp:
+        _run_module("cli.scaffold_helm",
+                   ["--name", "test-app",
+                    "--output-dir", tmp])
+        deployment_path = Path(tmp) / "chart" / "templates" / "deployment.yaml"
+        with open(deployment_path) as fh:
+           content = fh.read()
+        assert "apiVersion: apps/v1" in content
+        assert "kind: Deployment" in content
+        assert "{{ include" in content  # Helm template syntax
+        assert "{{ .Values" in content  # Helm template syntax
+        assert "test-app" in content
+
+def test_scaffold_helm_service_template():
+    """Service template uses correct Helm template syntax."""
+    with tempfile.TemporaryDirectory() as tmp:
+        _run_module("cli.scaffold_helm",
+                   ["--name", "my-app",
+                    "--output-dir", tmp])
+        service_path = Path(tmp) / "chart" / "templates" / "service.yaml"
+        with open(service_path) as fh:
+           content = fh.read()
+        assert "apiVersion: v1" in content
+        assert "kind: Service" in content
+        assert "{{ include" in content
+        assert "my-app" in content
+
+def test_scaffold_helm_via_cli():
+    """Regression: `python -m cli.devopsos scaffold helm` must work."""
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "helm", "--name", "test-app",
+             "--output-dir", tmp],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
+        )
+        assert result.returncode == 0, result.stderr
+        assert "Helm chart generated" in result.stdout
+        chart_path = Path(tmp) / "chart" / "Chart.yaml"
+        assert chart_path.exists()
+
 # -- Dev Container generator -----------------------------------------------
 
 def test_scaffold_devcontainer_default():
