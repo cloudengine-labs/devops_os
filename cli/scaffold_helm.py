@@ -69,8 +69,8 @@ def parse_arguments():
                         help="Container port")
     parser.add_argument("--service-type", default=os.environ.get(f"{ENV_PREFIX}SERVICE_TYPE", "ClusterIP"),
                         help="Kubernetes Service type (ClusterIP, NodePort, LoadBalancer)")
-    parser.add_argument("--author", default=os.environ.get(f"{ENV_PREFIX}AUTHOR", "DevOps-OS"),
-                        help="Chart author")
+    parser.add_argument("--author", default=os.environ.get(f"{ENV_PREFIX}AUTHOR", ""),
+                        help="Chart author (optional)")
     parser.add_argument("--author-email", default=os.environ.get(f"{ENV_PREFIX}AUTHOR_EMAIL", ""),
                         help="Chart author email (optional)")
     parser.add_argument("--repo-url", default=os.environ.get(f"{ENV_PREFIX}REPO_URL", ""),

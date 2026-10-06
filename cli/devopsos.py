@@ -719,8 +719,8 @@ def scaffold_helm_cmd(
                               help="Container port"),
     service_type: str = typer.Option("ClusterIP", "--service-type", envvar="DEVOPS_OS_HELM_SERVICE_TYPE",
                                       help="Kubernetes Service type (ClusterIP, NodePort, LoadBalancer)"),
-    author: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_HELM_AUTHOR",
-                                help="Chart author"),
+    author: str = typer.Option("", envvar="DEVOPS_OS_HELM_AUTHOR",
+                                help="Chart author (optional)"),
     author_email: str = typer.Option("", "--author-email", envvar="DEVOPS_OS_HELM_AUTHOR_EMAIL",
                                       help="Chart author email (optional)"),
     repo_url: str = typer.Option("", "--repo-url", envvar="DEVOPS_OS_HELM_REPO_URL",
@@ -762,9 +762,10 @@ def scaffold_helm_cmd(
         "--replicas", str(replicas),
         "--port", str(port),
         "--service-type", service_type,
-        "--author", author,
         "--output-dir", output_dir,
     ]
+    if author:
+        flags += ["--author", author]
     if author_email:
         flags += ["--author-email", author_email]
     if repo_url:
