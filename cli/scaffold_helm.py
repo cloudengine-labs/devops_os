@@ -47,7 +47,7 @@ def _validate_helm_chart_name(name):
 # Argument parsing
 # ---------------------------------------------------------------------------
 
-def parse_arguments():
+def parse_arguments(argv=None):
     parser = argparse.ArgumentParser(description="Generate Helm chart for DevOps-OS")
     parser.add_argument("--name", default=os.environ.get(f"{ENV_PREFIX}NAME", "my-app"),
                         help="Application name")
@@ -77,7 +77,7 @@ def parse_arguments():
                         help="Repository URL for home and sources (optional)")
     parser.add_argument("--output-dir", default=os.environ.get(f"{ENV_PREFIX}OUTPUT_DIR", "."),
                         help="Root output directory")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     # Validate chart name
     try:
         args.name = _validate_helm_chart_name(args.name)
@@ -447,7 +447,6 @@ def generate_helmignore():
 .idea/
 *.iml
 .vscode/
-*.vscode
 .env
 
 # Common dependency patterns to ignore
