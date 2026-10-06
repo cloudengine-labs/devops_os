@@ -721,6 +721,10 @@ def scaffold_helm_cmd(
                                       help="Kubernetes Service type (ClusterIP, NodePort, LoadBalancer)"),
     author: str = typer.Option("DevOps-OS", envvar="DEVOPS_OS_HELM_AUTHOR",
                                 help="Chart author"),
+    author_email: str = typer.Option("", "--author-email", envvar="DEVOPS_OS_HELM_AUTHOR_EMAIL",
+                                      help="Chart author email (optional)"),
+    repo_url: str = typer.Option("", "--repo-url", envvar="DEVOPS_OS_HELM_REPO_URL",
+                                  help="Repository URL for home and sources (optional)"),
     output_dir: str = typer.Option(".", "--output-dir", envvar="DEVOPS_OS_HELM_OUTPUT_DIR",
                                     help="Root output directory"),
 ):
@@ -761,6 +765,10 @@ def scaffold_helm_cmd(
         "--author", author,
         "--output-dir", output_dir,
     ]
+    if author_email:
+        flags += ["--author-email", author_email]
+    if repo_url:
+        flags += ["--repo-url", repo_url]
     _run_scaffold(scaffold_helm.main, flags)
 
 

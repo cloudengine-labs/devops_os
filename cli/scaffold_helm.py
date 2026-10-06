@@ -71,6 +71,10 @@ def parse_arguments():
                         help="Kubernetes Service type (ClusterIP, NodePort, LoadBalancer)")
     parser.add_argument("--author", default=os.environ.get(f"{ENV_PREFIX}AUTHOR", "DevOps-OS"),
                         help="Chart author")
+    parser.add_argument("--author-email", default=os.environ.get(f"{ENV_PREFIX}AUTHOR_EMAIL", ""),
+                        help="Chart author email (optional)")
+    parser.add_argument("--repo-url", default=os.environ.get(f"{ENV_PREFIX}REPO_URL", ""),
+                        help="Repository URL for home and sources (optional)")
     parser.add_argument("--output-dir", default=os.environ.get(f"{ENV_PREFIX}OUTPUT_DIR", "."),
                         help="Root output directory")
     args = parser.parse_args()
@@ -110,7 +114,7 @@ def _write_yaml(path, data):
 
 def generate_chart_yaml(args):
     """Generate Chart.yaml with chart metadata."""
-    return {
+    chart = {
         "apiVersion": "v2",
         "name": args.name,
         "description": args.description,
@@ -118,15 +122,21 @@ def generate_chart_yaml(args):
         "version": args.chart_version,
         "appVersion": args.app_version,
         "keywords": ["kubernetes", "helm", "application"],
-        "home": "https://github.com/myorg/my-app",
-        "sources": ["https://github.com/myorg/my-app"],
-        "maintainers": [
-            {
-                "name": args.author,
-                "email": "maintainer@example.com"
-            }
-        ]
     }
+    
+    # Add optional maintainer information if provided
+    if args.author or args.author_email:
+        maintainer = {"name": args.author}
+        if args.author_email:
+            maintainer["email"] = args.author_email
+        chart["maintainers"] = [maintainer]
+    
+    # Add optional repository URLs if provided
+    if args.repo_url:
+        chart["home"] = args.repo_url
+        chart["sources"] = [args.repo_url]
+    
+    return chart
 
 
 def generate_values_yaml(args):
@@ -201,44 +211,45 @@ def generate_values_yaml(args):
 
 def generate_deployment_template(args):
     """Generate templates/deployment.yaml template."""
-    deployment = """apiVersion: apps/v1
+    chart_name = args.name
+    deployment = f"""apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "{{ .Chart.Name }}.fullname" . }}
+  name: {{{{ include "{chart_name}.fullname" . }}}}
   labels:
-    {{- include "{{ .Chart.Name }}.labels" . | nindent 4 }}
+    {{{{- include "{chart_name}.labels" . | nindent 4 }}}}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  {{{{- if not .Values.autoscaling.enabled }}}}
+  replicas: {{{{ .Values.replicaCount }}}}
+  {{{{- end }}}}
   selector:
     matchLabels:
-      {{- include "{{ .Chart.Name }}.selectorLabels" . | nindent 6 }}
+      {{{{- include "{chart_name}.selectorLabels" . | nindent 6 }}}}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{{{- with .Values.podAnnotations }}}}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{{{- toYaml . | nindent 8 }}}}
+      {{{{- end }}}}
       labels:
-        {{- include "{{ .Chart.Name }}.selectorLabels" . | nindent 8 }}
+        {{{{- include "{chart_name}.selectorLabels" . | nindent 8 }}}}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{{{- with .Values.imagePullSecrets }}}}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "{{ .Chart.Name }}.serviceAccountName" . }}
+        {{{{- toYaml . | nindent 8 }}}}
+      {{{{- end }}}}
+      serviceAccountName: {{{{ include "{chart_name}.serviceAccountName" . }}}}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{{{- toYaml .Values.podSecurityContext | nindent 8 }}}}
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {chart_name}
         securityContext:
-          {{- toYaml .Values.securityContext | nindent 12 }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{{{- toYaml .Values.securityContext | nindent 12 }}}}
+        image: "{{{{ .Values.image.repository }}}}:{{{{ .Values.image.tag | default .Chart.AppVersion }}}}"
+        imagePullPolicy: {{{{ .Values.image.pullPolicy }}}}
         ports:
         - name: http
-          containerPort: {{ .Values.service.targetPort }}
+          containerPort: {{{{ .Values.service.targetPort }}}}
           protocol: TCP
         livenessProbe:
           httpGet:
@@ -253,69 +264,71 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
         resources:
-          {{- toYaml .Values.resources | nindent 12 }}
-        {{- if .Values.configMap.enabled }}
+          {{{{- toYaml .Values.resources | nindent 12 }}}}
+        {{{{- if .Values.configMap.enabled }}}}
         envFrom:
         - configMapRef:
-            name: {{ include "{{ .Chart.Name }}.fullname" . }}
-        {{- end }}
-        {{- with .Values.env }}
+            name: {{{{ include "{chart_name}.fullname" . }}}}
+        {{{{- end }}}}
+        {{{{- with .Values.env }}}}
         env:
-          {{- toYaml . | nindent 12 }}
-        {{- end }}
-      {{- with .Values.nodeSelector }}
+          {{{{- toYaml . | nindent 12 }}}}
+        {{{{- end }}}}
+      {{{{- with .Values.nodeSelector }}}}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
+        {{{{- toYaml . | nindent 8 }}}}
+      {{{{- end }}}}
+      {{{{- with .Values.affinity }}}}
       affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
+        {{{{- toYaml . | nindent 8 }}}}
+      {{{{- end }}}}
+      {{{{- with .Values.tolerations }}}}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{{{- toYaml . | nindent 8 }}}}
+      {{{{- end }}}}
 """
-    return deployment.replace("{{ .Chart.Name }}", args.name)
+    return deployment
 
 
 def generate_service_template(args):
     """Generate templates/service.yaml template."""
-    service = """apiVersion: v1
+    chart_name = args.name
+    service = f"""apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "{{ .Chart.Name }}.fullname" . }}
+  name: {{{{ include "{chart_name}.fullname" . }}}}
   labels:
-    {{- include "{{ .Chart.Name }}.labels" . | nindent 4 }}
+    {{{{- include "{chart_name}.labels" . | nindent 4 }}}}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{{{ .Values.service.type }}}}
   ports:
-    - port: {{ .Values.service.port }}
+    - port: {{{{ .Values.service.port }}}}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{- include "{{ .Chart.Name }}.selectorLabels" . | nindent 4 }}
+    {{{{- include "{chart_name}.selectorLabels" . | nindent 4 }}}}
 """
-    return service.replace("{{ .Chart.Name }}", args.name)
+    return service
 
 
 def generate_configmap_template(args):
     """Generate templates/configmap.yaml template."""
-    configmap = """{{- if .Values.configMap.enabled }}
+    chart_name = args.name
+    configmap = f"""{{{{- if .Values.configMap.enabled }}}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "{{ .Chart.Name }}.fullname" . }}
+  name: {{{{ include "{chart_name}.fullname" . }}}}
   labels:
-    {{- include "{{ .Chart.Name }}.labels" . | nindent 4 }}
+    {{{{- include "{chart_name}.labels" . | nindent 4 }}}}
 data:
-  {{- with .Values.configMap.data }}
-  {{- toYaml . | nindent 2 }}
-  {{- end }}
-{{- end }}
+  {{{{- with .Values.configMap.data }}}}
+  {{{{- toYaml . | nindent 2 }}}}
+  {{{{- end }}}}
+{{{{- end }}}}
 """
-    return configmap.replace("{{ .Chart.Name }}", args.name)
+    return configmap
 
 
 def generate_helpers_template(args):
@@ -416,7 +429,7 @@ def generate_helmignore():
     """Generate .helmignore file."""
     return """# Patterns to ignore when building packages.
 # This supports shell glob patterns, relative paths, and negated patterns
-# as per https://www.gnu.org/software/findutils/manual/html_node/find_002dname.html#find_002dname
+# as per .gitignore syntax: https://git-scm.com/docs/gitignore
 
 # Remove build artifacts from the local charts repository context before charting
 .DS_Store
