@@ -731,14 +731,14 @@ def scaffold_helm_cmd(
       chart/
       ├── Chart.yaml               Chart metadata
       ├── values.yaml              Default values
-      ├── templates/
-      │   ├── deployment.yaml      Kubernetes Deployment
-      │   ├── service.yaml         Kubernetes Service
-      │   ├── configmap.yaml       ConfigMap for configuration
-      │   ├── _helpers.tpl         Helm template helpers
-      │   ├── NOTES.txt            Post-deployment notes
-      │   └── .helmignore          Helm ignore patterns
-      └── README.md                Chart documentation
+      ├── .helmignore              Helm ignore patterns
+      ├── README.md                Chart documentation
+      └── templates/
+          ├── deployment.yaml      Kubernetes Deployment
+          ├── service.yaml         Kubernetes Service
+          ├── configmap.yaml       ConfigMap for configuration
+          ├── _helpers.tpl         Helm template helpers
+          └── NOTES.txt            Post-deployment notes
 
     \b
     Examples:

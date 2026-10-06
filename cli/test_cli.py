@@ -537,12 +537,11 @@ def test_scaffold_helm_service_template():
 def test_scaffold_helm_via_cli():
     """Regression: `python -m cli.devopsos scaffold helm` must work."""
     with tempfile.TemporaryDirectory() as tmp:
-        env = {**os.environ, "DEVOPS_OS_HELM_OUTPUT_DIR": tmp}
         result = subprocess.run(
-           [sys.executable, "-m", "cli.devopsos", "scaffold", "helm", "--name", "test-app"],
-           capture_output=True, text=True,
-           cwd=os.path.dirname(os.path.dirname(__file__)),
-           env=env,
+            [sys.executable, "-m", "cli.devopsos", "scaffold", "helm", "--name", "test-app",
+             "--output-dir", tmp],
+            capture_output=True, text=True,
+            cwd=os.path.dirname(os.path.dirname(__file__)),
         )
         assert result.returncode == 0, result.stderr
         assert "Helm chart generated" in result.stdout

@@ -10,22 +10,37 @@ Outputs:
   chart/                          (default output dir)
   ├── Chart.yaml                  Chart metadata
   ├── values.yaml                 Default values
-  ├── templates/
-  │   ├── deployment.yaml         Kubernetes Deployment
-  │   ├── service.yaml            Kubernetes Service
-  │   ├── configmap.yaml          ConfigMap for configuration
-  │   ├── _helpers.tpl            Helm template helpers
-  │   ├── NOTES.txt               Post-deployment notes
-  │   └── .helmignore             Helm ignore patterns
-  └── README.md                   Chart documentation
+  ├── .helmignore                 Helm ignore patterns
+  ├── README.md                   Chart documentation
+  └── templates/
+      ├── deployment.yaml         Kubernetes Deployment
+      ├── service.yaml            Kubernetes Service
+      ├── configmap.yaml          ConfigMap for configuration
+      ├── _helpers.tpl            Helm template helpers
+      └── NOTES.txt               Post-deployment notes
 """
 
 import os
 import argparse
+import re
 import yaml
 from pathlib import Path
 
 ENV_PREFIX = "DEVOPS_OS_HELM_"
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+def _validate_helm_chart_name(name):
+    """Validate that name is a valid Helm chart name (lowercase alphanumeric and hyphens)."""
+    if not re.match(r'^[a-z0-9]([-a-z0-9]*[a-z0-9])?$', name):
+        raise ValueError(
+            f"Invalid chart name: '{name}'. Chart names must start and end with a lowercase letter or digit, "
+            "and contain only lowercase letters, digits, and hyphens."
+        )
+    return name
 
 
 # ---------------------------------------------------------------------------
@@ -58,7 +73,13 @@ def parse_arguments():
                         help="Chart author")
     parser.add_argument("--output-dir", default=os.environ.get(f"{ENV_PREFIX}OUTPUT_DIR", "."),
                         help="Root output directory")
-    return parser.parse_args()
+    args = parser.parse_args()
+    # Validate chart name
+    try:
+        args.name = _validate_helm_chart_name(args.name)
+    except ValueError as e:
+        parser.error(str(e))
+    return args
 
 
 # ---------------------------------------------------------------------------
@@ -412,7 +433,6 @@ def generate_helmignore():
 .idea/
 *.iml
 .vscode/
-*.swp
 *.vscode
 .env
 
