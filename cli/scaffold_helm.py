@@ -125,7 +125,8 @@ def generate_chart_yaml(args):
     }
     
     # Add optional maintainer information if provided
-    if args.author or args.author_email:
+    # Author name is required; email is only added if both author and email are provided
+    if args.author:
         maintainer = {"name": args.author}
         if args.author_email:
             maintainer["email"] = args.author_email
@@ -456,9 +457,7 @@ vendor/
 env/
 venv/
 
-# Test files
-test/
-tests/
+# Development files
 *_test.py
 *_test.go
 *.test
